@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.jogger</groupId>
+	<artifactId>jogger-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	
+	<packaging>pom</packaging>
+	
+	<name>Jogger</name>
+	<description>Jogger Web Framework Parent</description>
+	
+	<modules>
+		<module>jogger-core</module>
+		<module>jogger-spring</module>
+	</modules>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	
+	<properties>
+		<testng.version>5.13</testng.version>
+		<mockito.version>1.8.5</mockito.version>
+		<slf4j.version>1.6.3</slf4j.version>
+	</properties>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<showDeprecation>false</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<optimize>true</optimize>
+					<compilerVersion>1.6</compilerVersion>
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<distributionManagement>  
+ 		
+ 		<!-- Publish the versioned releases here -->  
+ 		<repository>  
+  			<id>elibom</id>  
+  			<name>Elibom Nexus Repository</name>  
+  			<url>http://repository.elibom.net/nexus/content/repositories/releases</url>  
+ 		</repository>  
+  
+ 		<!-- Publish the snapshots here -->  
+ 		<snapshotRepository>  
+  			<id>elibom</id>  
+  			<name>Elibom Nexus Repository</name>  
+  			<url>http://repository.elibom.net/nexus/content/repositories/snapshots</url>  
+ 		</snapshotRepository>  
+ 		
+	</distributionManagement>
+</project>

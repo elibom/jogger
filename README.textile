@@ -1,0 +1,14 @@
+h1. Jogger Web Framework
+
+Jogger is a lightweight Java library for building Web Applications. It provides a *routing mechanism* - that allows you to map HTTP requests to Java methods - and *Freemarker as the view template engine*.
+
+The truth is that I just wanted a super simple web framework based on Java that would allow me to:
+
+* *Use a better request/response API*: The truth is that the Servlet API sucks.
+* *Map HTTP requests to Java methods*: similar to Play! Framework (which is inspired by Ruby on Rails).
+* *Define views and layouts*: reuse layouts in multiple views.
+* *Plug into any project*: let me choose the project structure and the libraries/frameworks I want to use; don't make this hard on me.
+* *Deploy into any Servlet Container*: such as Jetty, JBoss, etc.
+
+So, I made Jogger during my stay in Barcelona ;)
+
