@@ -5,7 +5,8 @@ import java.text.ParseException;
 import java.util.List;
 
 /**
- * A routes parser.
+ * A routes parser. Receives an {@link InputStream} and parse it into a list of {@link Route} objects. Implementations 
+ * should only check that the syntax is valid, not if the controller or the method exists and can be loaded.
  * 
  * @author German Escobar
  */

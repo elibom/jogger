@@ -8,5 +8,5 @@ Jogger is a lightweight Java library for building Web Applications. It provides 
 * _Plug into any project_: let me choose the project structure and the libraries/frameworks I want to use; don't make this hard on me.
 * _Deploy into any Servlet Container_: such as Jetty, JBoss, etc.
 
-So, I made Jogger - I really like the name BTW ;)
+So, I made Jogger ;)
 

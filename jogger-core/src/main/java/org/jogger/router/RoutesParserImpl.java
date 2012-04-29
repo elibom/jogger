@@ -9,20 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.jogger.Controller;
-import org.jogger.config.ControllerLoader;
-
 /**
- * Default routes parser implementation. This class is not thread-safe.
+ * Default routes parser implementation.  
+ *  
+ * This class is not thread-safe.
  * 
  * @author German Escobar
  */
 public class RoutesParserImpl implements RoutesParser {
-	
-	/**
-	 * Used to validate the controller.
-	 */
-	private ControllerLoader controllerLoader;
 	
 	/**
 	 * Keeps track of the line we are parsing so we don't have to keep passing it through the methods.
@@ -42,11 +36,6 @@ public class RoutesParserImpl implements RoutesParser {
 	 */
 	@Override
 	public List<Route> parse(InputStream inputStream) throws ParseException, RoutesException {
-		
-		// check that the controller loader is set
-		if (controllerLoader == null) {
-			throw new IllegalStateException("No ControllerLoader specified.");
-		}
 		
 		line = 0; // reset line positioning
 		List<Route> routes = new ArrayList<Route>(); // this is what we will fill and return
@@ -78,27 +67,6 @@ public class RoutesParserImpl implements RoutesParser {
 	}
 	
 	/**
-	 * Helper method. Parses the line and returns a route checking that the controller and controller method are valid.
-	 * 
-	 * @param input the string to parse.
-	 * 
-	 * @return a filled {@link Route} object.
-	 * @throws ParseException if the line contains a parsing error.
-	 * @throws RoutesException if another error occurs while creating the route.
-	 */
-	private Route parse(String input) throws ParseException, RoutesException {
-		
-		// create the Route object from the line checking for parsing errors
-		Route route = rawParse(input);
-		
-		// validate controller and method
-		Controller controller = validateController(route.getControllerName());
-		validateMethod(controller, route.getControllerMethod());
-		
-		return route;
-	}
-	
-	/**
 	 * Helper method. Creates a {@link Route} object from the input string.
 	 * 
 	 * @param input the string to parse.
@@ -106,7 +74,7 @@ public class RoutesParserImpl implements RoutesParser {
 	 * @return an 
 	 * @throws ParseException
 	 */
-	private Route rawParse(String input) throws ParseException {
+	private Route parse(String input) throws ParseException {
 		
 		StringTokenizer st = new StringTokenizer(input, " \t");
 		if (st.countTokens() != 3) {
@@ -181,51 +149,6 @@ public class RoutesParserImpl implements RoutesParser {
 		}
 		
 		return beanAndMethod;
-	}
-	
-	/**
-	 * Checks if the controller is valid (i.e. exists and can be loaded).
-	 * 
-	 * @param controllerName the name of the controller to be validated.
-	 * 
-	 * @return a instantiated controller.
-	 * @throws RoutesException if the controller can't be instantiated.
-	 */
-	private Controller validateController(String controllerName) throws RoutesException {
-		
-		Controller controller = null;
-		
-		try {
-			controller = controllerLoader.load(controllerName);
-		} catch (Exception e) {
-			throw new RoutesException("Exception loading the controller '" + controllerName + "': " + e.getMessage(), e, line);
-		}
-		
-		if (controller == null) {
-			throw new RoutesException("Controller '" + controllerName + "' was not found.", line);
-		}
-		
-		return controller;
-	}
-	
-	/**
-	 * Checks if the controller method exists and it's accessible.
-	 * 
-	 * @param controller the controller in which we are going to search for the method.
-	 * @param controllerMethod the method we are searching for.
-	 * 
-	 * @throws RoutesException if the method doesn't exists or can't be accessed.
-	 */
-	private void validateMethod(Controller controller, String controllerMethod) throws RoutesException {
-		try {
-			controller.getClass().getMethod(controllerMethod);
-		} catch (Exception e) {
-			throw new RoutesException("Method '" + controllerMethod + " couldn't be accessed: " + e.getMessage(), e, line);
-		} 
-	}
-
-	public void setControllerLoader(ControllerLoader controllerLoader) {
-		this.controllerLoader = controllerLoader;
 	}
 
 }

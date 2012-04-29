@@ -2,7 +2,6 @@ package org.jogger.config;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.Controller;
 import org.jogger.JoggerServlet;
 
 
@@ -30,13 +29,12 @@ public interface ControllerLoader {
 	 * Returns a controller based on the received argument. 
 	 * 
 	 * @param controllerName can be the name of a class, a Spring bean or any other string that
-	 * identifies a {@link Controller} implementation uniquely.
+	 * identifies a controller uniquely.
 	 * 
-	 * @return an {@link Controller} implementation or null if the controller is not found.
+	 * @return a controller object or null if the controller is not found.
 	 * 
-	 * @throws Exception we will catch any exception in the {@link JoggerServlet} to show it as
-	 * a status 500.
+	 * @throws ConfigurationException if something goes wrong loading the controller.
 	 */
-	Controller load(String controllerName) throws Exception;
+	Object load(String controllerName) throws ConfigurationException;
 	
 }

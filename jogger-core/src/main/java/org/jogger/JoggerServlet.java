@@ -22,8 +22,12 @@ import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.http.servlet.ServletRequest;
 import org.jogger.http.servlet.ServletResponse;
-import org.jogger.router.Route;
+import org.jogger.router.RouteInstance;
+import org.jogger.router.RouteNotFoundException;
+import org.jogger.router.Routes;
 import org.jogger.router.RoutesException;
+import org.jogger.router.RoutesImpl;
+import org.jogger.router.RoutesParser;
 import org.jogger.router.RoutesParserImpl;
 
 import freemarker.template.Configuration;
@@ -37,36 +41,83 @@ public class JoggerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	
-	private RoutesParserImpl routesParser;
+	/**
+	 * A routes store that exposes methods to load and find routes.
+	 */
+	private Routes routes;
 	
-	private ControllerLoader controllerLoader;
+	/**
+	 * Contains the interceptors that we must check on each request.
+	 */
+	private Interceptors interceptors;
 	
-	private Interceptors interceptorsConfig;
-	
+	/**
+	 * The FreeMarker configuration
+	 */
 	private Configuration freemarker;
 	
-	private List<Route> routes;
-
 	@Override
 	public void init() throws ServletException {
 		
 		try {
-			
-			controllerLoader = getControllerLoader();
-			controllerLoader.init(getServletConfig());
-			
-			routesParser = new RoutesParserImpl();
-			routesParser.setControllerLoader(controllerLoader);
+			routes = createRoutes();
 			
 			freemarker = new Configuration();
 			freemarker.setServletContextForTemplateLoading(getServletContext(), getTemplatesLocation());
 			
-			interceptorsConfig = getInterceptorsConfig();
-			interceptorsConfig.initialize(getServletConfig());
+			interceptors = createInterceptors();
 			
-			loadRoutes();
 		} catch (Exception e) {
 			throw new ServletException(e);
+		}
+		
+	}
+	
+	/**
+	 * Creates the {@link Routes} implementation and loads the routes.
+	 * 
+	 * @return an initialized {@link Routes} implementation. 
+	 * 
+	 * @throws ParseException if there is a parsing problem while loading the routes.
+	 * @throws RoutesException if there is a problem loading a controller.
+	 */
+	private Routes createRoutes() throws ParseException, RoutesException {
+		
+		ControllerLoader controllerLoader = getControllerLoader();
+		RoutesParser routesParser = new RoutesParserImpl();
+		
+		RoutesImpl routes = new RoutesImpl();
+		routes.setControllerLoader(controllerLoader);
+		routes.setRoutesParser(routesParser);
+		
+		loadRoutes(routes);
+		
+		return routes;
+	}
+	
+	/**
+	 * Loads the routes from the routes.config file. Routes are stored in the {@link Routes} object.
+	 * 
+	 * @param routes we are actually going to use this object to load the routes.
+	 * 
+	 * @throws ParseException if there is a parsing error while loading the routes.
+	 * @throws RoutesException if there is a problem loading a controller
+	 */
+	private void loadRoutes(Routes routes) throws ParseException, RoutesException {
+		
+		// get the routes.config location
+		String routesConfigLocation = getServletConfig().getInitParameter("routesConfigLocation");
+		if (routesConfigLocation == null) {
+			routesConfigLocation = "/WEB-INF/routes.config";
+		}
+		
+		// we don't want two or more threads loading routes at the same time although this can only happen in
+		// development mode.
+		synchronized(routes) {
+			
+			InputStream inputStream = getServletContext().getResourceAsStream(routesConfigLocation);; 
+			routes.load(inputStream);
+			
 		}
 		
 	}
@@ -75,9 +126,9 @@ public class JoggerServlet extends HttpServlet {
 	 * Loads the controller loader using the Java Service Loader mechanism.
 	 * 
 	 * @return the {@link ControllerLoader} implementation to be used.
-	 * @throws Exception if there is more than one controller loader in classpath
+	 * @throws IllegalStateException if there is more than one controller loader in classpath
 	 */
-	private ControllerLoader getControllerLoader() throws Exception {
+	private ControllerLoader getControllerLoader() throws IllegalStateException {
 		
 		// this is what we will actually return - set the default one
 		ControllerLoader controllerLoader = new DefaultControllerLoader();
@@ -93,8 +144,10 @@ public class JoggerServlet extends HttpServlet {
 		
 		// check if we have more than one controller loader
 		if (iterator.hasNext()) {
-			throw new Exception("There is more than one Jogger loader in classpath");
+			throw new IllegalStateException("There is more than one Jogger loader in classpath");
 		}
+		
+		controllerLoader.init(getServletConfig());
 		
 		return controllerLoader;
 	}
@@ -108,7 +161,7 @@ public class JoggerServlet extends HttpServlet {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 */
-	private Interceptors getInterceptorsConfig() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+	private Interceptors createInterceptors() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 		
 		// check if the user has provided a class with the list of interceptors
 		String interceptorsClass = getServletConfig().getInitParameter("interceptorsClass");
@@ -129,52 +182,30 @@ public class JoggerServlet extends HttpServlet {
 		
 		// load the class and return a new instance
 		Class<? extends Interceptors> clazz = Class.forName(interceptorsClass).asSubclass(Interceptors.class); 
-		return clazz.newInstance();
+		Interceptors interceptors = clazz.newInstance();
+		
+		// initialize the interceptors
+		interceptors.initialize(getServletConfig());
+		
+		return interceptors;
 		
 	}
 
 	@Override
 	protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
 		
-		// reload routes if we are working on development mode
-		if (isDevelopmentEnv()) {
-			try {
-				loadRoutes();
-			} catch (Exception e) {
-				throw new ServletException(e);
-			}
-		}
-		
 		Request request = new ServletRequest(servletRequest);
 		Response response = new ServletResponse(servletResponse, freemarker);
 		
-		final Route route = findRoute(request.getMethod(), request.getPath());
-		
-		// if no route found, use the default dispatcher
-		if (route == null) {
-			forward(servletRequest, servletResponse);
-			return;
-		}
-		
 		try {
 			
-			// load the controller
-			Controller controller = controllerLoader.load(route.getControllerName());
-			controller.init(request, response);
+			// delegate call using the request/response wrappers
+			service(request, response);
 			
-			// load the interceptors of the request
-			List<Interceptor> interceptors = interceptorsConfig.getInterceptors(request.getPath());
-			
-			// execute the controller
-			ControllerExecutor controllerExecutor = new ControllerExecutor(route, controller, request, response, 
-					interceptors);   
-			controllerExecutor.proceed();
-			
-			// clean
-			controller = null;
-			
+		} catch (RouteNotFoundException e) {
+			forward(servletRequest, servletResponse);
+			return;
 		} catch (Exception e) {
-			
 			/* TODO create a mechanism to handle exceptions, it could be a default template for 500 errors */
 			servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(servletResponse.getWriter());
@@ -183,29 +214,11 @@ public class JoggerServlet extends HttpServlet {
 	}
 	
 	/**
-	 * Helper method. Searches for a route that matches the HTTP method and the path.
-	 * 
-	 * @param httpMethod the HTTP method of the request.
-	 * @param path the path of the request.
-	 * 
-	 * @return a {@link Route} that matches the httpMethod and path; or null if no route matches.
-	 */
-	private Route findRoute(String httpMethod, String path) {
-		
-		for (Route r : routes) {
-			if (r.getPath().equalsIgnoreCase(path) && r.getHttpMethod().equalsIgnoreCase(httpMethod)) {
-				return r;
-			}
-		}
-		
-		return null;
-	}
-	
-	/**
 	 * Helper method. Forwards a request to the default dispatcher.
 	 * 
 	 * @param request
 	 * @param response
+	 * 
 	 * @throws ServletException
 	 * @throws IOException
 	 */
@@ -215,38 +228,39 @@ public class JoggerServlet extends HttpServlet {
 	}
 	
 	/**
-	 * Helper method. Loads the routes from the routes.config file into the <em>routes attribute</em>. It is called
-	 * when the Servlet initializes and when a request is received in development mode.
+	 * Service the request using our {@link Request} and {@link Response} objects. It's public so we can test it.
 	 * 
-	 * @throws ParseException
-	 * @throws RoutesException
-	 */
-	private synchronized void loadRoutes() throws ParseException, RoutesException {
-		
-		// load the routes.config file as an InputStream
-		String routesConfigLocation = getRoutesConfigLocation();
-		InputStream inputStream = getServletContext().getResourceAsStream(routesConfigLocation);
-		
-		// parse the input stream and set the routes attribute
-		routes = routesParser.parse(inputStream);
-		
-	}
-	
-	/**
-	 * Helper method. Searches for the routes configuration file path in the <em>init params</em> of the Servlet. If 
-	 * not found, it returns a default location. 
+	 * @param request
+	 * @param response
 	 * 
-	 * @return a string with the path of the routes configuration file.
+	 * @throws RouteNotFoundException
+	 * @throws Exception
 	 */
-	private String getRoutesConfigLocation() {
+	public void service(Request request, Response response) throws RouteNotFoundException, Exception {
 		
-		String routesConfigLocation = getServletConfig().getInitParameter("routesConfigLocation");
-		if (routesConfigLocation == null) {
-			routesConfigLocation = "/WEB-INF/routes.config";
+		// reload routes if we are working on development mode
+		if (isDevelopmentEnv()) {
+			loadRoutes(routes);
 		}
 		
-		return routesConfigLocation;
+		RouteInstance routeInstance = routes.find(request.getMethod(), request.getPath());
 		
+		// if no route found, use the default dispatcher
+		if (routeInstance == null) {
+			throw new RouteNotFoundException("No route found for method '" + request.getMethod() + "' and path '" 
+					+ request.getPath() + "'");
+		}
+			
+		// load the interceptors of the request
+		List<Interceptor> requestInterceptors = interceptors.getInterceptors(request.getPath());
+			
+		// execute the controller
+		ControllerExecutor controllerExecutor = new ControllerExecutor(routeInstance, request, response, 
+				requestInterceptors);   
+		controllerExecutor.proceed();
+			
+		// clean
+		routeInstance = null;
 	}
 	
 	/**
@@ -274,9 +288,9 @@ public class JoggerServlet extends HttpServlet {
 	 */
 	private boolean isDevelopmentEnv() {
 		
-		String env = System.getProperty("BROADCAST_ENV");
+		String env = System.getProperty("JOGGER_ENV");
 		if (env == null) {
-			env = System.getenv("BROADCAST_ENV");
+			env = System.getenv("JOGGER_ENV");
 		}
 		
 		if (env == null || "dev".equalsIgnoreCase(env)) {
@@ -295,9 +309,7 @@ public class JoggerServlet extends HttpServlet {
 	 */
 	private class ControllerExecutor implements InterceptorChain {
 		
-		private Route route;
-		
-		private Controller controller;
+		private RouteInstance routeInstance;
 		
 		private Request request;
 		
@@ -307,9 +319,8 @@ public class JoggerServlet extends HttpServlet {
 		
 		private int index = 0;
 		
-		public ControllerExecutor(Route route, Controller controller, Request request, Response response, List<Interceptor> interceptors) {
-			this.route = route;
-			this.controller = controller;
+		public ControllerExecutor(RouteInstance routeInstance, Request request, Response response, List<Interceptor> interceptors) {
+			this.routeInstance = routeInstance;
 			this.request = request;
 			this.response = response;
 			this.interceptors = interceptors;
@@ -320,8 +331,11 @@ public class JoggerServlet extends HttpServlet {
 			
 			// if we finished executing all the interceptors, call the controller method
 			if (index == interceptors.size()) {
-				Method method = controller.getClass().getMethod(route.getControllerMethod());
-				method.invoke(controller);
+				
+				Object controller = routeInstance.getController();
+				Method method = routeInstance.getMethod();
+				
+				method.invoke(controller, request, response);
 				
 				return;
 			}
@@ -335,7 +349,18 @@ public class JoggerServlet extends HttpServlet {
 			
 		}
 		
-		
-		
 	}
+
+	public void setRoutes(Routes routes) {
+		this.routes = routes;
+	}
+
+	public void setInterceptors(Interceptors interceptors) {
+		this.interceptors = interceptors;
+	}
+
+	public void setFreemarker(Configuration freemarker) {
+		this.freemarker = freemarker;
+	}
+	
 }

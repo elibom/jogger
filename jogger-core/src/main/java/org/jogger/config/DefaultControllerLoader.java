@@ -2,8 +2,6 @@ package org.jogger.config;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.Controller;
-
 /**
  * This is the default controller loading strategy. It loads the controller from the classpath using the current 
  * Java loader.
@@ -13,6 +11,11 @@ import org.jogger.Controller;
 public class DefaultControllerLoader implements ControllerLoader {
 	
 	public static final String BASE_PACKAGE_INIT_PARAM_NAME = "basePackage";
+	
+	/**
+	 * The class loader we are using to load the class.
+	 */
+	private ClassLoader classLoader = getClass().getClassLoader();
 	
 	/**
 	 * Stores the base package used to load the controller.
@@ -31,14 +34,29 @@ public class DefaultControllerLoader implements ControllerLoader {
 	}
 
 	@Override
-	public Controller load(String controllerName) throws Exception {
+	public Object load(String controllerName) throws ConfigurationException {
 		
 		String className = basePackage + controllerName;
 		
-		// load the controller class and instantiate it
-		Class<? extends Controller> controllerClass = Class.forName(className).asSubclass(Controller.class);
-		return controllerClass.newInstance();
+		try {
+			
+			// load the controller class and instantiate it
+			Class<?> controllerClass = classLoader.loadClass(className);
+			return controllerClass.newInstance();
+			
+		} catch (Exception e) {
+			throw new ConfigurationException(e);
+		}
 		
+	}
+
+	public void setClassLoader(ClassLoader classLoader) {
+		
+		if (classLoader == null) {
+			throw new IllegalStateException("classLoader cannot be null");
+		}
+		
+		this.classLoader = classLoader;
 	}
 
 }

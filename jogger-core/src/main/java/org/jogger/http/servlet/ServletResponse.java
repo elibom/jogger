@@ -143,6 +143,14 @@ public class ServletResponse implements Response {
 
 	@Override
 	public Response setAttribute(String name, Object object) {
+		if (name == null || "".equals(name)) {
+			throw new IllegalArgumentException("No name specified");
+		}
+		
+		if (object == null) {
+			throw new IllegalArgumentException("No object specified");
+		}
+		
 		attributes.put(name, object);
 		
 		return this;
