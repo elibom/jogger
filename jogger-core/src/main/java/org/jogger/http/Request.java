@@ -12,15 +12,28 @@ public interface Request {
 
 	String getHost();
 	
+	/**
+	 * Returns the path that was requested without the context path - if any. For example, if the URL is
+	 * "http://localhost:8080/app/users/1", the path would be "/users/1".
+	 * 
+	 * @return a String object with the path of the request.
+	 */
 	String getPath();
 	
 	String getQueryString();
 	
 	/**
-	 * @return the full URL with host, port, path and query string
+	 * Returns the full URL including scheme, host, port, path and query string.
+	 * 
+	 * @return a String object with the URL.
 	 */
 	String getUrl();
 	
+	/**
+	 * Returns the HTTP method of the request. 
+	 * 
+	 * @return a String object with the HTTP method.
+	 */
 	String getMethod();
 	
 	String getRemoteAddress();
@@ -31,6 +44,11 @@ public interface Request {
 	
 	boolean isSecure();
 	
+	/**
+	 * Tells whether the request was done using an AJAX call or not.
+	 * 
+	 * @return true if this was an AJAX call, false otherwise.
+	 */
 	boolean isAjax();
 	
 	Map<String,Cookie> getCookies();
@@ -48,6 +66,11 @@ public interface Request {
 	
 	String getHeader(String name);
 	
+	/**
+	 * Returns an object that will allow us to retrieve the body in multiple ways.
+	 * 
+	 * @return a {@link BodyParser} implementation.
+	 */
 	BodyParser getBody();
 	
 	/**
@@ -59,7 +82,9 @@ public interface Request {
 	interface BodyParser {
 		
 		/**
-		 * @return the body as a string.
+		 * Returns the body of the request as a string.
+		 * 
+		 * @return a String object with the body.
 		 */
 		String asString();
 		

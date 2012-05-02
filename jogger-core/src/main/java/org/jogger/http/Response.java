@@ -48,6 +48,11 @@ public interface Response {
 	 */
 	Response unauthorized();
 	
+	/**
+	 * Sets the status of the response to 404 - Not Found.
+	 * 
+	 * @return itself for method chaining.
+	 */
 	Response notFound();
 	
 	String getContentType();
