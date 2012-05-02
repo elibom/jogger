@@ -36,6 +36,7 @@
 	<modules>
 		<module>jogger-core</module>
 		<module>jogger-spring</module>
+		<module>jogger-archetype</module>
 	</modules>
 	
 	<dependencies>
