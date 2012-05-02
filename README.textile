@@ -6,7 +6,7 @@ Jogger is a lightweight Java library for building Web Applications. It provides 
 * _Map HTTP requests to Java methods_: similar to Play! Framework (which is inspired by Ruby on Rails).
 * _Define views and layouts_: reuse layouts in multiple views.
 * _Plug into any project_: let me choose the project structure and the libraries/frameworks I want to use; don't make this hard on me.
-* _Deploy into any Servlet Container_: such as Jetty, JBoss, etc.
+* _Deploy into any Servlet Container_: such as Jetty or Tomcat.
 
 So, I made Jogger ;)
 
