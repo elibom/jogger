@@ -21,7 +21,7 @@ public interface Routes {
 	void load(InputStream inputStream) throws ParseException, RoutesException;
 	
 	/**
-	 * Tries to find a route that matches the method and path, initializes the {@link Controller} implementation and
+	 * Tries to find a route that matches the method and path, retrieves or instantiates the controller and
 	 * retrieves the method to be invoked.
 	 * 
 	 * @param httpMethod the HTTP method that we are going to use to find the route.

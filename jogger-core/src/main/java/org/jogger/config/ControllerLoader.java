@@ -9,7 +9,7 @@ import org.jogger.JoggerServlet;
  * This interface is implemented by classes that provide a controller loading strategy. For example:
  * 
  * <ul>
- * 	<li>From the classpath (i.e. the {@DefaultControllerLoader}).</li>
+ * 	<li>From the classpath (i.e. the {@link DefaultControllerLoader}).</li>
  * 	<li>From a Spring Application Context.</li>
  * 	<li>From a Google Guice Module.</li>
  * </ul>

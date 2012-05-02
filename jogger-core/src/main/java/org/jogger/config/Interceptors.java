@@ -21,7 +21,7 @@ public abstract class Interceptors {
 	private List<InterceptorEntry> entries = new ArrayList<InterceptorEntry>();
 	
 	/**
-	 * Creates a new {@link InterceptorEntry} and adds it to the list of entries.
+	 * Stores a new {@link Interceptor} implementation with the specified paths.
 	 * 
 	 * @param interceptor the interceptor to be added.
 	 * @param paths the paths for which this interceptor will be executed.
@@ -38,7 +38,7 @@ public abstract class Interceptors {
 	 * Returns a list of interceptors that match a path
 	 * 
 	 * @param path
-	 * @return
+	 * @return a list of {@link Interceptor} objects.
 	 */
 	public List<Interceptor> getInterceptors(String path) {
 		
