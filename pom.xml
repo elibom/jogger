@@ -10,6 +10,28 @@
 	
 	<name>Jogger</name>
 	<description>Jogger Web Framework Parent</description>
+	<url>https://github.com/germanescobar/jogger</url>
+	
+  	<licenses>
+    	<license>
+      		<name>The Apache Software License, Version 2.0</name>
+      		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      		<distribution>repo</distribution>
+    	</license>
+  	</licenses>
+  	
+  	<scm>
+    	<url>scm:git:git@github.com:germanescobar/jogger.git</url>
+    	<connection>scm:git:git@github.com:germanescobar/jogger.git</connection>
+  	</scm>
+  	
+  	<developers>
+    	<developer>
+      		<id>germanescobar</id>
+      		<name>German Escobar</name>
+      		<email>german.escobarc@gmail.com</email>
+    	</developer>
+  	</developers>
 	
 	<modules>
 		<module>jogger-core</module>
