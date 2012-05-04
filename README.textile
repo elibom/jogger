@@ -10,3 +10,7 @@ Jogger is a lightweight Java library for building Web Applications. It provides 
 
 So, I made Jogger ;)
 
+h2. Documentation
+
+* "Main Documentation Page":https://github.com/germanescobar/jogger/wiki
+
