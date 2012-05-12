@@ -2,7 +2,7 @@ package org.jogger.config;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.JoggerServlet;
+import org.jogger.AbstractJoggerServlet;
 
 
 /**
@@ -19,7 +19,7 @@ import org.jogger.JoggerServlet;
 public interface ControllerLoader {
 
 	/**
-	 * This method is called from the {@link JoggerServlet} to initialize the class.
+	 * This method is called from the {@link AbstractJoggerServlet} to initialize the class.
 	 * 
 	 * @param servletConfig the servlet configuration.
 	 */

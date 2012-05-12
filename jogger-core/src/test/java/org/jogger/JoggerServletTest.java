@@ -45,7 +45,7 @@ public class JoggerServletTest {
 		when(request.getMethod()).thenReturn("GET");
 		when(request.getPath()).thenReturn("/users");
 		
-		JoggerServlet joggerServlet = new JoggerServlet();
+		MockJoggerServlet joggerServlet = new MockJoggerServlet();
 		joggerServlet.setRoutes(routes);
 		joggerServlet.setInterceptors(mock(Interceptors.class));
 		
@@ -81,7 +81,7 @@ public class JoggerServletTest {
 		when(request.getMethod()).thenReturn("GET");
 		when(request.getPath()).thenReturn("/users");
 		
-		JoggerServlet joggerServlet = new JoggerServlet();
+		MockJoggerServlet joggerServlet = new MockJoggerServlet();
 		joggerServlet.setRoutes(routes);
 		joggerServlet.setInterceptors(interceptors);
 		
@@ -103,7 +103,7 @@ public class JoggerServletTest {
 		when(request.getMethod()).thenReturn("GET");
 		when(request.getPath()).thenReturn("/users");
 		
-		JoggerServlet joggerServlet = new JoggerServlet();
+		MockJoggerServlet joggerServlet = new MockJoggerServlet();
 		joggerServlet.setRoutes(routes);
 		joggerServlet.setInterceptors(mock(Interceptors.class));
 		

@@ -11,15 +11,23 @@
 		<dependency>
 			<groupId>org.jogger</groupId>
 			<artifactId>jogger-core</artifactId>
-			<version>0.2.0</version>
+			<version>0.3.0</version>
 		</dependency>
 		
 		<dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>6.0</version>
-            <scope>provided</scope>
-        </dependency>
+    		<groupId>org.glassfish</groupId>
+    		<artifactId>javax.servlet</artifactId>
+    		<version>3.0</version>
+    		<scope>provided</scope>
+  		</dependency>
+        
+        <dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>5.13</version>
+			<scope>test</scope>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>

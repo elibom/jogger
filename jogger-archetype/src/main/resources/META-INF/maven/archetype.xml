@@ -16,4 +16,9 @@
 		<resource filtered="false">src/main/webapp/WEB-INF/freemarker/layout.ftl</resource>
 		<resource filtered="false">src/main/webapp/WEB-INF/freemarker/index.ftl</resource>
 	</resources>
+	
+	<testSources>
+		<source>src/test/java/controllers/PagesTest.java</source>
+	</testSources>
+  
 </archetype>

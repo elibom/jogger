@@ -58,5 +58,9 @@ public class DefaultControllerLoader implements ControllerLoader {
 		
 		this.classLoader = classLoader;
 	}
+	
+	public void setBasePackage(String basePackage) {
+		this.basePackage = basePackage;
+	}
 
 }
