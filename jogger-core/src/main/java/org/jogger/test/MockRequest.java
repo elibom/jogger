@@ -1,5 +1,6 @@
 package org.jogger.test;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -37,6 +38,8 @@ public class MockRequest implements Request {
 	private Map<String,Cookie> cookies = new HashMap<String,Cookie>();
 	
 	private Map<String,String> headers = new HashMap<String,String>();
+	
+	private String body;
 	
 	private MockJoggerServlet joggerServlet;
 	
@@ -141,7 +144,25 @@ public class MockRequest implements Request {
 
 	@Override
 	public BodyParser getBody() {
-		return null;
+		return new BodyParser() {
+
+			@Override
+			public String asString() {
+				return body;
+			}
+
+			@Override
+			public InputStream asInputStream() {
+				return null;
+			}
+			
+		};
+	}
+	
+	public MockRequest setBodyAsString(String body) {
+		this.body = body;
+		
+		return this;
 	}
 
 	public MockResponse run() throws Exception {

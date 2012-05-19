@@ -23,6 +23,7 @@ public interface Response {
     int PAYMENT_REQUIRED = 402;
     int FORBIDDEN = 403;
     int NOT_FOUND = 404;
+    int CONFLICT = 409;
     int INTERNAL_ERROR = 500;
     int NOT_IMPLEMENTED = 501;
     int OVERLOADED = 502;
@@ -39,6 +40,11 @@ public interface Response {
 	 */
 	Response status(int status);
 	
+	/**
+	 * Sets the status of the response to 400 - Bad Request.
+	 * 
+	 * @return itself for method chaining.
+	 */
 	Response badRequest();
 	
 	/**
@@ -54,6 +60,13 @@ public interface Response {
 	 * @return itself for method chaining.
 	 */
 	Response notFound();
+	
+	/**
+	 * Sets the status of the response to 409 - Conflict
+	 * 
+	 * @return itself for method chaining.
+	 */
+	Response conflict();
 	
 	String getContentType();
 	

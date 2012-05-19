@@ -24,7 +24,9 @@ public class MockResponse implements Response {
 	
 	private Map<String,String> headers = new HashMap<String,String>();
 	
-	private Map<String,Cookie> cookies = new HashMap<String,Cookie>();
+	private Map<String,Cookie> addedCookies = new HashMap<String,Cookie>();
+	
+	private Map<String,Cookie> removedCookies = new HashMap<String,Cookie>(); 
 	
 	private Map<String,Object> attributes = new HashMap<String,Object>();
 	
@@ -70,6 +72,12 @@ public class MockResponse implements Response {
 	}
 
 	@Override
+	public Response conflict() {
+		this.status = Response.CONFLICT;
+		return this;
+	}
+
+	@Override
 	public String getContentType() {
 		return contentType;
 	}
@@ -93,14 +101,22 @@ public class MockResponse implements Response {
 
 	@Override
 	public Response setCookie(Cookie cookie) {
-		cookies.put(cookie.getName(), cookie);
+		addedCookies.put(cookie.getName(), cookie);
 		return this;
 	}
 
 	@Override
 	public Response removeCookie(Cookie cookie) {
-		cookies.remove(cookie.getName());
+		removedCookies.put(cookie.getName(), cookie);
 		return this;
+	}
+	
+	public Map<String,Cookie> getAddedCookies() {
+		return addedCookies;
+	}
+	
+	public Map<String,Cookie> getRemovedCookies() {
+		return removedCookies;
 	}
 
 	@Override

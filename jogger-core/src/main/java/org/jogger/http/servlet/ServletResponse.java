@@ -78,6 +78,15 @@ public class ServletResponse implements Response {
 		
 		return this;
 	}
+	
+	
+
+	@Override
+	public Response conflict() {
+		response.setStatus(Response.CONFLICT);
+		
+		return this;
+	}
 
 	@Override
 	public String getContentType() {
