@@ -39,7 +39,7 @@ public class JoggerTest {
 		MockJoggerServlet joggerServlet = getJoggerServlet();
 		String url = "http://localhost" + path;
 		
-		return new MockRequest(joggerServlet, "GET", url);
+		return new MockRequest(joggerServlet, "POST", url);
 	}
 
 	/**
