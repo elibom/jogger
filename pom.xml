@@ -53,6 +53,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>test</scope>
@@ -63,6 +68,8 @@
 		<testng.version>5.13</testng.version>
 		<mockito.version>1.8.5</mockito.version>
 		<slf4j.version>1.6.3</slf4j.version>
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
 	<build>

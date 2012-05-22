@@ -21,6 +21,8 @@ import org.jogger.router.RouteInstance;
 import org.jogger.router.RouteNotFoundException;
 import org.jogger.router.Routes;
 import org.jogger.router.RoutesException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 
@@ -33,6 +35,8 @@ import freemarker.template.Configuration;
 public abstract class AbstractJoggerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	
+	private Logger log = LoggerFactory.getLogger(AbstractJoggerServlet.class);
 	
 	@Override
 	public void init() throws ServletException {
@@ -57,12 +61,16 @@ public abstract class AbstractJoggerServlet extends HttpServlet {
 			service(request, response);
 			
 		} catch (RouteNotFoundException e) {
+			servletResponse.setCharacterEncoding("UTF-8");
+			
 			forward(servletRequest, servletResponse);
 			return;
 		} catch (Exception e) {
 			/* TODO create a mechanism to handle exceptions, it could be a default template for 500 errors */
 			servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(servletResponse.getWriter());
+			
+			log.error("Exception processing request: " + e.getMessage(), e);
 		}
 		
 	}
