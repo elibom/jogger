@@ -23,6 +23,8 @@ public class MockRequest implements Request {
 	
 	private String queryString;
 	
+	private Map<String,String> params;
+	
 	private String url;
 	
 	private String method;
@@ -41,17 +43,17 @@ public class MockRequest implements Request {
 	
 	private String body;
 	
-	private MockJoggerServlet joggerServlet;
 	
-	public MockRequest(MockJoggerServlet joggerServlet, String method, String url) throws URISyntaxException {
-		
-		this.joggerServlet = joggerServlet;
+	
+	public MockRequest(String method, String url) throws URISyntaxException {
+
 		this.method = method;
 		
 		URI uri = new URI(url);
 		this.host = uri.getHost();
 		this.path = uri.getPath();
 		this.queryString = uri.getQuery();
+		this.params = buildParams( queryString );
 		this.port = uri.getPort() > 0 ? uri.getPort() : 80;
 		
 		if ( uri.getScheme().equals("https") ) {
@@ -60,6 +62,20 @@ public class MockRequest implements Request {
 		
 		String strPort = uri.getPort() > 0 ? ":" + uri.getPort() : "";
 		this.url = uri.getScheme() + "://" + uri.getHost() + strPort  + "/" + uri.getPath();
+		
+	}
+	
+	private Map<String,String> buildParams(String queryString) {
+		
+		Map<String,String> params = new HashMap<String,String>();
+		
+		String[] elems = queryString.split("&");
+		for (String elem : elems ) {
+			String[] pair = elem.split("=");
+			params.put( pair[0], pair[1] );
+		}
+		
+		return params;
 		
 	}
 
@@ -76,6 +92,11 @@ public class MockRequest implements Request {
 	@Override
 	public String getQueryString() {
 		return queryString;
+	}
+
+	@Override
+	public String getParameter(String name) {
+		return params.get(name);
 	}
 
 	@Override
@@ -164,14 +185,5 @@ public class MockRequest implements Request {
 		
 		return this;
 	}
-
-	public MockResponse run() throws Exception {
-		
-		// mock the response and call the JoggerServlet
-		MockResponse response = new MockResponse(joggerServlet.getFreeMarkerConfig());
-		joggerServlet.service(this, response);
-		
-		return response;
-		
-	}
+	
 }

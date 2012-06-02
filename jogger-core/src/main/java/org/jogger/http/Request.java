@@ -41,19 +41,7 @@ public interface Request {
 	 * 
 	 * @return a String object with the value of the parameter. Null if it doesn't exists.
 	 */
-	String getQueryParam(String name);
-	
-	/**
-	 * Retrieves a query string parameter casting it to the specified class.
-	 * 
-	 * @param <T>
-	 * @param name the name of the parameter.
-	 * @param clazz the class to which the parameter is casted.
-	 * 
-	 * @return an object of the specified type with the value of the parameter. Null if it doesn't exists.
-	 * @throws ClassCastException if the parameter can't be casted to the specified type.
-	 */
-	<T> T getQueryParam(String name, Class<T> clazz) throws ClassCastException;
+	String getParameter(String name);
 	
 	/**
 	 * Returns the HTTP method of the request. 

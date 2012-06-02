@@ -23,7 +23,7 @@ public class JoggerTest {
 		MockJoggerServlet joggerServlet = getJoggerServlet();
 		String url = "http://localhost" + path;
 		
-		return new MockRequest(joggerServlet, "GET", url);
+		return new RunnableMockRequest(joggerServlet, "GET", url);
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class JoggerTest {
 		MockJoggerServlet joggerServlet = getJoggerServlet();
 		String url = "http://localhost" + path;
 		
-		return new MockRequest(joggerServlet, "POST", url);
+		return new RunnableMockRequest(joggerServlet, "POST", url);
 	}
 
 	/**
@@ -49,6 +49,28 @@ public class JoggerTest {
 	 */
 	protected MockJoggerServlet getJoggerServlet() {
 		return new MockJoggerServlet();
+	}
+	
+	class RunnableMockRequest extends MockRequest {
+		
+		private MockJoggerServlet joggerServlet;
+
+		public RunnableMockRequest(MockJoggerServlet joggerServlet, String method, String url) throws URISyntaxException {
+			super(method, url);
+			this.joggerServlet = joggerServlet;
+			
+		}
+		
+		public MockResponse run() throws Exception {
+			
+			// mock the response and call the JoggerServlet
+			MockResponse response = new MockResponse(joggerServlet.getFreeMarkerConfig());
+			joggerServlet.service(this, response);
+			
+			return response;
+			
+		}
+		
 	}
 	 
 }

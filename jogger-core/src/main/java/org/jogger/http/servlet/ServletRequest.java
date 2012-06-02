@@ -63,14 +63,8 @@ public class ServletRequest implements Request {
 	}
 
 	@Override
-	public String getQueryParam(String name) {
+	public String getParameter(String name) {
 		return request.getParameter(name);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getQueryParam(String name, Class<T> clazz) throws ClassCastException {
-		return (T) request.getParameter(name);
 	}
 
 	@Override
