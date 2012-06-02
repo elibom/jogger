@@ -39,6 +39,11 @@ public class ServletRequest implements Request {
 	public String getHost() {
 		return request.getServerName();
 	}
+	
+	@Override
+	public String getUrl() {
+		return request.getRequestURL().toString();
+	}
 
 	@Override
 	public String getPath() {
@@ -58,8 +63,14 @@ public class ServletRequest implements Request {
 	}
 
 	@Override
-	public String getUrl() {
-		return request.getRequestURL().toString();
+	public String getQueryParam(String name) {
+		return request.getParameter(name);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getQueryParam(String name, Class<T> clazz) throws ClassCastException {
+		return (T) request.getParameter(name);
 	}
 
 	@Override

@@ -13,21 +13,47 @@ public interface Request {
 	String getHost();
 	
 	/**
-	 * Returns the path that was requested without the context path - if any. For example, if the URL is
+	 * Returns the full URL including scheme, host, port, path and query string.
+	 * 
+	 * @return a String object with the URL.
+	 */
+	String getUrl();
+	
+	/**
+	 * Retrieves the path that was requested without the context path - if any. For example, if the URL is
 	 * "http://localhost:8080/app/users/1", the path would be "/users/1".
 	 * 
 	 * @return a String object with the path of the request.
 	 */
 	String getPath();
 	
+	/**
+	 * Retrieves the raw query string part of the URL.
+	 * 
+	 * @return a String object with the query string part of the URL. An empty String if there is no query string. 
+	 */
 	String getQueryString();
 	
 	/**
-	 * Returns the full URL including scheme, host, port, path and query string.
+	 * Retrieves a raw query string parameter (i.e. as it comes in the URL)
 	 * 
-	 * @return a String object with the URL.
+	 * @param name the name of the parameter
+	 * 
+	 * @return a String object with the value of the parameter. Null if it doesn't exists.
 	 */
-	String getUrl();
+	String getQueryParam(String name);
+	
+	/**
+	 * Retrieves a query string parameter casting it to the specified class.
+	 * 
+	 * @param <T>
+	 * @param name the name of the parameter.
+	 * @param clazz the class to which the parameter is casted.
+	 * 
+	 * @return an object of the specified type with the value of the parameter. Null if it doesn't exists.
+	 * @throws ClassCastException if the parameter can't be casted to the specified type.
+	 */
+	<T> T getQueryParam(String name, Class<T> clazz) throws ClassCastException;
 	
 	/**
 	 * Returns the HTTP method of the request. 
