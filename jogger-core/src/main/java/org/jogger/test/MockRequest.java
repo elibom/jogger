@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jogger.http.Cookie;
 import org.jogger.http.Request;
+import org.jogger.http.Value;
 
 /**
  * This is a {@link Request} implementation that stores the request state in attributes. Useful for testing Jogger 
@@ -23,7 +24,7 @@ public class MockRequest implements Request {
 	
 	private String queryString;
 	
-	private Map<String,String> params;
+	private Map<String,Value> params;
 	
 	private String url;
 	
@@ -65,14 +66,14 @@ public class MockRequest implements Request {
 		
 	}
 	
-	private Map<String,String> buildParams(String queryString) {
+	private Map<String,Value> buildParams(String queryString) {
 		
-		Map<String,String> params = new HashMap<String,String>();
+		Map<String,Value> params = new HashMap<String,Value>();
 		
 		String[] elems = queryString.split("&");
 		for (String elem : elems ) {
 			String[] pair = elem.split("=");
-			params.put( pair[0], pair[1] );
+			params.put( pair[0], new Value(pair[1]) );
 		}
 		
 		return params;
@@ -95,7 +96,12 @@ public class MockRequest implements Request {
 	}
 
 	@Override
-	public String getParameter(String name) {
+	public Map<String, Value> getParameters() {
+		return params;
+	}
+
+	@Override
+	public Value getParameter(String name) {
 		return params.get(name);
 	}
 

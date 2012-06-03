@@ -7,12 +7,14 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.jogger.http.Cookie;
 import org.jogger.http.HttpException;
 import org.jogger.http.Request;
+import org.jogger.http.Value;
 
 /**
  * A {@link Request} implementation based on the Servlet API.
@@ -63,8 +65,36 @@ public class ServletRequest implements Request {
 	}
 
 	@Override
-	public String getParameter(String name) {
-		return request.getParameter(name);
+	public Map<String,Value> getParameters() {
+		
+		Map<String,Value> ret = new HashMap<String,Value>();
+		
+		Set<String> names = request.getParameterMap().keySet();
+		for (String name : names) {
+			ret.put( name, getParameter(name) );
+		}
+		
+		return ret;
+		
+	}
+
+	@Override
+	public Value getParameter(String name) {
+		
+		Map<String,String[]> params = request.getParameterMap();
+		
+		String[] paramValues = params.get(name);
+		if (paramValues == null) {
+			return null;
+		}
+		
+		String ret = "";
+		for (String p : paramValues) {
+			ret += "," + p;
+		}
+		
+		return new Value( ret.substring(1) );
+		
 	}
 
 	@Override

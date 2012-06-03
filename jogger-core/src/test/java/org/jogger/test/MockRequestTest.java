@@ -10,13 +10,13 @@ public class MockRequestTest {
 		
 		MockRequest request = new MockRequest("GET", "http://localhost/?param1=value1&param2=2");
 		
-		String param1 = request.getParameter("param1");
+		String param1 = request.getParameter("param1").asString();
 		Assert.assertNotNull( param1 );
 		Assert.assertEquals( param1, "value1" );
 		
-		String param2 = request.getParameter("param2");
+		long param2 = request.getParameter("param2").asLong();
 		Assert.assertNotNull( param2 );
-		Assert.assertEquals( param2 , "2");
+		Assert.assertEquals( param2 , 2L);
 		
 	}
 	

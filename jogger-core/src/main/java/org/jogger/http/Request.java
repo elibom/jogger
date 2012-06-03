@@ -35,13 +35,20 @@ public interface Request {
 	String getQueryString();
 	
 	/**
-	 * Retrieves a raw query string parameter (i.e. as it comes in the URL)
+	 * Retrieves the request parameters.
+	 * 
+	 * @return a Map<String,Value> object with the request parameters.
+	 */
+	Map<String,Value> getParameters();
+	
+	/**
+	 * Retrieves the value of a request parameter.
 	 * 
 	 * @param name the name of the parameter
 	 * 
-	 * @return a String object with the value of the parameter. Null if it doesn't exists.
+	 * @return a Value object. Null if it doesn't exists.
 	 */
-	String getParameter(String name);
+	Value getParameter(String name);
 	
 	/**
 	 * Returns the HTTP method of the request. 

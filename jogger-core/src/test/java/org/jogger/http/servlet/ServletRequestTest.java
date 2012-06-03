@@ -3,12 +3,15 @@ package org.jogger.http.servlet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.jogger.http.Cookie;
 import org.jogger.http.Request;
+import org.jogger.http.Value;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -45,6 +48,152 @@ public class ServletRequestTest {
 		
 		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getQueryString(), "method=test&action=success");
+		
+	}
+	
+	@Test
+	public void shouldRetrieveParams() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "value1" } );
+		mockParams.put( "param2", new String[] { "val1", "val2" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Map<String,Value> params = request.getParameters();
+		Assert.assertNotNull( params );
+		Assert.assertEquals( params.size(), 2 );
+		
+		Value param1 = params.get("param1");
+		Assert.assertNotNull( param1 );
+		Assert.assertEquals( param1.asString(), "value1" );
+		
+		List<Value> param1Values = param1.asList();
+		Assert.assertNotNull( param1Values );
+		Assert.assertEquals( param1Values.size(), 1 );
+		Assert.assertEquals( param1Values.get(0).asString(), "value1" );
+		
+		Value param2 = params.get("param2");
+		Assert.assertNotNull( param2 );
+		Assert.assertEquals( param2.asString(), "val1,val2" );
+		
+		List<Value> param2Values = param2.asList();
+		Assert.assertNotNull( param2Values );
+		Assert.assertEquals( param2Values.size(), 2);
+		Assert.assertEquals( param2Values.get(0).asString(), "val1" );
+		Assert.assertEquals( param2Values.get(1).asString(), "val2" );
+		
+		Assert.assertNull( params.get("notexistnet") );
+		
+	}
+	
+	@Test
+	public void shouldRetrieveStringParam() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "value1" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertNotNull( request.getParameter("param1") );
+		Assert.assertEquals( request.getParameter("param1").asString(), "value1" );
+		
+	}
+	
+	@Test
+	public void shouldNotRetrieveNonExistingParam() throws Exception {
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertNull( request.getParameter("nonexisting") );
+		
+	}
+	
+	@Test
+	public void shouldRetrieveLongParam() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "1" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertNotNull( request.getParameter("param1") );
+		Assert.assertEquals( request.getParameter("param1").asString(), "1" );
+		
+		long val = request.getParameter("param1").asLong();
+		Assert.assertEquals( val, 1L);
+		
+	}
+	
+	@Test(expectedExceptions=NumberFormatException.class)
+	public void shouldFailRetrievingUnparseableLongParam() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "notALong" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertNotNull( request.getParameter("param1") );
+		request.getParameter("param1").asLong();
+		
+	}
+	
+	@Test
+	public void shouldRetrieveBooleanParam() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "true" } );
+		mockParams.put( "param2", new String[] { "false" } );
+		mockParams.put( "param3", new String[] { "1" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertEquals( request.getParameter("param1").asBoolean(), Boolean.TRUE );
+		Assert.assertEquals( request.getParameter("param2").asBoolean(), Boolean.FALSE );
+		Assert.assertEquals( request.getParameter("param3").asBoolean(), Boolean.FALSE );
+		
+	}
+	
+	@Test
+	public void shouldRetrieveListParam() throws Exception {
+		
+		Map<String,String[]> mockParams = new HashMap<String,String[]>();
+		mockParams.put( "param1", new String[] { "value1" } );
+		mockParams.put( "param2", new String[] { "value1", "2" } );
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		
+		Request request = new ServletRequest(servletRequest);
+		
+		Assert.assertNotNull( request.getParameter("param1") );
+		Assert.assertNotNull( request.getParameter("param2") );
+		
+		List<Value> param1Values = request.getParameter("param1").asList();
+		Assert.assertEquals( param1Values.size(), 1 );
+		Assert.assertEquals( param1Values.get(0).asString(), "value1");
+		
+		List<Value> param2Values = request.getParameter("param2").asList();
+		Assert.assertEquals( param2Values.size(), 2 );
+		Assert.assertEquals( param2Values.get(0).asString(), "value1");
+		Assert.assertEquals( param2Values.get(1).asLong(), new Long(2) );
 		
 	}
 	
