@@ -1,11 +1,8 @@
 package org.jogger.test.spring;
 
 import org.jogger.config.ControllerLoader;
-import org.jogger.config.Interceptors;
 import org.jogger.config.spring.SpringControllerLoader;
-import org.jogger.config.spring.SpringInterceptors;
 import org.jogger.test.JoggerTest;
-import org.jogger.test.MockJoggerServlet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -24,11 +21,13 @@ public abstract class SpringJoggerTest extends JoggerTest {
 	
 	@BeforeSuite
 	public void init() {
+		System.setProperty("JOGGER_ENV", "test");
 		springContext = new FileSystemXmlApplicationContext( getConfigLocations() );
 	}
 	
 	@AfterSuite
 	public void destroy() {	
+		System.clearProperty("JOGGER_ENV");
 		springContext.close();
 	}
 	
@@ -42,22 +41,6 @@ public abstract class SpringJoggerTest extends JoggerTest {
 	@Override
 	protected String getBasePackage() {
 		return null;
-	}
-
-	@Override
-	protected MockJoggerServlet getJoggerServlet() {
-		
-		Interceptors interceptors = getInterceptors();
-		if (SpringInterceptors.class.isInstance(interceptors)) {
-			SpringInterceptors springInterceptors = (SpringInterceptors) interceptors;
-			springInterceptors.setApplicationContext(springContext);
-		}
-		
-		MockJoggerServlet joggerServlet = new MockJoggerServlet();
-		joggerServlet.setInterceptors(interceptors);
-		
-		return joggerServlet;
-		
 	}
 
 	@Override
