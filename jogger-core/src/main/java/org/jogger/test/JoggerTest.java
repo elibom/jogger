@@ -151,9 +151,10 @@ public abstract class JoggerTest {
 	protected abstract String getBasePackage();
 	
 	/**
-	 * Retrieves the {@link Interceptors} implementation that you use in your class.
+	 * Retrieves the {@link Interceptors} implementation that you use in your class. Remember that it must be already 
+	 * initialized and ready to use.
 	 * 
-	 * @return a {@link Interceptors} implementation object.
+	 * @return an initialized {@link Interceptors} implementation object.
 	 */
 	protected abstract Interceptors getInterceptors();
 	
