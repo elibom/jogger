@@ -26,9 +26,9 @@ public class DefaultControllerLoader implements ControllerLoader {
 	public void init(ServletConfig servletConfig) {
 		
 		// retrieve the base package from the init parameter
-		String basePackage = servletConfig.getInitParameter(BASE_PACKAGE_INIT_PARAM_NAME);	
-		if (basePackage != null) {
-			this.basePackage = basePackage + ".";
+		String bp = servletConfig.getInitParameter(BASE_PACKAGE_INIT_PARAM_NAME);	
+		if (bp != null) {
+			this.basePackage = bp + ".";
 		}
 		
 	}

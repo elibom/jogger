@@ -159,11 +159,11 @@ public class JoggerServlet extends AbstractJoggerServlet {
 		ControllerLoader controllerLoader = getControllerLoader();
 		RoutesParser routesParser = new RoutesParserImpl();
 		
-		RoutesImpl routes = new RoutesImpl();
-		routes.setControllerLoader(controllerLoader);
-		routes.setRoutesParser(routesParser);
+		RoutesImpl ret = new RoutesImpl();
+		ret.setControllerLoader(controllerLoader);
+		ret.setRoutesParser(routesParser);
 		
-		return routes;
+		return ret;
 	}
 	
 	/**

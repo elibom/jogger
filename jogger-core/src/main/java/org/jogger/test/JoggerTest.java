@@ -24,12 +24,12 @@ import org.testng.annotations.BeforeSuite;
 public abstract class JoggerTest {
 	
 	@BeforeSuite
-	public void init() throws Exception {	
+	public void init() {	
 		System.setProperty("JOGGER_ENV", "test");
 	}
 	
 	@AfterSuite
-	public void destroy() throws Exception {
+	public void destroy() {
 		System.clearProperty("JOGGER_ENV");
 	}
 	

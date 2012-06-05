@@ -87,7 +87,7 @@ public class RoutesParserImpl implements RoutesParser {
 		String controllerAndMethod = validateControllerAndMethod( st.nextToken().trim() );
 		
 		// retrieve controller name
-		int hashPos = controllerAndMethod.indexOf("#");
+		int hashPos = controllerAndMethod.indexOf('#');
 		String controllerName = controllerAndMethod.substring(0, hashPos);
 		
 		// retrieve controller method
@@ -188,7 +188,7 @@ public class RoutesParserImpl implements RoutesParser {
 	 * @throws ParseException if the format of the controller and method is not valid.
 	 */
 	private String validateControllerAndMethod(String beanAndMethod) throws ParseException {
-		int hashPos = beanAndMethod.indexOf("#");
+		int hashPos = beanAndMethod.indexOf('#');
 		if (hashPos == -1) {
 			throw new ParseException("Unrecognized format for '" + beanAndMethod + "'", line);
 		}

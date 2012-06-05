@@ -23,12 +23,12 @@ public abstract class SpringJoggerTest extends JoggerTest {
 	private static ConfigurableApplicationContext springContext;
 	
 	@BeforeSuite
-	public void init() throws Exception {
+	public void init() {
 		springContext = new FileSystemXmlApplicationContext( getConfigLocations() );
 	}
 	
 	@AfterSuite
-	public void destroy() throws Exception {	
+	public void destroy() {	
 		springContext.close();
 	}
 	

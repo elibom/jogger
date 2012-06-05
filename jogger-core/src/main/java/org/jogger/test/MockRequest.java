@@ -73,15 +73,15 @@ public class MockRequest extends AbstractRequest {
 	
 	private Map<String,Value> buildParams(String queryString) {
 		
-		Map<String,Value> params = new HashMap<String,Value>();
+		Map<String,Value> ret = new HashMap<String,Value>();
 		
 		String[] elems = queryString.split("&");
 		for (String elem : elems ) {
 			String[] pair = elem.split("=");
-			params.put( pair[0], new Value(pair[1]) );
+			ret.put( pair[0], new Value(pair[1]) );
 		}
 		
-		return params;
+		return ret;
 		
 	}
 
