@@ -1,27 +1,17 @@
 package org.jogger;
 
-import java.text.ParseException;
-
 import org.jogger.config.Interceptors;
-import org.jogger.router.Routes;
-import org.jogger.router.RoutesException;
+import org.jogger.support.AbstractJoggerServlet;
 
 import freemarker.template.Configuration;
 
 public class MockJoggerServlet extends AbstractJoggerServlet {
 	
 	private static final long serialVersionUID = 1L;
-
-	private Routes routes;
 	
 	private Configuration freeMarkerConfig;
 	
 	private Interceptors interceptors;
-
-	@Override
-	public Routes getRoutes() throws ParseException, RoutesException {
-		return routes;
-	}
 
 	@Override
 	public Configuration getFreeMarkerConfig() {
@@ -31,10 +21,6 @@ public class MockJoggerServlet extends AbstractJoggerServlet {
 	@Override
 	public Interceptors getInterceptors() {
 		return interceptors;
-	}
-
-	public void setRoutes(Routes routes) {
-		this.routes = routes;
 	}
 
 	public void setFreeMarkerConfig(Configuration freeMarkerConfig) {

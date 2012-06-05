@@ -18,7 +18,7 @@ public class RoutesParserImplTest {
 		String line = 	"GET 	/			MockController#init\n";
 		line += 		"POST 	/sessions	MockController#show\n";
 		
-		List<Route> routes = routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		List<RouteDefinition> routes = routesParser.parse(new ByteArrayInputStream(line.getBytes()));
 		
 		Assert.assertEquals(routes.size(), 2);
 		
@@ -31,11 +31,11 @@ public class RoutesParserImplTest {
 		
 		// sample routes configuration
 		String line = 	" \n";
-		line +=			"GET 	/			MockController#init\n";
+		line +=			"GET 	/							MockController#init\n";
 		line +=			"# this is a comment \n";
-		line += 		"POST 	/sessions	MockController#show\n";
+		line += 		"POST 	/sessions/{userId}/{hash}	MockController#show\n";
 		
-		List<Route> routes = routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		List<RouteDefinition> routes = routesParser.parse(new ByteArrayInputStream(line.getBytes()));
 		
 		Assert.assertEquals(routes.size(), 2);
 		
@@ -72,6 +72,66 @@ public class RoutesParserImplTest {
 		
 		// sample routes configuration
 		String line = 	"GET	invalidpath			MockController#init\n";
+		
+		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		
+	}
+	
+	@Test(expectedExceptions=ParseException.class)
+	public void shouldFailWithQuestionMark() throws Exception {
+		
+		RoutesParserImpl routesParser = new RoutesParserImpl();
+		
+		// sample routes configuration
+		String line = 	"GET	/inva?lidpath			MockController#init\n";
+		
+		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		
+	}
+	
+	@Test(expectedExceptions=ParseException.class)
+	public void shouldFailWithPoundSign() throws Exception {
+		
+		RoutesParserImpl routesParser = new RoutesParserImpl();
+		
+		// sample routes configuration
+		String line = 	"GET	/inva#lidpath			MockController#init\n";
+		
+		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		
+	}
+	
+	@Test(expectedExceptions=ParseException.class)
+	public void shouldFailWithSpace() throws Exception {
+		
+		RoutesParserImpl routesParser = new RoutesParserImpl();
+		
+		// sample routes configuration
+		String line = 	"GET	/inva lidpath			MockController#init\n";
+		
+		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		
+	}
+	
+	@Test(expectedExceptions=ParseException.class)
+	public void shouldFailWithSlashInHolder() throws Exception {
+		
+		RoutesParserImpl routesParser = new RoutesParserImpl();
+		
+		// sample routes configuration
+		String line = 	"GET	/{invalid/holder}			MockController#init\n";
+		
+		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
+		
+	}
+	
+	@Test(expectedExceptions=ParseException.class)
+	public void shouldFailWithOpenKeyHolder() throws Exception {
+		
+		RoutesParserImpl routesParser = new RoutesParserImpl();
+		
+		// sample routes configuration
+		String line = 	"GET	/{invalid{holder}			MockController#init\n";
 		
 		routesParser.parse(new ByteArrayInputStream(line.getBytes()));
 		

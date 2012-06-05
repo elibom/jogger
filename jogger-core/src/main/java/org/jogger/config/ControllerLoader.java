@@ -2,8 +2,6 @@ package org.jogger.config;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.AbstractJoggerServlet;
-
 
 /**
  * This interface is implemented by classes that provide a controller loading strategy. For example:
@@ -19,7 +17,7 @@ import org.jogger.AbstractJoggerServlet;
 public interface ControllerLoader {
 
 	/**
-	 * This method is called from the {@link AbstractJoggerServlet} to initialize the class.
+	 * This method is called to initialize the class.
 	 * 
 	 * @param servletConfig the servlet configuration.
 	 */

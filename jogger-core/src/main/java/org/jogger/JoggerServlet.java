@@ -1,21 +1,34 @@
 package org.jogger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jogger.config.ConfigurationException;
 import org.jogger.config.ControllerLoader;
 import org.jogger.config.DefaultControllerLoader;
 import org.jogger.config.Interceptors;
+import org.jogger.http.Request;
+import org.jogger.http.Response;
+import org.jogger.http.servlet.ServletRequest;
+import org.jogger.http.servlet.ServletResponse;
+import org.jogger.router.Route;
 import org.jogger.router.Routes;
 import org.jogger.router.RoutesException;
 import org.jogger.router.RoutesImpl;
 import org.jogger.router.RoutesParser;
 import org.jogger.router.RoutesParserImpl;
+import org.jogger.support.AbstractJoggerServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 
@@ -23,18 +36,13 @@ import freemarker.template.Configuration;
  * <p>This Servlet must be configured in the web.xml of your application to work. It acts as a front controller 
  * that receives all the HTTP requests and maps them to your controllers.</p>
  * 
- * 
- * 
  * @author German Escobar
  */
 public class JoggerServlet extends AbstractJoggerServlet {
 
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * A routes store that exposes methods to load and find routes.
-	 */
-	private Routes routes;
+	
+	private Logger log = LoggerFactory.getLogger(JoggerServlet.class);
 	
 	/**
 	 * Contains the interceptors that we must check on each request.
@@ -46,19 +54,95 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	 */
 	private Configuration freemarker;
 	
-
+	/**
+	 * Used to load and retrieve the routes.
+	 */
+	private Routes routes;
+	
+	/**
+	 * Loads the routes on initialization.
+	 */
 	@Override
-	protected Routes getRoutes() throws ParseException, RoutesException {
+	public void init() throws ServletException {
 		
-		if (routes == null) {
+		try {
+			getRoutes(); // validate the routes on initialization
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+		
+	}
+	
+	/**
+	 * This is the entry point of a request (through the Servlet API). It creates the Jogger {@link Request} and 
+	 * {@link Response} objects, tries to find the route and delegates the call to 
+	 * {@link AbstractJoggerServlet#service(Route, Request, Response)} method.
+	 */
+	@Override
+	protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
+		
+		// build the Jogger request/response objects
+		ServletRequest request = new ServletRequest(servletRequest);
+		ServletResponse response = new ServletResponse(servletResponse, getFreeMarkerConfig());
+		
+		try {
 			
-			routes = createRoutes();
+			// try to find the route 
+			Route route = getRoutes().find( request.getMethod(), request.getPath() );
+			if (route == null) {
+			
+				// if no route found, forward to the servlet container dispatcher
+				servletResponse.setCharacterEncoding("UTF-8");
+				forward(servletRequest, servletResponse);
+				
+				return;
+				
+			}
+			
+			// set the route path to the request so we can match path variables
+			request.setRoutePath( route.getPath() );
+
+			// delegate call using the request/response wrappers
+			service(route, request, response);
+			
+		} catch (Exception e) {
+			/* TODO create a mechanism to handle exceptions, it could be a default template for 500 errors */
+			servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			e.printStackTrace(servletResponse.getWriter());
+			
+			log.error("Exception processing request: " + e.getMessage(), e);
+		}
+		
+	}
+	
+	/**
+	 * Helper method. Forwards a request to the default dispatcher.
+	 * 
+	 * @param request
+	 * @param response
+	 * 
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void forward(final HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		RequestDispatcher rd = getServletContext().getNamedDispatcher("default");
+		rd.forward(request, response);
+	}
+	
+	/**
+	 * Helper method. Loads the routes.
+	 * 
+	 * @return
+	 * @throws ParseException
+	 * @throws RoutesException
+	 */
+	private Routes getRoutes() throws ParseException, RoutesException {
+		
+		if (routes == null) { // create the routes object if first time
+			routes = buildRoutesObject();
 			loadRoutes(routes);
-			
-		} else if ( isDeveloperMode() ) {
-			
+		} else if ( Jogger.isDevEnv() ) { // reload routes if development mode
 			loadRoutes(routes);
-			
 		}
 		
 		return routes;
@@ -66,11 +150,11 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	}
 	
 	/**
-	 * Helper method. Creates, but it doesn't initializes, the {@link Routes} implementation. 
+	 * Helper method. Builds the {@link Routes} implementation. It doesn't loads the routes.
 	 * 
 	 * @return a {@link Routes} implementation.
 	 */
-	private Routes createRoutes() {
+	private Routes buildRoutesObject() {
 		
 		ControllerLoader controllerLoader = getControllerLoader();
 		RoutesParser routesParser = new RoutesParserImpl();
@@ -83,27 +167,7 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	}
 	
 	/**
-	 * Tells if we are working in development environment. Remember that environments are set using the 
-	 * <em>BROADCAST_ENV</em> environment variable or system property. 
-	 * 
-	 * @return true if we are working in development mode, false otherwise.
-	 */
-	private boolean isDeveloperMode() {
-		
-		String env = System.getProperty("JOGGER_ENV");
-		if (env == null) {
-			env = System.getenv("JOGGER_ENV");
-		}
-		
-		if (env == null || "dev".equalsIgnoreCase(env)) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Loads the controller loader using the Java Service Loader mechanism.
+	 * Helper method. Loads the controller loader using the Java Service Loader mechanism.
 	 * 
 	 * @return the {@link ControllerLoader} implementation to be used.
 	 * @throws IllegalStateException if there is more than one controller loader in classpath
@@ -133,7 +197,7 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	}
 	
 	/**
-	 * Loads the routes from the routes.config file. Routes are stored in the {@link Routes} object.
+	 * Helper method. Loads the routes from the routes.config file. Routes are stored in the {@link Routes} object.
 	 * 
 	 * @param routes we are actually going to use this object to load the routes.
 	 * 

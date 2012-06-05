@@ -9,6 +9,9 @@ import java.util.Map;
 import org.jogger.http.Cookie;
 import org.jogger.http.Request;
 import org.jogger.http.Value;
+import org.jogger.router.Route;
+import org.jogger.router.Routes;
+import org.jogger.support.AbstractRequest;
 
 /**
  * This is a {@link Request} implementation that stores the request state in attributes. Useful for testing Jogger 
@@ -16,7 +19,7 @@ import org.jogger.http.Value;
  * 
  * @author German Escobar
  */
-public class MockRequest implements Request {
+public class MockRequest extends AbstractRequest {
 	
 	private String host;
 	
@@ -44,7 +47,9 @@ public class MockRequest implements Request {
 	
 	private String body;
 	
+	private MockJoggerServlet joggerServlet;
 	
+	private Routes routes;
 	
 	public MockRequest(String method, String url) throws URISyntaxException {
 
@@ -88,6 +93,16 @@ public class MockRequest implements Request {
 	@Override
 	public String getPath() {
 		return path;
+	}
+
+	@Override
+	public Map<String, Value> getPathVariables() {
+		return null;
+	}
+
+	@Override
+	public Value getPathVariable(String name) {
+		return null;
 	}
 
 	@Override
@@ -190,6 +205,38 @@ public class MockRequest implements Request {
 		this.body = body;
 		
 		return this;
+	}
+	
+	public MockResponse run() throws Exception {
+		
+		// mock the response
+		MockResponse response = new MockResponse( joggerServlet.getFreeMarkerConfig() );
+		
+		// try to find a route
+		Route route = routes.find( getMethod(), getPath() );
+		
+		if (route == null) {
+			// respond 404 if not found
+			response.notFound();
+			return response;
+		}
+		
+		// initialize path variables
+		initPathVariables( route.getPath() );
+		
+		// execute request
+		joggerServlet.service(route, this, response);
+		
+		return response;
+		
+	}
+
+	public void setJoggerServlet(MockJoggerServlet joggerServlet) {
+		this.joggerServlet = joggerServlet;
+	}
+
+	public void setRoutes(Routes routes) {
+		this.routes = routes;
 	}
 	
 }

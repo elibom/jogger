@@ -1,14 +1,37 @@
 package org.jogger.test;
 
-import java.net.URISyntaxException;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.ParseException;
+
+import org.jogger.config.ControllerLoader;
+import org.jogger.config.DefaultControllerLoader;
+import org.jogger.config.Interceptors;
+import org.jogger.router.Routes;
+import org.jogger.router.RoutesException;
+import org.jogger.router.RoutesImpl;
+import org.jogger.router.RoutesParser;
+import org.jogger.router.RoutesParserImpl;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 /**
  * This is an utility class that you can extend when testing Jogger applications. It provides methods
- * to emulate requests and a {@link #getJoggerServlet()} method to configure the {@link MockJoggerServlet}.
+ * to emulate requests some abstract methods that you need to implement.
  * 
  * @author German Escobar
  */
-public class JoggerTest {
+public abstract class JoggerTest {
+	
+	@BeforeSuite
+	public void init() throws Exception {	
+		System.setProperty("JOGGER_ENV", "test");
+	}
+	
+	@AfterSuite
+	public void destroy() throws Exception {
+		System.clearProperty("JOGGER_ENV");
+	}
 	
 	/**
 	 * Helper method. Creates and returns a {@link MockRequest} with 'GET' as the HTTP method. Call the 
@@ -18,12 +41,8 @@ public class JoggerTest {
 	 * 
 	 * @return a {@link MockRequest} object.
 	 */
-	public MockRequest get(String path) throws URISyntaxException {
-		
-		MockJoggerServlet joggerServlet = getJoggerServlet();
-		String url = "http://localhost" + path;
-		
-		return new RunnableMockRequest(joggerServlet, "GET", url);
+	public MockRequest get(String path) throws Exception {
+		return service("GET", path);
 	}
 	
 	/**
@@ -34,43 +53,108 @@ public class JoggerTest {
 	 * 
 	 * @return a {@link MockRequest} object.
 	 */
-	public MockRequest post(String path) throws URISyntaxException {
+	public MockRequest post(String path) throws Exception {
+		return service("POST", path);
+	}
+	
+	/**
+	 * Helper method. Builds a {@link MockRequest} based on the received arguments.
+	 * 
+	 * @param httpMethod the HTTP method.
+	 * @param path the requested path.
+	 * 
+	 * @return a {@link MockRequest} object.
+	 * @throws Exception
+	 */
+	private MockRequest service(String httpMethod, String path) throws Exception {
 		
-		MockJoggerServlet joggerServlet = getJoggerServlet();
 		String url = "http://localhost" + path;
 		
-		return new RunnableMockRequest(joggerServlet, "POST", url);
+		MockRequest request = new MockRequest(httpMethod, url);
+		request.setJoggerServlet( getJoggerServlet() );
+		request.setRoutes( getRoutes() );
+		
+		return request;
 	}
 
 	/**
-	 * Retrieves the mock servlet that we are going to use to process the request.
+	 * Retrieves the mock servlet that we are going to use to process the request. It can be overridden by subclasses 
+	 * to customize.
 	 * 
 	 * @return an initialized {@link MockJoggerServlet} object.
 	 */
 	protected MockJoggerServlet getJoggerServlet() {
-		return new MockJoggerServlet();
+		MockJoggerServlet joggerServlet = new MockJoggerServlet();
+		joggerServlet.setInterceptors( getInterceptors() );
+		
+		return joggerServlet;
 	}
 	
-	class RunnableMockRequest extends MockRequest {
+	/**
+	 * Helper method. Retrieves a {@link Routes} object with the routes loaded.
+	 * 
+	 * @return an initialized {@link Routes} object.
+	 * @throws ParseException if there is a problem parsing the routes.config file.
+	 * @throws RoutesException if there is a problem loading the routes.
+	 */
+	private Routes getRoutes() throws ParseException, RoutesException {
 		
-		private MockJoggerServlet joggerServlet;
-
-		public RunnableMockRequest(MockJoggerServlet joggerServlet, String method, String url) throws URISyntaxException {
-			super(method, url);
-			this.joggerServlet = joggerServlet;
+		ControllerLoader controllerLoader = getControllerLoader();
+		RoutesParser routesParser = new RoutesParserImpl();
+		
+		RoutesImpl routes = new RoutesImpl();
+		routes.setControllerLoader(controllerLoader);
+		routes.setRoutesParser(routesParser);
+		
+		try {
 			
+			InputStream inputStream = new FileInputStream( getRoutesPath() );
+			routes.load(inputStream);
+			
+		} catch (Exception e) {
+			throw new RoutesException(e);
 		}
 		
-		public MockResponse run() throws Exception {
-			
-			// mock the response and call the JoggerServlet
-			MockResponse response = new MockResponse(joggerServlet.getFreeMarkerConfig());
-			joggerServlet.service(this, response);
-			
-			return response;
-			
-		}
+		return routes;
 		
 	}
-	 
+	
+	/**
+	 * This is the default routes.config file path. It can be overridden by subclasses to provide a different path.
+	 * 
+	 * @return a String object representing the path to the routes.config file.
+	 */
+	protected String getRoutesPath() {
+		return "src/main/webapp/WEB-INF/routes.config";
+	}
+	
+	/**
+	 * Retrieves the default {@link ControllerLoader} implementation used to retrieve controllers. It can be 
+	 * overridden to provide a different one.
+	 * 
+	 * @return a {@link ControllerLoader} implementation object.
+	 */
+	protected ControllerLoader getControllerLoader() {
+		
+		DefaultControllerLoader controllerLoader = new DefaultControllerLoader();
+		controllerLoader.setBasePackage( getBasePackage() );
+		
+		return controllerLoader;
+		
+	}
+	
+	/**
+	 * Retrieves the base package name where your controllers are located.
+	 * 
+	 * @return a String object representing the base package.
+	 */
+	protected abstract String getBasePackage();
+	
+	/**
+	 * Retrieves the {@link Interceptors} implementation that you use in your class.
+	 * 
+	 * @return a {@link Interceptors} implementation object.
+	 */
+	protected abstract Interceptors getInterceptors();
+	
 }

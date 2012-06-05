@@ -21,10 +21,10 @@ public class RoutesImplTest {
 		ControllerLoader controllerLoader = mock(ControllerLoader.class);
 		when(controllerLoader.load("users")).thenReturn(new MockController());
 		
-		Route route = new Route("GET", "/users", "users", "show");
+		RouteDefinition routeDefinition = new RouteDefinition("GET", "/users", "users", "show");
 		
 		RoutesParser routesParser = mock(RoutesParser.class);
-		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(route));
+		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(routeDefinition));
 		
 		RoutesImpl routes = new RoutesImpl();
 		routes.setControllerLoader(controllerLoader);
@@ -32,10 +32,34 @@ public class RoutesImplTest {
 		
 		routes.load(null);
 		
-		RouteInstance routeInstance = routes.find("GET", "/users");
-		Assert.assertNotNull(routeInstance);
-		Assert.assertNotNull(routeInstance.getController());
-		Assert.assertNotNull(routeInstance.getMethod());
+		Route route = routes.find("GET", "/users");
+		Assert.assertNotNull(route);
+		Assert.assertNotNull(route.getController());
+		Assert.assertNotNull(route.getAction());
+		
+	}
+	
+	@Test
+	public void shouldFindRouteWithPathVariables() throws Exception {
+		
+		ControllerLoader controllerLoader = mock(ControllerLoader.class);
+		when(controllerLoader.load("users")).thenReturn(new MockController());
+		
+		RouteDefinition routeDefinition = new RouteDefinition("GET", "/users/{userId}/{hash}", "users", "show");
+		
+		RoutesParser routesParser = mock(RoutesParser.class);
+		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(routeDefinition));
+		
+		RoutesImpl routes = new RoutesImpl();
+		routes.setControllerLoader(controllerLoader);
+		routes.setRoutesParser(routesParser);
+		
+		routes.load(null);
+		
+		Route route = routes.find("GET", "/users/34/iuue-28484");
+		Assert.assertNotNull(route);
+		Assert.assertNotNull(route.getController());
+		Assert.assertNotNull(route.getAction());
 		
 	}
 	
@@ -45,7 +69,7 @@ public class RoutesImplTest {
 		ControllerLoader controllerLoader = mock(ControllerLoader.class);
 		when(controllerLoader.load("users")).thenReturn(new MockController());
 		
-		Route route = new Route("GET", "/users", "users", "show");
+		RouteDefinition route = new RouteDefinition("GET", "/users", "users", "show");
 		
 		RoutesParser routesParser = mock(RoutesParser.class);
 		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(route));
@@ -56,8 +80,30 @@ public class RoutesImplTest {
 		
 		routes.load(null);
 		
-		RouteInstance routeInstance = routes.find("GET", "/non-existent");
+		Route routeInstance = routes.find("GET", "/non-existent");
 		Assert.assertNull(routeInstance);
+	}
+	
+	@Test
+	public void shouldNotFindRouteWithPathVariable() throws Exception {
+		
+		ControllerLoader controllerLoader = mock(ControllerLoader.class);
+		when(controllerLoader.load("users")).thenReturn(new MockController());
+		
+		RouteDefinition routeDefinition = new RouteDefinition("GET", "/users/{userId}", "users", "show");
+		
+		RoutesParser routesParser = mock(RoutesParser.class);
+		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(routeDefinition));
+		
+		RoutesImpl routes = new RoutesImpl();
+		routes.setControllerLoader(controllerLoader);
+		routes.setRoutesParser(routesParser);
+		
+		routes.load(null);
+		
+		Route route = routes.find("GET", "/users/34/test");
+		Assert.assertNull(route);
+		
 	}
 	
 	@Test(expectedExceptions=RoutesException.class)
@@ -65,7 +111,7 @@ public class RoutesImplTest {
 		
 		ControllerLoader controllerLoader = mock(ControllerLoader.class);
 		
-		Route route = new Route("GET", "/users", "users", "show");
+		RouteDefinition route = new RouteDefinition("GET", "/users", "users", "show");
 		
 		RoutesParser routesParser = mock(RoutesParser.class);
 		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(route));
@@ -83,7 +129,7 @@ public class RoutesImplTest {
 		ControllerLoader controllerLoader = mock(ControllerLoader.class);
 		when(controllerLoader.load("users")).thenReturn(new MockController());
 		
-		Route route = new Route("GET", "/users", "users", "test");
+		RouteDefinition route = new RouteDefinition("GET", "/users", "users", "test");
 		
 		RoutesParser routesParser = mock(RoutesParser.class);
 		when(routesParser.parse(any(InputStream.class))).thenReturn(Collections.singletonList(route));

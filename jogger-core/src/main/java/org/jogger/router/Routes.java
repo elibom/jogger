@@ -27,8 +27,8 @@ public interface Routes {
 	 * @param httpMethod the HTTP method that we are going to use to find the route.
 	 * @param path the path for which we are searching a route.
 	 * 
-	 * @return an initialized {@link RouteInstance} if a route is found or null otherwise.
+	 * @return an initialized {@link Route} if a route is found or null otherwise.
 	 * @throws RoutesException if there is a problem loading the controller or the method.
 	 */
-	RouteInstance find(String httpMethod, String path) throws RoutesException;
+	Route find(String httpMethod, String path) throws RoutesException;
 }

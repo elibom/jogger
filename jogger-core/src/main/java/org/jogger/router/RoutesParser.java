@@ -5,7 +5,7 @@ import java.text.ParseException;
 import java.util.List;
 
 /**
- * A routes parser. Receives an {@link InputStream} and parse it into a list of {@link Route} objects. Implementations 
+ * A routes parser. Receives an {@link InputStream} and parse it into a list of {@link RouteDefinition} objects. Implementations 
  * should only check that the syntax is valid, not if the controller or the method exists and can be loaded.
  * 
  * @author German Escobar
@@ -17,10 +17,10 @@ public interface RoutesParser {
 	 * 
 	 * @param inputStream
 	 * 
-	 * @return a list of {@link Route} objects.
+	 * @return a list of {@link RouteDefinition} objects.
 	 * @throws ParseException
 	 * @throws RoutesException
 	 */
-	List<Route> parse(InputStream inputStream) throws ParseException, RoutesException;
+	List<RouteDefinition> parse(InputStream inputStream) throws ParseException, RoutesException;
 	
 }

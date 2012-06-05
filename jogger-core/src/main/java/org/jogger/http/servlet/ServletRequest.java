@@ -15,13 +15,14 @@ import org.jogger.http.Cookie;
 import org.jogger.http.HttpException;
 import org.jogger.http.Request;
 import org.jogger.http.Value;
+import org.jogger.support.AbstractRequest;
 
 /**
  * A {@link Request} implementation based on the Servlet API.
  * 
  * @author German Escobar
  */
-public class ServletRequest implements Request {
+public class ServletRequest extends AbstractRequest {
 	
 	/**
 	 * The underlying Servlet Request.
@@ -29,7 +30,7 @@ public class ServletRequest implements Request {
 	private HttpServletRequest request;
 	
 	/**
-	 * Constructor. Initializes the underlying Servlet request that we are going to use.
+	 * Constructor. Initialized the underlying Servlet request with a null route path.
 	 * 
 	 * @param request the Servlet request object.
 	 */
@@ -227,4 +228,13 @@ public class ServletRequest implements Request {
 		return bodyParser;
 	}
 
+	/**
+	 * Sets the path variables from the holders in the route path.
+	 * 
+	 * @param routePath the original route path with holders, if any.
+	 */
+	public void setRoutePath(String routePath) {
+		initPathVariables( routePath );
+	}
+	
 }

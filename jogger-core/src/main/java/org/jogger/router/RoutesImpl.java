@@ -29,15 +29,15 @@ public class RoutesImpl implements Routes {
 	/**
 	 * Here we are storing the loaded routes.
 	 */
-	private List<Route> routes;
+	private List<RouteDefinition> routes;
 
 	@Override
 	public void load(InputStream inputStream) throws ParseException, RoutesException {
 		
-		List<Route> routes = routesParser.parse(inputStream);
+		List<RouteDefinition> routes = routesParser.parse(inputStream);
 		
 		// validate routes
-		for (Route route : routes) {
+		for (RouteDefinition route : routes) {
 			Object controller = validateController(route.getControllerName());
 			validateMethod(controller, route.getControllerMethod());
 		}
@@ -95,12 +95,11 @@ public class RoutesImpl implements Routes {
 	}
 
 	@Override
-	public RouteInstance find(String httpMethod, String path) throws RoutesException {
+	public Route find(String httpMethod, String path) throws RoutesException {
 		
-		for (Route route : routes) {
+		for (RouteDefinition route : routes) {
 			
-			/* TODO match multiple routes and routes with holders */
-			if (route.getPath().equalsIgnoreCase(path) && route.getHttpMethod().equalsIgnoreCase(httpMethod)) {
+			if (matchesPath(route.getPath(), path) && route.getHttpMethod().equalsIgnoreCase(httpMethod)) {
 				
 				try {
 					return createInstance(route);
@@ -114,20 +113,27 @@ public class RoutesImpl implements Routes {
 		return null;
 	}
 	
+	private boolean matchesPath(String routePath, String pathToMatch) {
+		
+		routePath = routePath.replaceAll( "\\{([^{}]+)\\}", "[^#/?]+" );
+		return pathToMatch.matches( routePath );
+		
+	}
+	
 	/**
-	 * Helper method. Given a {@link Route} create a {@link RouteInstance}.
+	 * Helper method. Given a {@link RouteDefinition} create a {@link Route}.
 	 * 
 	 * @param route the route from which we are creating the route instance. 
 	 * 
-	 * @return a initialized {@link RouteInstance}.
+	 * @return a initialized {@link Route}.
 	 * @throws Exception if something goes wrong.
 	 */
-	private RouteInstance createInstance(Route route) throws Exception {
+	private Route createInstance(RouteDefinition routeDef) throws Exception {
 		
-		Object controller = controllerLoader.load(route.getControllerName());
-		Method method = controller.getClass().getMethod(route.getControllerMethod(), Request.class, Response.class);
+		Object controller = controllerLoader.load( routeDef.getControllerName() );
+		Method method = controller.getClass().getMethod( routeDef.getControllerMethod(), Request.class, Response.class );
 		
-		return new RouteInstance(controller, method);
+		return new Route(routeDef.getHttpMethod(), routeDef.getPath(), controller, method);
 		
 	}
 

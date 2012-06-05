@@ -35,10 +35,10 @@ public class RoutesParserImpl implements RoutesParser {
 	 * </code></pre>
 	 */
 	@Override
-	public List<Route> parse(InputStream inputStream) throws ParseException, RoutesException {
+	public List<RouteDefinition> parse(InputStream inputStream) throws ParseException, RoutesException {
 		
 		line = 0; // reset line positioning
-		List<Route> routes = new ArrayList<Route>(); // this is what we will fill and return
+		List<RouteDefinition> routes = new ArrayList<RouteDefinition>(); // this is what we will fill and return
 		
 		try {
 			
@@ -53,7 +53,7 @@ public class RoutesParserImpl implements RoutesParser {
 				// only parse line if it is not empty and not a comment
 				if (!input.equals("") && !input.startsWith("#")) {
 					
-					Route route = parse(input);
+					RouteDefinition route = parse(input);
 					routes.add(route);
 					
 				}
@@ -67,14 +67,14 @@ public class RoutesParserImpl implements RoutesParser {
 	}
 	
 	/**
-	 * Helper method. Creates a {@link Route} object from the input string.
+	 * Helper method. Creates a {@link RouteDefinition} object from the input string.
 	 * 
 	 * @param input the string to parse.
 	 * 
 	 * @return an 
 	 * @throws ParseException
 	 */
-	private Route parse(String input) throws ParseException {
+	private RouteDefinition parse(String input) throws ParseException {
 		
 		StringTokenizer st = new StringTokenizer(input, " \t");
 		if (st.countTokens() != 3) {
@@ -93,7 +93,7 @@ public class RoutesParserImpl implements RoutesParser {
 		// retrieve controller method
 		String controllerMethod = controllerAndMethod.substring(hashPos + 1);
 		
-		return new Route(httpMethod, path, controllerName, controllerMethod);
+		return new RouteDefinition(httpMethod, path, controllerName, controllerMethod);
 		
 	}
 	
@@ -131,7 +131,52 @@ public class RoutesParserImpl implements RoutesParser {
 			throw new ParseException("Path must start with '/'", line);
 		}
 		
+		boolean openedKey = false;
+		for (int i=0; i < path.length(); i++) {
+			
+			validateChar(path, i, openedKey);
+				
+			if (path.charAt(i) == '{') {
+				openedKey = true;
+			}
+			
+			if (path.charAt(i) == '}') {
+				openedKey = false;
+			}
+			
+		}
+		
 		return path;
+	}
+	
+	/**
+	 * Helper method. 
+	 * 
+	 * @param path
+	 * @param index
+	 * @param openedKey
+	 * @throws ParseException
+	 */
+	private void validateChar(String path, int index, boolean openedKey) throws ParseException {
+		
+		char pathChar = path.charAt(index);
+		
+		char[] invalidChars = { '?', '#', ' ' };
+		for (char invalidChar : invalidChars) {
+			if (pathChar == invalidChar) {
+				throw new ParseException(path, index);
+			}
+		}
+		
+		if (openedKey) {
+			char[] moreInvalidChars = { '/', '{' };
+			for (char invalidChar : moreInvalidChars) {
+				if (pathChar == invalidChar) {
+					throw new ParseException(path, index);
+				}
+			}
+		}
+		
 	}
 	
 	/**

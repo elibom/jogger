@@ -1,52 +1,32 @@
 package org.jogger.router;
 
+import java.lang.reflect.Method;
+
 /**
- * Represents a row in the routes.config file. 
+ * This is a wrapper class that has a controller object and a {@link Method}. It is returned from the 
+ * {@link Routes#find(String, String)} method.
  * 
  * @author German Escobar
  */
 public class Route {
-
-	/**
-	 * The HTTP method that this routes is declaring.
-	 */
+	
 	private String httpMethod;
 	
-	/**
-	 * The path of the route
-	 */
 	private String path;
 	
-	/**
-	 * The name of the controller.
-	 */
-	private String controllerName;
+	private Object controller;
 	
-	/**
-	 * The method that is going to be called for this route.
-	 */
-	private String controllerMethod;
+	private Method action;
 	
-	/**
-	 * Constructor.
-	 */
 	public Route() {
-		
+		this(null, null, null, null);
 	}
 	
-	/**
-	 * Constructor. Sets all the properties with the arguments.
-	 * 
-	 * @param httpMethod
-	 * @param path
-	 * @param beanName
-	 * @param beanMethod
-	 */
-	public Route(String httpMethod, String path, String beanName, String beanMethod) {
+	public Route(String httpMethod, String path, Object controller, Method action) {
 		this.httpMethod = httpMethod;
 		this.path = path;
-		this.controllerName = beanName;
-		this.controllerMethod = beanMethod;
+		this.controller = controller;
+		this.action = action;
 	}
 
 	public String getHttpMethod() {
@@ -65,20 +45,20 @@ public class Route {
 		this.path = path;
 	}
 
-	public String getControllerName() {
-		return controllerName;
+	public Object getController() {
+		return controller;
 	}
 
-	public void setBeanName(String controllerName) {
-		this.controllerName = controllerName;
+	public void setController(Object controller) {
+		this.controller = controller;
 	}
 
-	public String getControllerMethod() {
-		return controllerMethod;
+	public Method getAction() {
+		return action;
 	}
 
-	public void setControllerMethod(String controllerMethod) {
-		this.controllerMethod = controllerMethod;
+	public void setAction(Method action) {
+		this.action = action;
 	}
 	
 }

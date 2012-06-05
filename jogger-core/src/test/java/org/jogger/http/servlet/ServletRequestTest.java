@@ -41,6 +41,40 @@ public class ServletRequestTest {
 	}
 	
 	@Test
+	public void shouldRetrievePathVariables() throws Exception {
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getContextPath()).thenReturn("");
+		when(servletRequest.getRequestURI()).thenReturn("/users/1/edit/th1s1s4hAsh");
+		
+		ServletRequest request = new ServletRequest(servletRequest);
+		request.setRoutePath("/users/{userId}/edit/{hash}");
+		
+		Map<String,Value> pathVariables = request.getPathVariables();
+		Assert.assertNotNull( pathVariables );
+		Assert.assertEquals( pathVariables.size(), 2 );
+		Assert.assertEquals( pathVariables.get("userId").asLong(), new Long(1) );
+		Assert.assertEquals( pathVariables.get("hash").asString(), "th1s1s4hAsh");
+		
+	}
+	
+	@Test
+	public void shouldNotRetrieveNonExistingPathVariable() throws Exception {
+		
+		HttpServletRequest servletRequest = mock(HttpServletRequest.class);
+		when(servletRequest.getContextPath()).thenReturn("");
+		when(servletRequest.getRequestURI()).thenReturn("/users/1/edit/th1s1s4hAsh");
+		
+		ServletRequest request = new ServletRequest(servletRequest);
+		request.setRoutePath("/users/1/edit/th1s1s4hAsh");
+		
+		Map<String,Value> pathVariables = request.getPathVariables();
+		Assert.assertNotNull( pathVariables );
+		Assert.assertEquals( pathVariables.size(), 0 );
+		
+	}
+	
+	@Test
 	public void shouldRetrieveQueryString() throws Exception {
 		
 		HttpServletRequest servletRequest = mock(HttpServletRequest.class);

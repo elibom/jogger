@@ -28,6 +28,23 @@ public interface Request {
 	String getPath();
 	
 	/**
+	 * Retrieves the path variables. Path variables are wildcards that you can add to the url in the routes.config 
+	 * file. 
+	 * 
+	 * @return a Map<String,Value> object with the path variables.
+	 */
+	Map<String,Value> getPathVariables();
+	
+	/**
+	 * Retrieves the value of a path variable.
+	 * 
+	 * @param name the name of the path variable.
+	 * 
+	 * @return a Value object. Null if it doesn't exists.
+	 */
+	Value getPathVariable(String name);
+	
+	/**
 	 * Retrieves the raw query string part of the URL.
 	 * 
 	 * @return a String object with the query string part of the URL. An empty String if there is no query string. 
