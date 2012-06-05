@@ -75,6 +75,10 @@ public class MockRequest extends AbstractRequest {
 		
 		Map<String,Value> ret = new HashMap<String,Value>();
 		
+		if (queryString == null) {
+			return ret;
+		}
+		
 		String[] elems = queryString.split("&");
 		for (String elem : elems ) {
 			String[] pair = elem.split("=");
