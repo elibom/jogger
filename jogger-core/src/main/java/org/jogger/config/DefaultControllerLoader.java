@@ -60,7 +60,7 @@ public class DefaultControllerLoader implements ControllerLoader {
 	}
 	
 	public void setBasePackage(String basePackage) {
-		this.basePackage = basePackage;
+		this.basePackage = basePackage + ".";
 	}
 
 }
