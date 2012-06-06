@@ -1,9 +1,8 @@
 package ${package}.controllers;
 
-import org.jogger.config.DefaultControllerLoader;
+import org.jogger.config.Interceptors;
 import org.jogger.http.Response;
 import org.jogger.test.JoggerTest;
-import org.jogger.test.MockJoggerServlet;
 import org.jogger.test.MockResponse;
 
 import ${package}.interceptors.AppInterceptors;
@@ -25,14 +24,16 @@ public class PagesTest extends JoggerTest {
 	}
 
 	@Override
-	protected MockJoggerServlet getJoggerServlet() {
+	protected String getBasePackage() {
+		return "${package}.controllers";
+	}
+
+	@Override
+	protected Interceptors getInterceptors() {
+		AppInterceptors interceptors = new AppInterceptors();
+		interceptors.initialize(null);
 		
-		MockJoggerServlet joggerServlet = new MockJoggerServlet();
-		joggerServlet.setBasePackage("${package}.controllers");
-		joggerServlet.setInterceptors( new AppInterceptors() );
-		
-		return joggerServlet;
-		
+		return interceptors;
 	}
 
 }
