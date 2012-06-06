@@ -100,16 +100,6 @@ public class MockRequest extends AbstractRequest {
 	}
 
 	@Override
-	public Map<String, Value> getPathVariables() {
-		return null;
-	}
-
-	@Override
-	public Value getPathVariable(String name) {
-		return null;
-	}
-
-	@Override
 	public String getQueryString() {
 		return queryString;
 	}
@@ -160,6 +150,11 @@ public class MockRequest extends AbstractRequest {
             return false;
         }
         return "XMLHttpRequest".equals(headers.get("x-requested-with"));
+	}
+	
+	public MockRequest ajax() {
+		headers.put("x-requested-with", "XMLHttpRequest");
+		return this;
 	}
 	
 	public MockRequest addCookie(Cookie cookie) {
