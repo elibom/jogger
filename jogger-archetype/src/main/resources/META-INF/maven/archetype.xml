@@ -14,7 +14,7 @@
 		<resource>src/main/webapp/WEB-INF/web.xml</resource>
 		<resource filtered="false">src/main/webapp/WEB-INF/routes.config</resource>
 		<resource filtered="false">src/main/webapp/WEB-INF/freemarker/layout.ftl</resource>
-		<resource filtered="false">src/main/webapp/WEB-INF/freemarker/index.ftl</resource>
+		<resource filtered="true">src/main/webapp/WEB-INF/freemarker/index.ftl</resource>
 	</resources>
 	
 	<testSources>

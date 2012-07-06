@@ -19,7 +19,7 @@ public class PagesTest extends JoggerTest {
 		
 		Assert.assertEquals( response.getStatus(), Response.OK );
 		Assert.assertEquals( response.getRenderedTemplate(), "index.ftl" );
-		Assert.assertTrue( response.getOutputAsString().contains("test") );
+		Assert.assertTrue( response.getOutputAsString().contains("Jogger") );
 		
 	}
 
