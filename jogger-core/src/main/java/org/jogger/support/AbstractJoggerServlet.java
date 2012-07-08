@@ -25,6 +25,11 @@ import freemarker.template.Configuration;
 public abstract class AbstractJoggerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * The FreeMarker configuration
+	 */
+	private Configuration freemarker;
 
 	/**
 	 * Service the request using our {@link Request} and {@link Response} objects. It's public so we can test it.
@@ -101,13 +106,37 @@ public abstract class AbstractJoggerServlet extends HttpServlet {
 	}
 	
 	/**
-	 * Must return the FreeMarker configuration that the Servlet will use to render templates.
+	 * Returns the FreeMarker configuration that the Servlet will use to render templates.
 	 * 
 	 * @return the FreeMarker {@link Configuration} object.
-	 * 
 	 * @throws ConfigurationException if there is a problem creating the {@link Configuration} object.
 	 */
-	protected abstract Configuration getFreeMarkerConfig() throws ConfigurationException;
+	public Configuration getFreeMarker() throws ConfigurationException {
+		
+		if (freemarker != null) {
+			return freemarker;
+		}
+		
+		freemarker = buildFreeMarker();
+		
+		return freemarker;
+	}
+	
+	/**
+	 * Configure the FreeMarker configuration object. Implementations of this method <strong>must</strong>, at least,
+	 * call one of the following:
+	 * 
+	 * <pre>
+	 * 	freemarker.setServletContextForTemplateLoading(servletContext, templatesPath);
+	 * 	// or
+	 * 	freemarker.setDirectoryForTemplateLoading(new File(templatesPath));
+	 * 	// or
+	 * 	freemarker.setClassForTemplateLoading(Some.class, templatesPath);
+	 * <pre>
+	 * 
+	 * @param freemarker
+	 */
+	protected abstract Configuration buildFreeMarker();
 	
 	/**
 	 * Must return the interceptors that the Servlet will use to intercept requests.

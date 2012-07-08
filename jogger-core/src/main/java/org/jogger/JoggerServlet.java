@@ -30,6 +30,7 @@ import org.jogger.support.AbstractJoggerServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import freemarker.cache.NullCacheStorage;
 import freemarker.template.Configuration;
 
 /**
@@ -50,11 +51,6 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	private Interceptors interceptors;
 	
 	/**
-	 * The FreeMarker configuration
-	 */
-	private Configuration freemarker;
-	
-	/**
 	 * Used to load and retrieve the routes.
 	 */
 	private Routes routes;
@@ -65,6 +61,8 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	@Override
 	public void init() throws ServletException {
 		
+		doInit();
+		
 		try {
 			getRoutes(); // validate the routes on initialization
 		} catch (Exception e) {
@@ -72,6 +70,12 @@ public class JoggerServlet extends AbstractJoggerServlet {
 		}
 		
 	}
+	
+	/**
+	 * Extended classes can override this method to add functionality on initialization of the Servlet. This method is
+	 * called before loading the routes.
+	 */
+	protected void doInit() {}
 	
 	/**
 	 * This is the entry point of a request (through the Servlet API). It creates the Jogger {@link Request} and 
@@ -83,7 +87,7 @@ public class JoggerServlet extends AbstractJoggerServlet {
 		
 		// build the Jogger request/response objects
 		ServletRequest request = new ServletRequest(servletRequest);
-		ServletResponse response = new ServletResponse(servletResponse, getFreeMarkerConfig());
+		ServletResponse response = new ServletResponse(servletResponse, getFreeMarker());
 		
 		try {
 			
@@ -216,7 +220,14 @@ public class JoggerServlet extends AbstractJoggerServlet {
 		// development mode.
 		synchronized(routes) {
 			
-			InputStream inputStream = getServletContext().getResourceAsStream(routesConfigLocation);; 
+			// try to get the file from the servlet context
+			InputStream inputStream = getServletContext().getResourceAsStream(routesConfigLocation);
+			
+			if (inputStream == null) {
+				// try in the classpath
+				inputStream =JoggerServlet.class.getClassLoader().getResourceAsStream(routesConfigLocation);
+			}
+			
 			routes.load(inputStream);
 			
 		}
@@ -224,13 +235,9 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	}
 
 	@Override
-	protected Configuration getFreeMarkerConfig() throws ConfigurationException {
-		
-		if (freemarker != null) {
-			return freemarker;
-		}
-		
-		freemarker = new Configuration();
+	protected Configuration buildFreeMarker() throws ConfigurationException {
+
+		Configuration freemarker = new Configuration();
 		
 		String templatesLocation = getServletConfig().getInitParameter("templatesLocation");
 		if (templatesLocation == null) {
@@ -238,6 +245,9 @@ public class JoggerServlet extends AbstractJoggerServlet {
 		}
 
 		freemarker.setServletContextForTemplateLoading(getServletContext(), templatesLocation);
+		if (Jogger.isDevEnv()) {
+			freemarker.setCacheStorage(new NullCacheStorage());
+		}
 		
 		return freemarker;
 		

@@ -209,7 +209,7 @@ public class MockRequest extends AbstractRequest {
 	public MockResponse run() throws Exception {
 		
 		// mock the response
-		MockResponse response = new MockResponse( joggerServlet.getFreeMarkerConfig() );
+		MockResponse response = new MockResponse( joggerServlet.getFreeMarker() );
 		
 		// try to find a route
 		Route route = routes.find( getMethod(), getPath() );

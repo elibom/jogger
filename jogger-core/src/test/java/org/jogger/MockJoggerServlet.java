@@ -14,7 +14,7 @@ public class MockJoggerServlet extends AbstractJoggerServlet {
 	private Interceptors interceptors;
 
 	@Override
-	public Configuration getFreeMarkerConfig() {
+	public Configuration buildFreeMarker() {
 		return freeMarkerConfig;
 	}
 

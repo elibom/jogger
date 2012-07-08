@@ -37,7 +37,7 @@ public class MockJoggerServlet extends AbstractJoggerServlet {
 	};
 
 	@Override
-	public Configuration getFreeMarkerConfig() throws ConfigurationException {
+	public Configuration buildFreeMarker() throws ConfigurationException {
 		
 		try {
 		
