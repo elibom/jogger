@@ -5,7 +5,7 @@
 	<!-- Welcome page starts -->
 	<style>
 		body {
-			background: whiteSmoke; height: 100%; font-size: 100%; line-height:1.6em; font-color:#444;
+			background: whiteSmoke; height: 100%; font-size: 100%; line-height:1.6em; color:#444;
 		}
 		
 		.header {
@@ -14,6 +14,10 @@
 		
 		.header div {
 			padding-top:25px;
+		}
+		
+		pre {
+			white-space: pre;word-wrap: normal; overflow-x: auto;
 		}
 		
 		div#content {
@@ -25,14 +29,41 @@
 		}
 		
 		div.list {
-			padding-left: 40px;
-			margin-bottom: 20px;
+			padding-left: 40px; margin-bottom: 20px;
 		}
 		
 		div.list p span.number {
 			margin-left: -25px; padding-right: 10px;
 		}
 		
+		@media (max-width: 767px) {
+			body {
+				padding-right: 0px; padding-left: 0px; font-size: 14px;
+			}
+			
+			.header div {
+				padding-left:20px;
+			}
+			
+			div#content {
+				padding: 20px; -webkit-border-radius: 0px; -moz-border-radius: 0px; border-radius: 0px; margin-bottom: 0px;
+			}
+			
+			div.list {
+				padding-left: 30px;
+			}
+		}
+		
+		@media (max-width: 480px) {
+			.header div {
+				padding-left:15px;
+			}
+			
+			div#content {
+				padding: 15px;
+			}
+		}
+	
 	</style>
 	
 	<div class="header">
@@ -54,9 +85,9 @@
 				<p>Every time a <code>GET</code> to the <code>/</code> path is received, it will be handled by the <code>index</code> method of the <code>Pages</code> controller.</p>
 			</div>
 			<div class="list">
-				<p><span class="number">2.</span> Open the <code>${package}.controllers.Pages</code> class. Take a look at the <code>index</code> method.</p>
+				<p><span class="number">2.</span> Open the <code>com.company.controller.Pages</code> class. Take a look at the <code>index</code> method.</p>
 				<pre>public void index(Request request, Response response) {
-	response.render("index.ftl");
+    response.render("index.ftl");
 }</pre>
 				<p>You can play with the <code>response</code> object to render different things.</p>
 			</div>
