@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.jogger</groupId>
 		<artifactId>jogger-parent</artifactId>
-		<version>0.4.2</version>
+		<version>0.4.3-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>jogger-spring</artifactId>
