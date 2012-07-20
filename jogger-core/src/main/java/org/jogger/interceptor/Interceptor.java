@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.interceptor;
 
 import org.jogger.http.Request;
 import org.jogger.http.Response;
@@ -21,7 +21,7 @@ public interface Interceptor {
 
 	/**
 	 * This method is called when a matching request is received. Implementations of this method are responsible of
-	 * calling the {@link InterceptorChain#proceed()} method to continue with the execution of the request unless it
+	 * calling the {@link InterceptorExecution#proceed()} method to continue with the execution of the request unless it
 	 * actually wants to stop the execution (in which case it should set the response in the controller)
 	 * 
 	 * @param request
@@ -30,6 +30,6 @@ public interface Interceptor {
 	 * 
 	 * @throws Exception
 	 */
-	void intercept(Request request, Response response, InterceptorChain execution) throws Exception;
+	void intercept(Request request, Response response, InterceptorExecution execution) throws Exception;
 	
 }

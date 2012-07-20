@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.Interceptor;
+import org.jogger.interceptor.Interceptor;
 
 /**
  * This is the mechanism that web applications use for registering interceptors. Just subclass this abstract class and 

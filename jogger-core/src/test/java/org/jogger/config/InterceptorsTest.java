@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.Interceptor;
-import org.jogger.InterceptorChain;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.interceptor.Interceptor;
+import org.jogger.interceptor.InterceptorExecution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -70,7 +70,7 @@ public class InterceptorsTest {
 	private class MockInterceptor implements Interceptor {
 
 		@Override
-		public void intercept(Request request, Response response, InterceptorChain execution) throws Exception {
+		public void intercept(Request request, Response response, InterceptorExecution execution) throws Exception {
 			
 			execution.proceed();
 			

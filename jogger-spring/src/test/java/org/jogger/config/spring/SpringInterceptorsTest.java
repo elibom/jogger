@@ -8,7 +8,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.jogger.Interceptor;
+import org.jogger.interceptor.Interceptor;
 import org.springframework.context.ApplicationContext;
 import org.testng.annotations.Test;
 

@@ -8,8 +8,9 @@ import org.jogger.http.Response;
  * 
  * @author German Escobar
  */
-public abstract class MockController {
-	
-	public abstract void show(Request request, Response response);
+@MockAnnotation
+public class AnnotatedMockController {
+
+	public void action(Request request, Response response) {}
 	
 }

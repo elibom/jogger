@@ -2,9 +2,9 @@ package org.jogger.config.spring;
 
 import javax.servlet.ServletConfig;
 
-import org.jogger.Interceptor;
 import org.jogger.config.ConfigurationException;
 import org.jogger.config.Interceptors;
+import org.jogger.interceptor.Interceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

@@ -1,16 +1,19 @@
 package org.jogger.support;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.servlet.http.HttpServlet;
 
-import org.jogger.Interceptor;
-import org.jogger.InterceptorChain;
 import org.jogger.config.ConfigurationException;
 import org.jogger.config.Interceptors;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.interceptor.Action;
+import org.jogger.interceptor.Controller;
+import org.jogger.interceptor.Interceptor;
+import org.jogger.interceptor.InterceptorExecution;
 import org.jogger.router.Route;
 
 import freemarker.template.Configuration;
@@ -61,7 +64,7 @@ public abstract class AbstractJoggerServlet extends HttpServlet {
 	 * 
 	 * @author German Escobar
 	 */
-	private class ControllerExecutor implements InterceptorChain {
+	private class ControllerExecutor implements InterceptorExecution {
 		
 		private Route route;
 		
@@ -73,6 +76,14 @@ public abstract class AbstractJoggerServlet extends HttpServlet {
 		
 		private int index = 0;
 		
+		/**
+		 * Constructor. Initializes the object with the specified parameters.
+		 * 
+		 * @param route holds the controller class and the action method.
+		 * @param request an object that represents the current HTTP request.
+		 * @param response an object that represents the current HTTP response.
+		 * @param interceptors a list of interceptors that we need to execute before calling the action.
+		 */
 		public ControllerExecutor(Route route, Request request, Response response, List<Interceptor> interceptors) {
 			this.route = route;
 			this.request = request;
@@ -98,8 +109,32 @@ public abstract class AbstractJoggerServlet extends HttpServlet {
 			Interceptor interceptor = interceptors.get(index);
 			index++;
 			
-			// execute the interceptor - notice that the interceptor will call this same method
+			// execute the interceptor - notice that the interceptor can eventually call the proceed() method recursively.
 			interceptor.intercept(request, response, this);
+			
+		}
+
+		@Override
+		public Controller getController() {
+			
+			// create and return a new instance of the Controller class
+			return new Controller() {
+				public <A extends Annotation> A getAnnotation(Class<A> annotation) {
+					return route.getController().getClass().getAnnotation(annotation);
+				}
+			};
+			
+		}
+
+		@Override
+		public Action getAction() {
+			
+			// create and return a new instance of the Action class
+			return new Action() {
+				public <A extends Annotation> A getAnnotation(Class<A> annotation) {
+					return route.getAction().getAnnotation(annotation);
+				}
+			};
 			
 		}
 		
