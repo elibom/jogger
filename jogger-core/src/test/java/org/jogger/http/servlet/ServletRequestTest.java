@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -105,20 +104,20 @@ public class ServletRequestTest {
 		Assert.assertNotNull( param1 );
 		Assert.assertEquals( param1.asString(), "value1" );
 		
-		List<Value> param1Values = param1.asList();
+		Value[] param1Values = param1.asArray();
 		Assert.assertNotNull( param1Values );
-		Assert.assertEquals( param1Values.size(), 1 );
-		Assert.assertEquals( param1Values.get(0).asString(), "value1" );
+		Assert.assertEquals( param1Values.length, 1 );
+		Assert.assertEquals( param1Values[0].asString(), "value1" );
 		
 		Value param2 = params.get("param2");
 		Assert.assertNotNull( param2 );
 		Assert.assertEquals( param2.asString(), "val1,val2" );
 		
-		List<Value> param2Values = param2.asList();
+		Value[] param2Values = param2.asArray();
 		Assert.assertNotNull( param2Values );
-		Assert.assertEquals( param2Values.size(), 2);
-		Assert.assertEquals( param2Values.get(0).asString(), "val1" );
-		Assert.assertEquals( param2Values.get(1).asString(), "val2" );
+		Assert.assertEquals( param2Values.length, 2);
+		Assert.assertEquals( param2Values[0].asString(), "val1" );
+		Assert.assertEquals( param2Values[1].asString(), "val2" );
 		
 		Assert.assertNull( params.get("notexistnet") );
 		
@@ -220,14 +219,14 @@ public class ServletRequestTest {
 		Assert.assertNotNull( request.getParameter("param1") );
 		Assert.assertNotNull( request.getParameter("param2") );
 		
-		List<Value> param1Values = request.getParameter("param1").asList();
-		Assert.assertEquals( param1Values.size(), 1 );
-		Assert.assertEquals( param1Values.get(0).asString(), "value1");
+		Value[] param1Values = request.getParameter("param1").asArray();
+		Assert.assertEquals( param1Values.length, 1 );
+		Assert.assertEquals( param1Values[0].asString(), "value1");
 		
-		List<Value> param2Values = request.getParameter("param2").asList();
-		Assert.assertEquals( param2Values.size(), 2 );
-		Assert.assertEquals( param2Values.get(0).asString(), "value1");
-		Assert.assertEquals( param2Values.get(1).asLong(), new Long(2) );
+		Value[] param2Values = request.getParameter("param2").asArray();
+		Assert.assertEquals( param2Values.length, 2 );
+		Assert.assertEquals( param2Values[0].asString(), "value1");
+		Assert.assertEquals( param2Values[1].asLong(), new Long(2) );
 		
 	}
 	

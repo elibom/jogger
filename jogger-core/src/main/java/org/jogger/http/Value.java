@@ -2,12 +2,10 @@ package org.jogger.http;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Wraps a String object that can be converted into other objects (e.g. Long, Boolean, Date, List, etc.). 
+ * Wraps a String object that can be converted into other objects (e.g. Long, Boolean, Date, Array, etc.). 
  * 
  * @author German Escobar
  */
@@ -16,6 +14,10 @@ public class Value {
 	private String value;
 
 	public Value(String value) {
+		if (value == null) {
+			throw new IllegalArgumentException("value not provided.");
+		}
+		
 		this.value = value;
 	}
 	
@@ -40,20 +42,19 @@ public class Value {
 		return sdf.parse(value);
 	}
 	
-	public List<Value> asList() {
-		return asList( "," );
+	public Value[] asArray() {
+		return asArray( "," );
 	}
 	
-	public List<Value> asList(String separator) {
-		
-		List<Value> params = new ArrayList<Value>();
+	public Value[] asArray(String separator) {
 		
 		String[] tokens = value.split( separator );
-		for (String token : tokens) {
-			params.add( new Value(token) );
+		Value[] values = new Value[tokens.length];
+		for (int i=0; i < tokens.length; i++) {
+			values[i] = new Value(tokens[i]);
 		}
 		
-		return params;
+		return values;
 		
 	}
 	
