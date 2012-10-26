@@ -85,11 +85,10 @@ public class JoggerServlet extends AbstractJoggerServlet {
 	@Override
 	protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws ServletException, IOException {
 		
-		// build the Jogger request/response objects
-		ServletRequest request = new ServletRequest(servletRequest);
-		ServletResponse response = new ServletResponse(servletResponse, getFreeMarker());
-		
 		try {
+			// build the Jogger request/response objects
+			ServletRequest request = new ServletRequest(servletRequest);
+			ServletResponse response = new ServletResponse(servletResponse, getFreeMarker());
 			
 			// try to find the route 
 			Route route = getRoutes().find( request.getMethod(), request.getPath() );

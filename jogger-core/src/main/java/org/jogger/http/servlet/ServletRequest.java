@@ -3,18 +3,24 @@ package org.jogger.http.servlet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.jogger.http.Cookie;
+import org.jogger.http.FileItem;
 import org.jogger.http.HttpException;
 import org.jogger.http.Request;
 import org.jogger.http.Value;
+import org.jogger.http.servlet.multipart.Multipart;
+import org.jogger.http.servlet.multipart.MultipartException;
+import org.jogger.http.servlet.multipart.PartHandler;
 import org.jogger.support.AbstractRequest;
 
 /**
@@ -29,13 +35,61 @@ public class ServletRequest extends AbstractRequest {
 	 */
 	private HttpServletRequest request;
 	
+	private Map<String,Value> parameters = new HashMap<String,Value>();
+	
+	private List<FileItem> files = new ArrayList<FileItem>();
+	
 	/**
-	 * Constructor. Initialized the underlying Servlet request with a null route path.
+	 * Constructor.
 	 * 
 	 * @param request the Servlet request object.
+	 * 
+	 * @throws FileUploadException if there is a problem parsing the multipart/form-data.
+	 * @throws IOException if there is a problem parsing the multipart/form-data.
 	 */
-	public ServletRequest(HttpServletRequest request) {
+	public ServletRequest(HttpServletRequest request) throws MultipartException, IOException {
 		this.request = request;
+		
+		// retrieve query and post params
+		Map<String,String[]> requestParams = request.getParameterMap();
+		for (Map.Entry<String,String[]> entry : requestParams.entrySet()) {
+			parameters.put( entry.getKey(), new Value(join(entry.getValue())) );
+		}
+		
+		// retrieve multipart/form-data parameters
+		if (Multipart.isMultipartContent(request)) {
+			
+			Multipart multipart = new Multipart();
+			multipart.parse(request, new PartHandler() {
+
+				@Override
+				public void handleFormItem(String name, String value) {
+					parameters.put( name, new Value(value) );
+				}
+
+				@Override
+				public void handleFileItem(String name, FileItem fileItem) {
+					files.add(fileItem);
+				}
+				
+			});
+			
+		}
+		
+	}
+	
+	private String join(String[] arr) {
+		
+		String ret = "";
+		for (String item : arr) {
+			ret += "," + item;
+		}
+		
+		if (ret.length() > 0) { 
+			ret = ret.substring(1);
+		}
+		
+		return ret;
 	}
 
 	@Override
@@ -67,35 +121,12 @@ public class ServletRequest extends AbstractRequest {
 
 	@Override
 	public Map<String,Value> getParameters() {
-		
-		Map<String,Value> ret = new HashMap<String,Value>();
-		
-		Set<String> names = request.getParameterMap().keySet();
-		for (String name : names) {
-			ret.put( name, getParameter(name) );
-		}
-		
-		return ret;
-		
+		return Collections.unmodifiableMap(parameters);
 	}
 
 	@Override
 	public Value getParameter(String name) {
-		
-		Map<String,String[]> params = request.getParameterMap();
-		
-		String[] paramValues = params.get(name);
-		if (paramValues == null) {
-			return null;
-		}
-		
-		String ret = "";
-		for (String p : paramValues) {
-			ret += "," + p;
-		}
-		
-		return new Value( ret.substring(1) );
-		
+		return parameters.get(name);
 	}
 
 	@Override
@@ -191,6 +222,17 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
+	public FileItem[] getFiles() {
+		
+		FileItem[] fileParts = new FileItem[files.size()];
+		for (int i=0; i < files.size(); i++) {
+			fileParts[i] = files.get(i);
+		}
+		return fileParts;
+		
+	}
+
+	@Override
 	public BodyParser getBody() throws HttpException {
 		
 		BodyParser bodyParser = new BodyParser() {
@@ -198,7 +240,7 @@ public class ServletRequest extends AbstractRequest {
 			@Override
 			public String asString() throws HttpException {
 				try {
-					BufferedReader reader = request.getReader();
+					BufferedReader reader = new BufferedReader( new InputStreamReader(request.getInputStream()) );
 				    StringBuilder sb = new StringBuilder();
 				    String line = reader.readLine();
 				    while (line != null) {

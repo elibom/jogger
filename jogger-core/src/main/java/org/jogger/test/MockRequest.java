@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jogger.http.Cookie;
+import org.jogger.http.FileItem;
 import org.jogger.http.Request;
 import org.jogger.http.Value;
 import org.jogger.router.Route;
@@ -181,6 +182,11 @@ public class MockRequest extends AbstractRequest {
 	@Override
 	public String getHeader(String name) {
 		return headers.get(name);
+	}
+
+	@Override
+	public FileItem[] getFiles() {
+		return new FileItem[0];
 	}
 
 	@Override

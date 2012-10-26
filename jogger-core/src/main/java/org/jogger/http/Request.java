@@ -105,6 +105,13 @@ public interface Request {
 	String getHeader(String name);
 	
 	/**
+	 * Retrieves the files from the request (if any).
+	 * 
+	 * @return an array of {@link FileItem} objects or an empty array if no files.
+	 */
+	FileItem[] getFiles();
+	
+	/**
 	 * Returns an object that will allow us to retrieve the body in multiple ways.
 	 * 
 	 * @return a {@link BodyParser} implementation.
