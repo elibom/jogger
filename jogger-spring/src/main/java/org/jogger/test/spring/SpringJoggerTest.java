@@ -22,6 +22,7 @@ public abstract class SpringJoggerTest extends JoggerTest {
 	@BeforeSuite
 	public void init() {
 		System.setProperty("JOGGER_ENV", "test");
+		doInit();
 		springContext = new FileSystemXmlApplicationContext( getConfigLocations() );
 	}
 	
@@ -51,6 +52,11 @@ public abstract class SpringJoggerTest extends JoggerTest {
 		
 		return controllerLoader;
 	}
+	
+	/**
+	 * Used to initialize system properties.
+	 */
+	protected abstract void doInit();
 	
 	protected abstract String[] getConfigLocations();
 
