@@ -13,7 +13,7 @@
 		}
 		
 		.header div {
-			padding-top:25px;
+			padding-top:15px;
 		}
 		
 		pre {
