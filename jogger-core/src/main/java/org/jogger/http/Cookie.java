@@ -27,9 +27,14 @@ public class Cookie {
 	}
 	
 	public Cookie(String name, String value, int maxAge) {
+		this(name, value, maxAge, null);
+	}
+	
+	public Cookie(String name, String value, int maxAge, String path) {
 		this.name = name;
 		this.value = value;
 		this.maxAge = maxAge;
+		this.path = path;
 	}
 	
 	public Cookie(String name, String value, int maxAge, boolean httpOnly) {
