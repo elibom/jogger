@@ -1,9 +1,12 @@
 package org.jogger.test;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jogger.http.Cookie;
@@ -45,6 +48,8 @@ public class MockRequest extends AbstractRequest {
 	private Map<String,Cookie> cookies = new HashMap<String,Cookie>();
 	
 	private Map<String,String> headers = new HashMap<String,String>();
+	
+	private List<FileItem> files = new ArrayList<FileItem>();
 	
 	private String body;
 	
@@ -186,7 +191,14 @@ public class MockRequest extends AbstractRequest {
 
 	@Override
 	public FileItem[] getFiles() {
-		return new FileItem[0];
+		return files.toArray( new FileItem[0] );
+	}
+	
+	public MockRequest addFile(File file, String fileName, String contentType) {
+		String fieldName = "file" + files.size();
+		files.add( new FileItem(fieldName, fileName, contentType, 0, file, new HashMap<String,String>()) );
+		
+		return this;
 	}
 
 	@Override
