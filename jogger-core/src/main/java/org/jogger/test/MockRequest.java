@@ -183,10 +183,20 @@ public class MockRequest extends AbstractRequest {
 	public Map<String, String> getHeaders() {
 		return headers;
 	}
+	
+	public MockRequest setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+		return this;
+    }
 
 	@Override
 	public String getHeader(String name) {
 		return headers.get(name);
+	}
+	
+	public MockRequest setHeader(String name, String value) {
+		headers.put(name, value);
+		return this;
 	}
 
 	@Override
