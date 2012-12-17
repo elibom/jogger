@@ -1,17 +1,6 @@
 package org.jogger.test;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.text.ParseException;
-
-import org.jogger.config.ControllerLoader;
-import org.jogger.config.DefaultControllerLoader;
-import org.jogger.config.Interceptors;
-import org.jogger.router.Routes;
-import org.jogger.router.RoutesException;
-import org.jogger.router.RoutesImpl;
-import org.jogger.router.RoutesParser;
-import org.jogger.router.RoutesParserImpl;
+import org.jogger.Jogger;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -67,95 +56,10 @@ public abstract class JoggerTest {
 	 * @throws Exception
 	 */
 	private MockRequest service(String httpMethod, String path) throws Exception {
-		
 		String url = "http://localhost" + path;
-		
-		MockRequest request = new MockRequest(httpMethod, url);
-		request.setJoggerServlet( getJoggerServlet() );
-		request.setRoutes( getRoutes() );
-		
-		return request;
+		return new MockRequest(getJogger(), httpMethod, url);
 	}
 
-	/**
-	 * Retrieves the mock servlet that we are going to use to process the request. It can be overridden by subclasses 
-	 * to customize.
-	 * 
-	 * @return an initialized {@link MockJoggerServlet} object.
-	 */
-	protected MockJoggerServlet getJoggerServlet() {
-		MockJoggerServlet joggerServlet = new MockJoggerServlet();
-		joggerServlet.setInterceptors( getInterceptors() );
-		
-		return joggerServlet;
-	}
-	
-	/**
-	 * Helper method. Retrieves a {@link Routes} object with the routes loaded.
-	 * 
-	 * @return an initialized {@link Routes} object.
-	 * @throws ParseException if there is a problem parsing the routes.config file.
-	 * @throws RoutesException if there is a problem loading the routes.
-	 */
-	private Routes getRoutes() throws ParseException, RoutesException {
-		
-		ControllerLoader controllerLoader = getControllerLoader();
-		RoutesParser routesParser = new RoutesParserImpl();
-		
-		RoutesImpl routes = new RoutesImpl();
-		routes.setControllerLoader(controllerLoader);
-		routes.setRoutesParser(routesParser);
-		
-		try {
-			
-			InputStream inputStream = new FileInputStream( getRoutesPath() );
-			routes.load(inputStream);
-			
-		} catch (Exception e) {
-			throw new RoutesException(e);
-		}
-		
-		return routes;
-		
-	}
-	
-	/**
-	 * This is the default routes.config file path. It can be overridden by subclasses to provide a different path.
-	 * 
-	 * @return a String object representing the path to the routes.config file.
-	 */
-	protected String getRoutesPath() {
-		return "src/main/webapp/WEB-INF/routes.config";
-	}
-	
-	/**
-	 * Retrieves the default {@link ControllerLoader} implementation used to retrieve controllers. It can be 
-	 * overridden to provide a different one.
-	 * 
-	 * @return a {@link ControllerLoader} implementation object.
-	 */
-	protected ControllerLoader getControllerLoader() {
-		
-		DefaultControllerLoader controllerLoader = new DefaultControllerLoader();
-		controllerLoader.setBasePackage( getBasePackage() );
-		
-		return controllerLoader;
-		
-	}
-	
-	/**
-	 * Retrieves the base package name where your controllers are located.
-	 * 
-	 * @return a String object representing the base package.
-	 */
-	protected abstract String getBasePackage();
-	
-	/**
-	 * Retrieves the {@link Interceptors} implementation that you use in your class. Remember that it must be already 
-	 * initialized and ready to use.
-	 * 
-	 * @return an initialized {@link Interceptors} implementation object.
-	 */
-	protected abstract Interceptors getInterceptors();
+	protected abstract Jogger getJogger();
 	
 }

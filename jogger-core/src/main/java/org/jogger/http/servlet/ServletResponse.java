@@ -1,17 +1,20 @@
 package org.jogger.http.servlet;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.jogger.asset.Asset;
 import org.jogger.http.Cookie;
 import org.jogger.http.HttpException;
 import org.jogger.http.Response;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import org.jogger.template.TemplateEngine;
+import org.jogger.template.TemplateException;
 
 /**
  * A {@link Response} implementation based on the Servlet API.
@@ -24,11 +27,8 @@ public class ServletResponse implements Response {
 	 * The underlying Servlet Response.
 	 */
 	private HttpServletResponse response;
-	
-	/**
-	 * The FreeMarker configuration object.
-	 */
-	private Configuration freemarker;
+
+	private TemplateEngine templateEngine;
 	
 	/**
 	 * The attributes that we are passing to the view.
@@ -39,11 +39,22 @@ public class ServletResponse implements Response {
 	 * Constructor. Initializes the object with the underlying Servlet Response and the FreeMarker configuration.
 	 * 
 	 * @param response the Servlet response object.
-	 * @param freemarker the FreeMarker configuration object.
+	 * @param templateEngine the {@link TemplateEngine} implementation to use.
 	 */
-	public ServletResponse(HttpServletResponse response, Configuration freemarker) {
+	public ServletResponse(HttpServletResponse response, TemplateEngine templateEngine) {
+		
+		if (response == null) {
+			throw new IllegalArgumentException("no response provided");
+		}
+		
+		if (templateEngine == null) {
+			throw new IllegalArgumentException("no templateEngine provided");
+		}
+		
 		this.response = response;
-		this.freemarker = freemarker;
+		response.setStatus(Response.OK);
+		
+		this.templateEngine = templateEngine;
 	}
 
 	@Override
@@ -166,7 +177,7 @@ public class ServletResponse implements Response {
 	}
 
 	@Override
-	public Response print(String html) throws HttpException {
+	public Response write(String html) throws HttpException {
 		try {
 			response.getWriter().print(html);
 			return this;
@@ -176,24 +187,64 @@ public class ServletResponse implements Response {
 	}
 
 	@Override
-	public Response render(String templateName) {
+	public Response write(Asset asset) {
+		
+		response.setBufferSize(10240);
+		response.setContentType(asset.getContentType());
+		response.setHeader("Content-Length", String.valueOf(asset.getLength()));
+		response.setHeader("Content-Disposition", "inline; filename=\"" + asset.getName() + "\"");
+
+		// prepare streams
+		BufferedInputStream input = null;
+		BufferedOutputStream output = null;
+		try {
+			// open streams
+			input = new BufferedInputStream(asset.getInputStream(), 10240);
+			output = new BufferedOutputStream(response.getOutputStream(), 10240);
+
+			// Write file contents to response.
+			byte[] buffer = new byte[10240];
+			int length;
+			while ((length = input.read(buffer)) > 0) {
+				output.write(buffer, 0, length);
+			}
+		} catch (IOException e) {
+			throw new HttpException(e);
+		} finally {
+			close(output);
+			close(input);
+		}
+
+		return this;
+	}
+
+	private static void close(Closeable resource) {
+		if (resource != null) {
+			try {
+				resource.close();
+			} catch (IOException e) {
+
+			}
+		}
+	}
+
+	@Override
+	public Response render(String templateName) throws TemplateException {
 		return render(templateName, new HashMap<String,Object>());
 	}
 
 	@Override
-	public Response render(String templateName, Map<String, Object> atts) throws HttpException {
+	public Response render(String templateName, Map<String, Object> atts) throws TemplateException {
+		
 		// merge the user attributes with the controller attributes
 		attributes.putAll(atts);
 		
 		try {
-			// retrieve and process the template
-			Template template = freemarker.getTemplate(templateName);
-			template.process(attributes, response.getWriter());
-			
-			return this;
-		} catch (Exception e) {
-			throw new HttpException(e);
+			templateEngine.render(templateName, attributes, response.getWriter());
+		} catch (IOException e) {
+			throw new TemplateException(e);
 		}
+		return this;
 	}
 
 	@Override
