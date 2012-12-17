@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.HttpException;
@@ -21,7 +22,6 @@ import org.jogger.http.Value;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
-import org.jogger.support.AbstractRequest;
 
 /**
  * A {@link Request} implementation based on the Servlet API.
@@ -104,11 +104,10 @@ public class ServletRequest extends AbstractRequest {
 
 	@Override
 	public String getPath() {
-		String contextPath = request.getContextPath();
 		String path = request.getRequestURI();
 		
-		if (path.startsWith(contextPath)) {
-			return path.substring(contextPath.length());
+		if (path == null) {
+			return "/";
 		}
 		
 		return path;
@@ -268,15 +267,6 @@ public class ServletRequest extends AbstractRequest {
 		};
 		
 		return bodyParser;
-	}
-
-	/**
-	 * Sets the path variables from the holders in the route path.
-	 * 
-	 * @param routePath the original route path with holders, if any.
-	 */
-	public void setRoutePath(String routePath) {
-		initPathVariables( routePath );
 	}
 	
 }

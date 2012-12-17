@@ -2,15 +2,15 @@ package org.jogger.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jogger.asset.Asset;
 import org.jogger.http.Cookie;
-import org.jogger.http.HttpException;
 import org.jogger.http.Response;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import org.jogger.template.TemplateEngine;
+import org.jogger.template.TemplateException;
 
 /**
  * <p>This is a {@link Response} implementation that stores the response state in attributes. Useful for testing Jogger 
@@ -20,7 +20,7 @@ import freemarker.template.Template;
  */
 public class MockResponse implements Response {
 
-	private Configuration freemarker;
+	private TemplateEngine templateEngine;
 	
 	private Map<String,String> headers = new HashMap<String,String>();
 	
@@ -36,10 +36,12 @@ public class MockResponse implements Response {
 	
 	private String output;
 	
+	private Asset renderedAsset;
+	
 	private String renderedTemplate;
 	
-	public MockResponse(Configuration freemarker) {
-		this.freemarker = freemarker;
+	public MockResponse(TemplateEngine templateEngine) {
+		this.templateEngine = templateEngine;
 	}
 
 	@Override
@@ -131,37 +133,42 @@ public class MockResponse implements Response {
 	}
 
 	@Override
-	public Response print(String html) {
+	public Response write(String html) {
 		this.output = html;
 		return this;
 	}
 
 	@Override
-	public Response render(String templateName) {
+	public Response write(Asset asset) {
+		this.renderedAsset = asset;
+		return this;
+	}
+
+	@Override
+	public Response render(String templateName) throws TemplateException {
 		return render(templateName, new HashMap<String,Object>());
 	}
 
 	@Override
-	public Response render(String templateName, Map<String, Object> atts) {
+	public Response render(String templateName, Map<String, Object> atts) throws TemplateException {
 		// merge the user attributes with the controller attributes
 		attributes.putAll(atts);
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		PrintWriter writer = new PrintWriter(out);
 		
+		// retrieve and process the template
+		templateEngine.render(templateName, atts, writer);
+			
 		try {
-			// retrieve and process the template
-			Template template = freemarker.getTemplate(templateName);
-			template.process(attributes, writer);
-			
 			output = out.toString("UTF-8");
-			
-			this.renderedTemplate = templateName;
-			
-			return this;
-		} catch (Exception e) {
-			throw new HttpException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new TemplateException(e);
 		}
+			
+		this.renderedTemplate = templateName;
+			
+		return this;
 	}
 
 	@Override
@@ -176,6 +183,10 @@ public class MockResponse implements Response {
 
 	public String getRenderedTemplate() {
 		return renderedTemplate;
+	}
+	
+	public Asset getRenderedAsset() {
+		return renderedAsset;
 	}
 	
 }

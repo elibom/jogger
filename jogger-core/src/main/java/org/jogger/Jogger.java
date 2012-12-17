@@ -1,57 +1,137 @@
 package org.jogger;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.jogger.Route.HttpMethod;
+import org.jogger.asset.AssetLoader;
+import org.jogger.asset.FileAssetLoader;
+import org.jogger.http.Request;
+import org.jogger.http.Response;
+import org.jogger.interceptor.Interceptor;
+import org.jogger.interceptor.InterceptorEntry;
+import org.jogger.routes.RoutesException;
+import org.jogger.template.FreemarkerTemplateEngine;
+import org.jogger.template.TemplateEngine;
+
 /**
- * Helper class. Provides methods to check the environment in which Jogger is working. Remember that the environment 
- * is set using a system (i.e. System.setProperty method) or environment (i.e. System.setenv method) variable. 
+ * 
  * 
  * @author German Escobar
  */
 public class Jogger {
 
-	/**
-	 * Retrieves the environment in which Jogger is working.
-	 *  
-	 * @return a String object representing the environment.
-	 */
-	public static String env() {
-		
-		String env = System.getProperty("JOGGER_ENV");
-		if (env == null) {
-			env = System.getenv("JOGGER_ENV");
+	private List<Route> routes = new CopyOnWriteArrayList<Route>();
+
+	private List<InterceptorEntry> interceptors = new CopyOnWriteArrayList<InterceptorEntry>();
+
+	private AssetLoader assetLoader = new FileAssetLoader();
+	
+	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
+
+	public List<Route> getRoutes() {
+		return routes;
+	}
+
+	public void setRoutes(List<Route> routes) {
+		if (routes == null) {
+			throw new IllegalArgumentException("No routes provided");
+		}
+		this.routes = routes;
+	}
+	
+	public void addRoute(Route route) {
+		if (route == null) {
+			throw new IllegalArgumentException("No route provided");
 		}
 		
-		if (env == null) {
-			return "dev";
-		}
+		this.routes.add(route);
+	}
+
+	public void addRoute(HttpMethod httpMethod, String path, Object controller, String methodName) 
+			throws NoSuchMethodException {
 		
-		return env;
+		if (controller == null) {
+			throw new IllegalArgumentException("No controller provided");
+		}
+
+		Method method = controller.getClass().getMethod(methodName, Request.class, Response.class);
+		addRoute(httpMethod, path, controller, method);
+		
 	}
-	
-	/**
-	 * Checks if Jogger is working in testing mode.
-	 * 
-	 * @return true if working in testing mode, false otherwise.
-	 */
-	public static boolean isTestEnv() {
-		return env().equals("test");
+
+	public void addRoute(HttpMethod httpMethod, String path, Object controller, Method method) {
+
+		// validate signature
+		Class<?>[] paramTypes = method.getParameterTypes();
+		if (paramTypes.length != 2 || !paramTypes[0].equals(Request.class) || !paramTypes[1].equals(Response.class)) {
+			throw new RoutesException("Expecting two params of type org.jogger.http.Request and org.jogger.http.Response "
+					+ "respectively");
+		}
+
+		method.setAccessible(true); // to access methods from anonymous classes
+
+		routes.add(new Route(httpMethod, path, controller, method));
+
 	}
-	
-	/**
-	 * Checks if Jogger is working in development mode.
-	 * 
-	 * @return true if working in development mode, false otherwise.
-	 */
-	public static boolean isDevEnv() {
-		return env().equals("dev");
+
+	public void get(String path, RouteHandler handler) {
+		try {
+			addRoute(HttpMethod.GET, path, handler, "handle");
+		} catch (NoSuchMethodException e) {
+			// shouldn't happen ... unless we change the name of the method RouteHandler#handle
+			throw new JoggerException(e);
+		}
 	}
-	
-	/**
-	 * Checks if Jogger is working in production mode.
-	 * 
-	 * @return true if working in production mode, false otherwise.
-	 */
-	public static boolean isProdEnv() {
-		return env().equals("prod");
+
+	public void post(String path, RouteHandler handler) {
+		try {
+			addRoute(HttpMethod.POST, path, handler, "handle");
+		} catch (NoSuchMethodException e) {
+			// shouldn't happen ... unless we change the name of the method RouteHandler#handle
+			throw new JoggerException(e);
+		}
 	}
-	
+
+	public List<InterceptorEntry> getInterceptors() {
+		return interceptors;
+	}
+
+	public void setInterceptors(List<InterceptorEntry> interceptors) {
+		if (interceptors == null) {
+			throw new IllegalArgumentException("No interceptors provided");
+		}
+		this.interceptors = interceptors;
+	}
+
+	public void addInterceptor(Interceptor interceptor, String... paths) {
+		if (interceptor == null) {
+			throw new IllegalArgumentException("No interceptor provided");
+		}
+		interceptors.add(new InterceptorEntry(interceptor, paths));
+	}
+
+	public AssetLoader getAssetLoader() {
+		return assetLoader;
+	}
+
+	public void setAssetLoader(AssetLoader assetLoader) {
+		if (assetLoader == null) {
+			throw new IllegalArgumentException("No assetLoader provided");
+		}
+		this.assetLoader = assetLoader;
+	}
+
+	public TemplateEngine getTemplateEngine() {
+		return templateEngine;
+	}
+
+	public void setTemplateEngine(TemplateEngine templateEngine) {
+		if (templateEngine == null) {
+			throw new IllegalArgumentException("No templateEngine provided");
+		}
+		this.templateEngine = templateEngine;
+	}
+
 }
