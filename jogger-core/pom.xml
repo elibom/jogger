@@ -20,16 +20,22 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-servlet_3.0_spec</artifactId>
-			<version>1.0</version>
-			<scope>provided</scope>
+  			<groupId>de.neuland</groupId>
+  			<artifactId>jade4j</artifactId>
+  			<version>${jade4j.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>8.1.7.v20120910</version>
 		</dependency>
 
 	</dependencies>
 	
 	<properties>
 		<freemarker.version>2.3.19</freemarker.version>
+		<jade4j.version>0.3.7</jade4j.version>
 	</properties>
 	
 	<build>
@@ -60,11 +66,18 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-          					<stylesheetfile>${basedir}/src/main/assembly/javadoc-stylesheet.css</stylesheetfile>
-          				</configuration>
+							<stylesheetfile>${basedir}/src/main/assembly/javadoc-stylesheet.css</stylesheetfile>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+    		<id>jade4j-releases</id>
+    		<url>https://raw.github.com/neuland/jade4j/master/releases</url>
+  		</repository>
+	</repositories>
 </project>

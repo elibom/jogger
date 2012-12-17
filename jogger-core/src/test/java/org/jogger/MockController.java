@@ -8,8 +8,10 @@ import org.jogger.http.Response;
  * 
  * @author German Escobar
  */
-public abstract class MockController {
+public class MockController {
 	
-	public abstract void show(Request request, Response response);
+	public void init(Request request, Response response) {}
+	
+	public void show(Request request, Response response) {}
 	
 }

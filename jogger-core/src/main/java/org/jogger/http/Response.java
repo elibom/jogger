@@ -2,6 +2,9 @@ package org.jogger.http;
 
 import java.util.Map;
 
+import org.jogger.asset.Asset;
+import org.jogger.template.TemplateException;
+
 /**
  * Represents an HTTP Response.
  * 
@@ -105,7 +108,16 @@ public interface Response {
 	 * 
 	 * @return itself for method chaining.
 	 */
-	Response print(String html);
+	Response write(String html);
+	
+	/**
+	 * Writes an InputStream into the response.
+	 * 
+	 * @param asset the {@link Asset} to write in the response.
+	 * 
+	 * @return itself for method chaining.
+	 */
+	Response write(Asset asset);
 	
 	/**
 	 * Renders the specified template with no additional attributes (besides those already in the response)
@@ -113,8 +125,9 @@ public interface Response {
 	 * @param templateName the name of the template to be rendered.
 	 * 
 	 * @return itself for method chaining.
+	 * @throws TemplateException
 	 */
-	Response render(String templateName);
+	Response render(String templateName) throws TemplateException;
 	
 	/**
 	 * Renders the specified template with the specified attributes (and those already in the response). If an
@@ -124,8 +137,9 @@ public interface Response {
 	 * @param attributes a map of attributes to be passed to the view.
 	 * 
 	 * @return itself for method chaining.
+	 * @throws TemplateException
 	 */
-	Response render(String templateName, Map<String,Object> attributes);
+	Response render(String templateName, Map<String,Object> attributes) throws TemplateException;
 	
 	/**
 	 * Sends a redirect.

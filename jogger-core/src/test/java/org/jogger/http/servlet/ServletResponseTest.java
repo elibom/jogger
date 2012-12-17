@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jogger.http.Cookie;
 import org.jogger.http.Response;
+import org.jogger.template.TemplateEngine;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -23,7 +24,7 @@ public class ServletResponseTest {
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		when(servletResponse.getStatus()).thenReturn(400);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		Assert.assertEquals(response.getStatus(), 400);
 		
 	}
@@ -33,7 +34,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.status(400);
 		
 		verify(servletResponse).setStatus(400);
@@ -45,7 +46,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.badRequest();
 		
 		verify(servletResponse).setStatus(Response.BAD_REQUEST);
@@ -57,7 +58,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.unauthorized();
 		
 		verify(servletResponse).setStatus(Response.UNAUTHORIZED);
@@ -69,7 +70,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.notFound();
 		
 		verify(servletResponse).setStatus(Response.NOT_FOUND);
@@ -82,7 +83,7 @@ public class ServletResponseTest {
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		when(servletResponse.getContentType()).thenReturn("application/json");
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		Assert.assertEquals(response.getContentType(), "application/json");
 		
 	}
@@ -92,7 +93,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.contentType("application/json");
 		
 		verify(servletResponse).setContentType("application/json");
@@ -105,7 +106,7 @@ public class ServletResponseTest {
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		when(servletResponse.getHeader("Authorization")).thenReturn("Basic");
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		Assert.assertEquals(response.getHeader("Authorization"), "Basic");
 		
 	}
@@ -115,7 +116,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.setHeader("Authorization", "Basic");
 		
 		verify(servletResponse).setHeader("Authorization", "Basic");
@@ -127,7 +128,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.setCookie(new Cookie("test-1", "1"));
 		
 		verify(servletResponse).addCookie(any(javax.servlet.http.Cookie.class));
@@ -139,7 +140,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.removeCookie(new Cookie("test-1", "1"));
 		
 		verify(servletResponse).addCookie(any(javax.servlet.http.Cookie.class));
@@ -149,7 +150,7 @@ public class ServletResponseTest {
 	@Test
 	public void shouldSetAndGetAttributes() throws Exception {
 		
-		Response response = new ServletResponse(null, null);
+		Response response = new ServletResponse(mock(HttpServletResponse.class), mock(TemplateEngine.class));
 		response.setAttribute("test-1", "1");
 		
 		Map<String,Object> atts = response.getAttributes();
@@ -163,7 +164,7 @@ public class ServletResponseTest {
 	@Test(expectedExceptions=IllegalArgumentException.class)
 	public void shouldFailWhenTryingToSetNullAttributeName() throws Exception {
 		
-		Response response = new ServletResponse(null, null);
+		Response response = new ServletResponse(mock(HttpServletResponse.class), mock(TemplateEngine.class));
 		response.setAttribute(null, "1");
 		
 	}
@@ -171,7 +172,7 @@ public class ServletResponseTest {
 	@Test(expectedExceptions=IllegalArgumentException.class)
 	public void shouldFailWhenTryingToSetNullAttributeValue() throws Exception {
 		
-		Response response = new ServletResponse(null, null);
+		Response response = new ServletResponse(mock(HttpServletResponse.class), mock(TemplateEngine.class));
 		response.setAttribute("test-1", null);
 		
 	}
@@ -183,8 +184,8 @@ public class ServletResponseTest {
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		when(servletResponse.getWriter()).thenReturn(writer);
 		
-		Response response = new ServletResponse(servletResponse, null);
-		response.print("test");
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
+		response.write("test");
 		
 		verify(writer).print("test");
 		
@@ -195,7 +196,7 @@ public class ServletResponseTest {
 		
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		
-		Response response = new ServletResponse(servletResponse, null);
+		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
 		response.redirect("/");
 		
 		verify(servletResponse).sendRedirect("/");
