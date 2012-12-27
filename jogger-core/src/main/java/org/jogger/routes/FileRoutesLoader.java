@@ -1,14 +1,29 @@
 package org.jogger.routes;
 
+import org.jogger.RoutesException;
 
+/**
+ * A concrete implementation of {@link AbstractFileRoutesLoader} that loads the controller using the default mechanism 
+ * for loading classes. Users can specified a <code>basePackage</code> to avoid repeating the package in the routes 
+ * file.
+ * 
+ * @author German Escobar
+ */
 public class FileRoutesLoader extends AbstractFileRoutesLoader {
 	
 	private String basePackage;
 	
+	/**
+	 * Constructor. Initializes the object with an empty <code>basePackage</code>.
+	 */
 	public FileRoutesLoader() {
 		this("");
 	}
 	
+	/**
+	 * Constructor. Initializes the object with the specified <code>basePackage</code>.
+	 * @param basePackage
+	 */
 	public FileRoutesLoader(String basePackage) {
 		this.basePackage = basePackage;
 		
@@ -19,6 +34,7 @@ public class FileRoutesLoader extends AbstractFileRoutesLoader {
 		}
 	}
 
+	@Override
 	protected Object loadController(String controllerName) throws RoutesException {
 		String className = basePackage + controllerName;
 		

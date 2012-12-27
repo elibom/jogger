@@ -3,6 +3,8 @@ package org.jogger.http;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.jogger.Route;
+
 /**
  * Represents an HTTP Request. 
  * 
@@ -18,6 +20,13 @@ public interface Request {
 	 * @return a String object with the URL.
 	 */
 	String getUrl();
+	
+	/**
+	 * Returns the route associated with this request. A missing route means that the request didn't matches any route.
+	 * 
+	 * @return a {@link Route} object if it exists, null otherwise.
+	 */
+	Route getRoute();
 	
 	/**
 	 * Retrieves the path that was requested without the context path - if any. For example, if the URL is

@@ -1,4 +1,4 @@
-package org.jogger.routes;
+package org.jogger;
 
 /**
  * Generally thrown when a problem occurs loading the routes (different from a parsing error)

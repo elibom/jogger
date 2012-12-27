@@ -2,14 +2,31 @@ package org.jogger.asset;
 
 import java.io.InputStream;
 
+/**
+ * Represents a static asset resource.
+ * 
+ * @author German Escobar
+ */
 public class Asset {
 	
+	/**
+	 * The input stream of the asset.
+	 */
 	private final InputStream inputStream;
 	
+	/**
+	 * The name of the asset.
+	 */
 	private final String name;
 	
+	/**
+	 * The content length of the asset.
+	 */
 	private final long length;
 	
+	/**
+	 * The content type of the asset.
+	 */
 	private final String contentType;
 
 	public Asset(InputStream inputStream, String name, String contentType, long length) {

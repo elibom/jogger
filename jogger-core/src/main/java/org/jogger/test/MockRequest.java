@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jogger.Jogger;
-import org.jogger.RouteExecutor;
+import org.jogger.Route;
+import org.jogger.RouteRequestExecutor;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
@@ -55,12 +56,13 @@ public class MockRequest extends AbstractRequest {
 	
 	private MockResponse response;
 	
-	private RouteExecutor routeExecutor;
+	private RouteRequestExecutor routeExecutor;
 	
-	public MockRequest(Jogger jogger, String method, String url) throws URISyntaxException {
-
+	public MockRequest(Jogger jogger, Route route, String method, String url) throws URISyntaxException {
+		super(route);
+		
 		this.response = new MockResponse(jogger.getTemplateEngine());
-		this.routeExecutor = new RouteExecutor(jogger);
+		this.routeExecutor = new RouteRequestExecutor(jogger);
 		
 		this.method = method;
 		
@@ -77,6 +79,10 @@ public class MockRequest extends AbstractRequest {
 		
 		String strPort = uri.getPort() > 0 ? ":" + uri.getPort() : "";
 		this.url = uri.getScheme() + "://" + uri.getHost() + strPort  + "/" + uri.getPath();
+		
+		if (route != null) {
+			initPathVariables(route.getPath());
+		}
 		
 	}
 	
@@ -239,7 +245,7 @@ public class MockRequest extends AbstractRequest {
 	
 	public MockResponse run() throws Exception {
 		// execute request
-		routeExecutor.route(getMethod(), getPath(), this, response);
+		routeExecutor.execute(this, response);
 		return response;
 		
 	}

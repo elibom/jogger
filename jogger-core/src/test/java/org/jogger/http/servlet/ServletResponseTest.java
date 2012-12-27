@@ -1,11 +1,13 @@
 package org.jogger.http.servlet;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -178,7 +180,7 @@ public class ServletResponseTest {
 	}
 	
 	@Test
-	public void shouldPrint() throws Exception {
+	public void shouldWriteOutput() throws Exception {
 		
 		PrintWriter writer = mock(PrintWriter.class);
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
@@ -189,6 +191,18 @@ public class ServletResponseTest {
 		
 		verify(writer).print("test");
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void shouldRenderTemplate() throws Exception {
+		
+		TemplateEngine templateEngine = mock(TemplateEngine.class);
+		
+		Response response = new ServletResponse(mock(HttpServletResponse.class), templateEngine);
+		response.render("template");
+		
+		verify(templateEngine).render(eq("template"), any(Map.class), any(Writer.class));
 	}
 	
 	@Test

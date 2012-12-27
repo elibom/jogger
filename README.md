@@ -2,11 +2,11 @@
 
 [![Build Status](https://buildhive.cloudbees.com/job/germanescobar/job/jogger/badge/icon)](https://buildhive.cloudbees.com/job/germanescobar/job/jogger/)
 
-Inspired by [Express.js](http://expressjs.com/), [Ruby on Rails](http://rubyonrails.org/), [Sinatra](http://www.sinatrarb.com/) and [Flask](http://flask.pocoo.org/), Jogger is a lightweight web framework that moves away from the Servlet API (which sucks!) and provides a simple and elegant way of creating web applications programatically.
+A **micro-web framework** that provides a simple and elegant way of creating web applications programatically. Jogger brings the best ideas of other frameworks ([Express.js](http://expressjs.com/), [Ruby on Rails](http://rubyonrails.org/), [Sinatra](http://www.sinatrarb.com/) and [Flask](http://flask.pocoo.org/)) to create a solution that doesn't feel foreign in the Java language.
 
-Instead of cloning another web framework, Jogger brings the best ideas of multiple frameworks (from multiple languages) and creates a solution that doesn't feel foreign in the Java language.
+## Getting started
 
-Let's take a look at the following (basic) example:
+To get started first add the dependency to your project (download JAR or use Maven) and then create your first Jogger app like this:
 
 ```java
 public class Main {
@@ -17,7 +17,7 @@ public class Main {
         app.get("/", new RouteHandler() {
             @Override
             public void handle(Request request, Response response) {
-                response.write("<h1>Hello World!</h1>")
+                response.write("<h1>Hello World!</h1>");
             }
         });
         
@@ -28,7 +28,7 @@ public class Main {
     }
 }
 ```
-That's it! *Run it* and point your browser to [http://localhost:5000](http://localhost:5000). You are now ready to hack on your project!
+Run it and point your browser to [http://localhost:5000](http://localhost:5000). That's it!
 
 ## What's provided?
 
@@ -40,4 +40,6 @@ Out of the box Jogger comes with the following:
 * A view template engine. The default is [Freemarker](http://freemarker.sourceforge.net/) but [Jade](https://github.com/neuland/jade4j) is also supported.
 * A testing framework that allows you to create integration tests easily.
 
-## Getting started
+## Documentation
+
+TODO

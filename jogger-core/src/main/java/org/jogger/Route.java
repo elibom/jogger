@@ -3,8 +3,7 @@ package org.jogger;
 import java.lang.reflect.Method;
 
 /**
- * This is a wrapper class that has a controller object and a {@link Method}. It is returned from the 
- * {@link Routes#find(String, String)} method.
+ * Holds the information of a route.
  * 
  * @author German Escobar
  */

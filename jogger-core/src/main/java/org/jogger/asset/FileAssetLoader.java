@@ -6,14 +6,29 @@ import java.io.FileNotFoundException;
 
 import org.eclipse.jetty.http.MimeTypes;
 
+/**
+ * An {@link AssetLoader} implementation that uses the file system to retrieve assets.
+ * 
+ * @author German Escobar
+ */
 public class FileAssetLoader implements AssetLoader {
+	
+	private final static String DEFAULT_BASE_DIRECTORY = "assets";
 	
 	private File parent;
 	
+	/**
+	 * Constructor. Initializes the object with the default base directory.
+	 */
 	public FileAssetLoader() {
-		this("assets");
+		this(DEFAULT_BASE_DIRECTORY);
 	}
 	
+	/**
+	 * Constructor. Initializes the object with the specified base <code>directory</code>. 
+	 * 
+	 * @param directory
+	 */
 	public FileAssetLoader(String directory) {
 		if (directory == null || "".equals(directory)) {
 			throw new IllegalArgumentException("No directory specified");

@@ -1,11 +1,12 @@
 package org.jogger.test;
 
 import org.jogger.Jogger;
+import org.jogger.Route;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 /**
- * This is an utility class that you can extend when testing Jogger applications. It provides methods
+ * This is an utility class that you can extend for testing Jogger applications. It provides methods
  * to emulate requests some abstract methods that you need to implement.
  * 
  * @author German Escobar
@@ -57,9 +58,15 @@ public abstract class JoggerTest {
 	 */
 	private MockRequest service(String httpMethod, String path) throws Exception {
 		String url = "http://localhost" + path;
-		return new MockRequest(getJogger(), httpMethod, url);
+		Route route = getJogger().getRoute(httpMethod, path);
+		return new MockRequest(getJogger(), route, httpMethod, url);
 	}
 
+	/**
+	 * Retrieves the {@link Jogger} object used to configure the application.
+	 * 
+	 * @return the {@link Jogger} object.
+	 */
 	protected abstract Jogger getJogger();
 	
 }

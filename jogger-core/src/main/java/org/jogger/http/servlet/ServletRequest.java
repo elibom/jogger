@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jogger.Route;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
@@ -42,13 +43,26 @@ public class ServletRequest extends AbstractRequest {
 	/**
 	 * Constructor.
 	 * 
+	 * @param route the {@link Route} object which can be null if there is no route for this request.
 	 * @param request the Servlet request object.
+	 */
+	public ServletRequest(Route route, HttpServletRequest request) {
+		super(route);
+		this.request = request;
+		
+	}
+	
+	/**
+	 * Initializes the path variables and the multipart content.
 	 * 
 	 * @throws FileUploadException if there is a problem parsing the multipart/form-data.
 	 * @throws IOException if there is a problem parsing the multipart/form-data.
 	 */
-	public ServletRequest(HttpServletRequest request) throws MultipartException, IOException {
-		this.request = request;
+	public ServletRequest init() throws MultipartException, IOException {
+		
+		if (getRoute() != null) {
+			initPathVariables( getRoute().getPath() );
+		}
 		
 		// retrieve query and post params
 		Map<String,String[]> requestParams = request.getParameterMap();
@@ -76,6 +90,7 @@ public class ServletRequest extends AbstractRequest {
 			
 		}
 		
+		return this;
 	}
 	
 	private String join(String[] arr) {

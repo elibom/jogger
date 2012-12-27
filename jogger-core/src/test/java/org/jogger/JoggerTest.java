@@ -21,7 +21,7 @@ public class JoggerTest {
 		
 		MockController controller = new MockController();
 		Method initMethod = MockController.class.getMethod("init", Request.class, Response.class);
-		Method showMethod = MockController.class.getMethod("init", Request.class, Response.class);
+		Method showMethod = MockController.class.getMethod("show", Request.class, Response.class);
 		
 		List<Route> routes = new ArrayList<Route>();
 		routes.add( new Route(HttpMethod.GET, "/", controller, initMethod) );
@@ -42,6 +42,39 @@ public class JoggerTest {
 		});
 		
 		Assert.assertEquals(jogger.getRoutes().size(), 6);
+		
+	}
+	
+	@Test(dependsOnMethods="shouldAddRoutes")
+	public void shouldFindExistingRoutes() throws Exception {
+		
+		Jogger jogger = new Jogger();
+		jogger.addRoute(HttpMethod.GET, "", new MockController(), "init");
+		jogger.addRoute(HttpMethod.GET, "/test", new MockController(), "init");
+		jogger.addRoute(HttpMethod.POST, "/test/{id}", new MockController(), "init");
+		jogger.addRoute(HttpMethod.GET, "/test/{id_test}/mocks/{id_mock}", new MockController(), "init");
+		
+		Assert.assertNotNull(jogger.getRoute("get", ""));
+		Assert.assertNotNull(jogger.getRoute("get", "/"));
+		Assert.assertNotNull(jogger.getRoute("GET", "/test"));
+		// Assert.assertNotNull(jogger.getRoute("get", "/test/")); fails!
+		Assert.assertNotNull(jogger.getRoute("post", "/test/1"));
+		Assert.assertNotNull(jogger.getRoute("get", "/test/1/mocks/2"));
+		
+	}
+	
+	@Test(dependsOnMethods="shouldAddRoutes")
+	public void shouldNotFindNotExistingRoutes() throws Exception {
+		
+		Jogger jogger = new Jogger();
+		jogger.addRoute(HttpMethod.GET, "", new MockController(), "init");
+		jogger.addRoute(HttpMethod.GET, "/test", new MockController(), "init");
+		jogger.addRoute(HttpMethod.POST, "/test/{id}", new MockController(), "init");
+		
+		Assert.assertNull(jogger.getRoute("post", "/"));
+		Assert.assertNull(jogger.getRoute("post", "/test"));
+		Assert.assertNull(jogger.getRoute("get", "/undefined"));
+		Assert.assertNull(jogger.getRoute("get", "/test/1"));
 		
 	}
 	

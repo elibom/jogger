@@ -7,6 +7,11 @@ import java.util.Map;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
+/**
+ * A {@link TemplateEngine} implementation for <a href="http://freemarker.sourceforge.net/">FreeMarker</a>.
+ * 
+ * @author German Escobar
+ */
 public class FreemarkerTemplateEngine implements TemplateEngine {
 	
 	private Configuration freeMarker;

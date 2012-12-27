@@ -104,11 +104,11 @@ public interface Response {
 	/**
 	 * Writes an HTML string into the response.
 	 * 
-	 * @param html the HTML code to write in the response.
+	 * @param output the output code to write in the response.
 	 * 
 	 * @return itself for method chaining.
 	 */
-	Response write(String html);
+	Response write(String output);
 	
 	/**
 	 * Writes an InputStream into the response.

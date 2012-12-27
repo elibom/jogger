@@ -44,16 +44,16 @@ public class FileItem {
 	/**
 	 * Constructor.
 	 * 
-	 * @param name
-	 * @param fileName
+	 * @param fieldName the name of the field that holds the file.
+	 * @param fileName the name of the file.
 	 * @param contentType
 	 * @param contentLength
-	 * @param inputStream
+	 * @param file
 	 * @param headers
 	 */
-	public FileItem(String name, String fileName, String contentType, long contentLength, File file, Map<String,String> headers) {
+	public FileItem(String fieldName, String fileName, String contentType, long contentLength, File file, Map<String,String> headers) {
 		
-		assertNotNull(name, "no fieldName specified.");
+		assertNotNull(fieldName, "no fieldName specified.");
 		assertNotNull(fileName, "no fileName specified.");
 		assertNotNull(file, "no inputStream specified");
 		

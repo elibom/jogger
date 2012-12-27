@@ -6,6 +6,11 @@ import java.util.Map;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
 
+/**
+ * A {@link TemplateEngine} implementation for <a href="https://github.com/neuland/jade4j">Jade</a>.
+ * 
+ * @author German Escobar
+ */
 public class JadeTemplateEngine implements TemplateEngine {
 	
 	private JadeConfiguration jadeConfig;

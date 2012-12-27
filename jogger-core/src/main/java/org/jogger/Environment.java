@@ -1,8 +1,9 @@
 package org.jogger;
 
 /**
- * Helper class. Provides methods to check the environment in which Jogger is working. Remember that the environment is set
- * using a system (i.e. System.setProperty method) or environment (i.e. System.setenv method) variable.
+ * Helper class that provides methods to check the environment in which Jogger is working. Remember that the 
+ * environment is set using a system (i.e. System.setProperty method) or environment (i.e. System.setenv method) 
+ * variable.
  * 
  * @author German Escobar
  */

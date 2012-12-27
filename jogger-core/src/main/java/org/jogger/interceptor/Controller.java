@@ -14,7 +14,7 @@ public interface Controller {
 	 * Retrieves an annotation from the controller if the annotation is present.
 	 * 
 	 * @param <A> the type of the annotation to be retrieved.
-	 * @param annotation the class of the annotation to be retrieved.
+	 * @param annotationClass the class of the annotation to be retrieved.
 	 * 
 	 * @return a java.lang.annotation.Annotation object or null if not found.
 	 */
