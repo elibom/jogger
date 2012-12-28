@@ -5,8 +5,6 @@ import java.net.URLDecoder;
 import org.jogger.asset.Asset;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible of executing requests for static assets.
@@ -15,11 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AssetRequestExecutor {
 	
-	private Logger log = LoggerFactory.getLogger(AssetRequestExecutor.class);
-	
 	private Jogger jogger;
-	
-	private NotFoundHandler defaultNotFoundHandler;
 
 	public AssetRequestExecutor(Jogger jogger) {
 		if (jogger == null) {
@@ -27,7 +21,6 @@ public class AssetRequestExecutor {
 		}
 		
 		this.jogger = jogger;
-		this.defaultNotFoundHandler = new DefaultNotFoundHandler();
 	}
 	
 	/**
@@ -42,7 +35,7 @@ public class AssetRequestExecutor {
 		
 		// only handle GET requests
 		if (!request.getMethod().equalsIgnoreCase("get")) {
-			handleNotFound(request, response);
+			response.notFound();
 			return;
 		}
 		
@@ -51,31 +44,8 @@ public class AssetRequestExecutor {
 			response.status(Response.OK);
 			response.write(asset);
 		} else {
-			handleNotFound(request, response);
+			response.notFound();
 		}
-	}
-	
-	/**
-	 * Helper method. Called when the requested asset was not found.
-	 * 
-	 * @param request the Jogger HTTP request object.
-	 * @param response the Jogger HTTP response object.
-	 */
-	private void handleNotFound(Request request, Response response) {
-		
-		NotFoundHandler notFoundHandler = jogger.getNotFoundHandler();
-		if (notFoundHandler == null) {
-			defaultNotFoundHandler.handle(request, response);
-			return;
-		}
-		
-		try {
-			notFoundHandler.handle(request, response);
-		} catch (Exception e) {
-			log.error("Exception running the not found handler ... using the default one: " + e.getMessage(), e);
-			defaultNotFoundHandler.handle(request, response);
-		}
-		
 	}
 
 }

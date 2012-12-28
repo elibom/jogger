@@ -174,10 +174,15 @@ public class JoggerServer {
 				} else if (jogger.getAssetLoader() != null) {
 					assetExecutor.execute(request, response);
 				} else {
+					response.notFound();
+				}
+				
+				if (response.getStatus() == Response.NOT_FOUND) {
 					handleNotFound(request, response);
 				}
 				
 			} catch (Exception e) {
+				response.status(Response.INTERNAL_ERROR);
 				handleException(e, request, response);
 			} finally {
 				baseRequest.setHandled(true);
@@ -194,6 +199,12 @@ public class JoggerServer {
 			return path;
 		}
 		
+		/**
+		 * Helper method. Called when the requested asset was not found.
+		 * 
+		 * @param request the Jogger HTTP request object.
+		 * @param response the Jogger HTTP response object.
+		 */
 		private void handleNotFound(Request request, Response response) {
 			
 			NotFoundHandler notFoundHandler = jogger.getNotFoundHandler();
@@ -212,6 +223,8 @@ public class JoggerServer {
 		}
 		
 		private void handleException(Exception e, Request request, Response response) {
+			
+			log.error("Exception processing request (" + request.getMethod() + " " + request.getPath() + "): " + e.getMessage(), e);
 
 			ExceptionHandler exceptionHandler = jogger.getExceptionHandler();
 			if (exceptionHandler == null) {
