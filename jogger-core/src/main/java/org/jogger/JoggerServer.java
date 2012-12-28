@@ -27,7 +27,12 @@ public class JoggerServer {
 	private static final int DEFAULT_PORT = 5000;
 	
 	/**
-	 * The configuration of the application.
+	 * Used to create the {@link Jogger} instance.
+	 */
+	private JoggerFactory joggerFactory;
+	
+	/**
+	 * The cached version of the app configuration.
 	 */
 	private Jogger jogger;
 
@@ -46,20 +51,40 @@ public class JoggerServer {
 	 * 
 	 * @param jogger the application configuration that this server will use to handle the HTTP requests.
 	 */
-	public JoggerServer(Jogger jogger) {
+	public JoggerServer(final Jogger jogger) {
 		if (jogger == null) {
 			throw new IllegalArgumentException("No jogger provided.");
 		}
 		
+		this.joggerFactory = new JoggerFactory() {
+			@Override
+			public Jogger configure() {
+				return jogger;
+			}
+		};
 		this.jogger = jogger;
+	}
+	
+	/**
+	 * Constructor. 
+	 * 
+	 * @param joggerFactory the factory from which we will retrieve the {@link Jogger} instance.
+	 */
+	public JoggerServer(final JoggerFactory joggerFactory) {
+		if (joggerFactory == null) {
+			throw new IllegalArgumentException("No joggerFactory provided.");
+		}
+		
+		this.joggerFactory = joggerFactory;
+		this.jogger = joggerFactory.configure();
+		if (this.jogger == null) {
+			throw new IllegalArgumentException("joggerFactory is not providing a jogger instance.");
+		}
+		
 	}
 	
 	public Jogger getJogger() {
 		return jogger;
-	}
-
-	public void setJogger(Jogger jogger) {
-		this.jogger = jogger;
 	}
 	
 	/**
@@ -154,6 +179,11 @@ public class JoggerServer {
 		@Override
 		public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest servletRequest,
 				HttpServletResponse servletResponse) throws IOException, ServletException {
+			
+			// reload the jogger instance if we are in development
+			if (Environment.isDevelopment()) {
+				jogger = joggerFactory.configure();
+			}
 
 			// try to find a matching route
 			Route route = jogger.getRoute( servletRequest.getMethod(), getPath(servletRequest) );
