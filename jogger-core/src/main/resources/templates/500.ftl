@@ -18,7 +18,7 @@
 				color: #222;
 			}
 			header {
-				background-color: #94162D;
+				background-color: #B03F3F;
 				padding: 20px 0;
 			}
 			div.content, h1 {
