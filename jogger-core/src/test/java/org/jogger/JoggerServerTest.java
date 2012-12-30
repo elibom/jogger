@@ -1,5 +1,9 @@
 package org.jogger;
 
+import java.net.ConnectException;
+import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.jogger.http.Response;
@@ -9,7 +13,7 @@ import org.testng.annotations.Test;
 public class JoggerServerTest {
 
 	@Test
-	public void shouldStartServer() throws Exception {
+	public void shouldStartStopServer() throws Exception {
 		JoggerServer joggerServer = new JoggerServer(new Jogger());
 		joggerServer.listen(27773);
 
@@ -18,6 +22,10 @@ public class JoggerServerTest {
 			Assert.assertEquals(response.getStatusLine().getStatusCode(), 404);
 		} finally {
 			joggerServer.stop();
+			try {
+				new Socket("localhost", 27773);
+				Assert.fail("Server is still running");
+			} catch (ConnectException e) {}
 		}
 	}
 	
@@ -61,6 +69,37 @@ public class JoggerServerTest {
 		} finally {
 			joggerServer.stop();
 		}
+	}
+	
+	@Test
+	public void shouldJoinServerThread() throws Exception {
+		final AtomicBoolean running = new AtomicBoolean(false);
+		
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				JoggerServer joggerServer = new JoggerServer(new Jogger());
+				joggerServer.listen(27773);
+				
+				try {
+					running.getAndSet(true);
+					
+					try {
+						joggerServer.join();
+					} catch (InterruptedException e) {}
+				} finally {
+					joggerServer.stop();
+					running.getAndSet(false);
+				}
+			}
+		});
+		thread.start();
+		
+		Thread.sleep(100);
+		Assert.assertTrue(running.get());
+		thread.interrupt();
+		Thread.sleep(100);
+		Assert.assertFalse(running.get());
 	}
 	
 }
