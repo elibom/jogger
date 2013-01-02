@@ -6,7 +6,7 @@ A **micro-web framework** that provides a simple and elegant way of creating web
 
 ## Getting started
 
-To get started first add the dependency to your project (download JAR or use Maven) and then create your first Jogger app like this:
+To get started first [include the Jogger library](Including Jogger) and then create your first Jogger app like this:
 
 ```java
 public class Main {
