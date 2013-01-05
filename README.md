@@ -35,10 +35,10 @@ Run it and point your browser to [http://localhost:5000](http://localhost:5000).
 Out of the box Jogger comes with the following:
 
 * An embedded [Jetty server](http://www.eclipse.org/jetty/).
-* An asset handler that allows you to serve static files (CSS, Javascript, images, etc.). 
-* A routing mechanism that allows you to map HTTP requests to Java methods. [Learn more](https://github.com/germanescobar/jogger/wiki/Routing-Guide)
-* A view template engine. The default is [Freemarker](http://freemarker.sourceforge.net/) but [Jade](https://github.com/neuland/jade4j) is also supported. [Learn more](https://github.com/germanescobar/jogger/wiki/Templating-Guide)
-* A testing framework that allows you to create integration tests easily. [Learn more](https://github.com/germanescobar/jogger/wiki/Testing-Guide)
+* An **asset handler** that allows you to serve static files (CSS, Javascript, images, etc.). 
+* A **routing mechanism** that allows you to map HTTP requests to Java methods. [Learn more](https://github.com/germanescobar/jogger/wiki/Routing-Guide)
+* A **view template engine**. The default is [Freemarker](http://freemarker.sourceforge.net/) but [Jade](https://github.com/neuland/jade4j) is also supported. [Learn more](https://github.com/germanescobar/jogger/wiki/Templating-Guide)
+* A **testing framework** that allows you to create integration tests easily. [Learn more](https://github.com/germanescobar/jogger/wiki/Testing-Guide)
 
 ## Documentation
 
