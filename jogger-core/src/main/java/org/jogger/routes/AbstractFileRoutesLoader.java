@@ -1,12 +1,10 @@
 package org.jogger.routes;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -14,14 +12,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.jogger.Route;
-import org.jogger.RoutesException;
 import org.jogger.Route.HttpMethod;
+import org.jogger.RoutesException;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
 
 /**
  * <p>Base class for classes that load routes from a file. Concrete implementations need only to 
- * implement the method {@link #loadController(String)}.</p>
+ * implement the method {@link #getInputStream()}.</p>
  * 
  * <h3>The format of the file</h3>
  * 
@@ -52,53 +50,42 @@ import org.jogger.http.Response;
  * 
  * @author German Escobar
  */
-public abstract class AbstractFileRoutesLoader {
-
-	/**
-	 * Loads the routes from the specified <code>routesFilePath</code>. 
-	 * 
-	 * @param routesFilePath the path to the file that holds the routes.
-	 * 
-	 * @return a List of {@link Route} objects or an empty List if there are no routes.
-	 * @throws ParseException if there is a problem parsing the file.
-	 * @throws RoutesException if the file is not found or any other problem creating the routes.
-	 */
-	public List<Route> load(String routesFilePath) throws ParseException, RoutesException {
-		return load(new File(routesFilePath));
-	}
+public abstract class AbstractFileRoutesLoader implements RoutesLoader {
 	
-	/**
-	 * Loads the routes from the specified <code>routesFile</code>.
-	 * 
-	 * @param routesFile the File that holds the routes.
-	 * 
-	 * @return a List of {@link Route} objects or an empty List if there are no routes.
-	 * @throws ParseException if there is a problem parsing the file.
-	 * @throws RoutesException if the file is not found or any other problem creating the routes.
-	 */
-	public List<Route> load(File routesFile) throws ParseException, RoutesException {
+	private ControllerLoader controllerLoader = new ClassPathControllerLoader();
+
+	@Override
+	public List<Route> load() throws ParseException, RoutesException {
+		InputStream inputStream = null;
 		try {
-			return load(new FileInputStream(routesFile));
-		} catch (FileNotFoundException e) {
-			throw new RoutesException(e);
+			inputStream = getInputStream();
+		} catch (Exception e) {
+			throw new RoutesException("Problem loading the routes.config file: " + e.getMessage(), e);
+		}
+		
+		try {
+			return load(inputStream);
+		} catch (IOException e) {
+			throw new RoutesException("Problem loading the routes.config file: " + e.getMessage(), e);
 		}
 	}
 	
 	/**
-	 * Loads the routes from the specified <code>inputStream</code>.
+	 * Helper method. Loads the routes from the <code>inputStream</code>.
 	 * 
-	 * @param inputStream the InputStream that holds the routes.
+	 * @param inputStream
 	 * 
-	 * @return a List of {@link Route} objects or an empty List if there are no routes.
-	 * @throws ParseException if there is a problem parsing the file.
-	 * @throws RoutesException if the file is not found or any other problem creating the routes.
+	 * @return
+	 * @throws ParseException
+	 * @throws IOException
 	 */
-	public List<Route> load(InputStream inputStream) throws ParseException, RoutesException {
+	private List<Route> load(InputStream inputStream) throws ParseException, IOException {
 		int line = 0; // reset line positioning
 		List<Route> routes = new ArrayList<Route>(); // this is what we will fill and return
 		
+		BufferedReader in = null;
 		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+			in = new BufferedReader(new InputStreamReader(inputStream));
 			
 			String input;
 			while ( (input = in.readLine()) != null ) {
@@ -108,15 +95,13 @@ public abstract class AbstractFileRoutesLoader {
 				
 				// only parse line if it is not empty and not a comment
 				if (!input.equals("") && !input.startsWith("#")) {
-					
 					Route route = parse(input, line);
 					routes.add(route);
-					
 				}
 			}
 			
-		} catch (IOException e) {
-			throw new RoutesException("Problem loading the routes.config file: " + e.getMessage(), e);
+		} finally {
+			closeResource(in);
 		}
 		
 		return routes;
@@ -268,7 +253,7 @@ public abstract class AbstractFileRoutesLoader {
 	 * @throws RoutesException if there is a problem loading the controller or the method.
 	 */
 	private Route buildRoute(String httpMethod, String path, String controllerName, String methodName) throws RoutesException {	
-		Object controller = loadController(controllerName);
+		Object controller = controllerLoader.load(controllerName);
 		Method method = getMethod(controller, methodName);
 		
 		return new Route(HttpMethod.valueOf(httpMethod.toUpperCase()), path, controller, method);
@@ -293,15 +278,40 @@ public abstract class AbstractFileRoutesLoader {
 		}
 	}
 	
+	private void closeResource(Reader reader) {
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (Exception e) {
+			}
+		}
+	}
+	
 	/**
-	 * Helper method. Loads the controller with the specified <code>controllerName</code>. It is up to the concrete 
-	 * implementation to decide how to load the controller and what does the <code>controllerName</code> represents.
+	 * Used to retrieve the InputStream 
 	 * 
-	 * @param controllerName the name of the controller.
-	 * 
-	 * @return an Object that represents the controller.
-	 * @throws RoutesException if the controller is not found or there is a problem instantiating it.
+	 * @return
+	 * @throws Exception
 	 */
-	protected abstract Object loadController(String controllerName) throws RoutesException;
+	protected abstract InputStream getInputStream() throws Exception;
+	
+	/**
+	 * Sets the <code>basePackage</code> to use when loading controllers (i.e you don't need to specified all the 
+	 * package of all controllers in the routes files). This method will set a {@link ClassPathControllerLoader} as the
+	 * default mechanism to load controllers with the specified <code>basePackage</code>.
+	 * 
+	 * @param basePackage the base package of all controllers.
+	 */
+	public void setBasePackage(String basePackage) {
+		this.controllerLoader = new ClassPathControllerLoader(basePackage);
+	}
+
+	public ControllerLoader getControllerLoader() {
+		return controllerLoader;
+	}
+
+	public void setControllerLoader(ControllerLoader controllerLoader) {
+		this.controllerLoader = controllerLoader;
+	}
 	
 }

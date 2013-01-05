@@ -6,19 +6,18 @@
 	<id>jogger-archetype</id>
 	
 	<sources>
-		<source>src/main/java/controllers/Pages.java</source>
-		<source>src/main/java/interceptors/AppInterceptors.java</source>
+		<source>src/main/java/Main.java</source>
+		<source>src/main/java/ApplicationFactory.java</source>
 	</sources>
 	
 	<resources>
-		<resource>src/main/webapp/WEB-INF/web.xml</resource>
-		<resource filtered="false">src/main/webapp/WEB-INF/routes.config</resource>
-		<resource filtered="false">src/main/webapp/WEB-INF/freemarker/layout.ftl</resource>
-		<resource filtered="true">src/main/webapp/WEB-INF/freemarker/index.ftl</resource>
+		<resource>src/main/assembly/bin.xml</resource>
+		<resource filtered="false">assets/style.css</resource>
+		<resource filtered="false">templates/hello.ftl</resource>
 	</resources>
 	
 	<testSources>
-		<source>src/test/java/controllers/PagesTest.java</source>
+		<source>src/test/java/ApplicationTest.java</source>
 	</testSources>
   
 </archetype>

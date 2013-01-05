@@ -13,7 +13,8 @@ public interface JoggerFactory {
 	 * this method should always return a new instance of the {@link Jogger} class. 
 	 * 
 	 * @return a configured {@link Jogger} instance.
+	 * @throws Exception
 	 */
-	Jogger configure();
+	Jogger configure() throws Exception;
 	
 }

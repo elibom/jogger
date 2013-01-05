@@ -158,7 +158,7 @@ public class MockResponse implements Response {
 		PrintWriter writer = new PrintWriter(out);
 		
 		// retrieve and process the template
-		templateEngine.render(templateName, atts, writer);
+		templateEngine.render(templateName, attributes, writer);
 			
 		try {
 			output = out.toString("UTF-8");

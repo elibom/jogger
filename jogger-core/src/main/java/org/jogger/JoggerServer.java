@@ -76,7 +76,11 @@ public class JoggerServer {
 		}
 		
 		this.joggerFactory = joggerFactory;
-		this.jogger = joggerFactory.configure();
+		try {
+			this.jogger = joggerFactory.configure();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		if (this.jogger == null) {
 			throw new IllegalArgumentException("joggerFactory is not providing a jogger instance.");
 		}
@@ -180,9 +184,8 @@ public class JoggerServer {
 		public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest servletRequest,
 				HttpServletResponse servletResponse) throws IOException, ServletException {
 			
-			// reload the jogger instance if we are in development
 			if (Environment.isDevelopment()) {
-				jogger = joggerFactory.configure();
+				reloadJogger();
 			}
 
 			// try to find a matching route
@@ -216,6 +219,14 @@ public class JoggerServer {
 				handleException(e, request, response);
 			} finally {
 				baseRequest.setHandled(true);
+			}
+		}
+		
+		private void reloadJogger() throws ServletException {
+			try {
+				jogger = joggerFactory.configure();
+			} catch (Exception e) {
+				throw new ServletException(e);
 			}
 		}
 		
