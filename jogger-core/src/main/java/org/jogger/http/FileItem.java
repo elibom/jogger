@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jogger.util.Preconditions;
+
 /**
  * Represents a file from an HTTP multipart/form-data request.
  * 
@@ -53,9 +55,9 @@ public class FileItem {
 	 */
 	public FileItem(String fieldName, String fileName, String contentType, long contentLength, File file, Map<String,String> headers) {
 		
-		assertNotNull(fieldName, "no fieldName specified.");
-		assertNotNull(fileName, "no fileName specified.");
-		assertNotNull(file, "no inputStream specified");
+		Preconditions.notNull(fieldName, "no fieldName provided.");
+		Preconditions.notNull(fileName, "no fileName provided.");
+		Preconditions.notNull(file, "no inputStream provided");
 		
 		this.fileName = fileName;
 		this.contentType = contentType;
@@ -66,12 +68,6 @@ public class FileItem {
 			this.headers = new HashMap<String,String>();
 		}
 		
-	}
-	
-	private void assertNotNull(Object o, String message) {
-		if (o == null) {
-			throw new IllegalArgumentException(message);
-		}
 	}
 
 	public String getName() {

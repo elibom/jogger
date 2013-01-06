@@ -2,6 +2,8 @@ package org.jogger;
 
 import java.lang.reflect.Method;
 
+import org.jogger.util.Preconditions;
+
 /**
  * Holds the information of a route.
  * 
@@ -23,26 +25,18 @@ public class Route {
 	private final Method action;
 	
 	public Route(HttpMethod httpMethod, String path, Object controller, Method action) {
-		if (httpMethod == null) {
-			throw new IllegalArgumentException("No httpMethod provided");
-		}
-		if (path == null) {
-			throw new IllegalArgumentException("No path provided");
-		}
-		if (controller == null) {
-			throw new IllegalArgumentException("No controller provided");
-		}
-		if (action == null) {
-			throw new IllegalArgumentException("No action provided");
-		}
+		Preconditions.notNull(httpMethod, "no httpMethod provided");
+		Preconditions.notNull(path, "no path provided");
+		Preconditions.notNull(controller, "no controller provided");
+		Preconditions.notNull(action, "no action provided");
 		
 		this.httpMethod = httpMethod;
-		this.path = fixPath(path);
+		this.path = addSlashPrefixTo(path);
 		this.controller = controller;
 		this.action = action;
 	}
 	
-	private String fixPath(String path) {
+	private String addSlashPrefixTo(String path) {
 		if (!path.startsWith("/")) {
 			path = "/" + path;
 		}

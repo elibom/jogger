@@ -15,6 +15,7 @@ import org.jogger.http.HttpException;
 import org.jogger.http.Response;
 import org.jogger.template.TemplateEngine;
 import org.jogger.template.TemplateException;
+import org.jogger.util.Preconditions;
 
 /**
  * A {@link Response} implementation based on the Servlet API.
@@ -42,14 +43,8 @@ public class ServletResponse implements Response {
 	 * @param templateEngine the {@link TemplateEngine} implementation to use.
 	 */
 	public ServletResponse(HttpServletResponse response, TemplateEngine templateEngine) {
-		
-		if (response == null) {
-			throw new IllegalArgumentException("no response provided");
-		}
-		
-		if (templateEngine == null) {
-			throw new IllegalArgumentException("no templateEngine provided");
-		}
+		Preconditions.notNull(response, "no response provided.");
+		Preconditions.notNull(templateEngine, "no templateEngine provided.");
 		
 		this.response = response;
 		response.setStatus(Response.OK);
@@ -163,13 +158,8 @@ public class ServletResponse implements Response {
 
 	@Override
 	public Response setAttribute(String name, Object object) {
-		if (name == null || "".equals(name)) {
-			throw new IllegalArgumentException("No name specified");
-		}
-		
-		if (object == null) {
-			throw new IllegalArgumentException("No object specified");
-		}
+		Preconditions.notEmpty(name, "no name provided.");
+		Preconditions.notNull(object, "no object specified");
 		
 		attributes.put(name, object);
 		

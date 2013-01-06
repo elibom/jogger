@@ -1,6 +1,8 @@
 package org.jogger;
 
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -13,6 +15,7 @@ import org.jogger.interceptor.Interceptor;
 import org.jogger.interceptor.InterceptorEntry;
 import org.jogger.template.FreemarkerTemplateEngine;
 import org.jogger.template.TemplateEngine;
+import org.jogger.util.Preconditions;
 
 /**
  * <p>Use this class to configure your application's routes, interceptors, template engine, exception handlers, etc.</p>
@@ -106,24 +109,41 @@ public class Jogger {
 	/**
 	 * Retrieves the {@link Route} that matches the specified <code>httpMethod</code> and <code>path</code>.
 	 * 
-	 * @param httpMethod the HTTP method to match.
-	 * @param path the path to match.
+	 * @param httpMethod the HTTP method to match. Should not be null or empty.
+	 * @param path the path to match. Should not be null but can be empty (which is interpreted as /)
 	 * 
 	 * @return a {@link Route} object that matches the arguments or null if no route matches.
 	 */
 	public Route getRoute(String httpMethod, String path) {
-		
-		if (!path.startsWith("/")) {
-			path = "/" + path;
-		}
-		
+
+		Preconditions.notEmpty(httpMethod, "no httpMethod provided.");
+		Preconditions.notNull(path, "no path provided.");
+
+		String cleanPath = parsePath(path);
+
 		for (Route route : routes) {
-			if (matchesPath(route.getPath(), path) && route.getHttpMethod().toString().equalsIgnoreCase(httpMethod)) {
+			if (matchesPath(route.getPath(), cleanPath) && route.getHttpMethod().toString().equalsIgnoreCase(httpMethod)) {
 				return route;
 			}
 		}
 
 		return null;
+	}
+
+	private String parsePath(String path) {
+
+		if (!path.startsWith("/")) {
+			path = "/" + path;
+		}
+
+		URI uri = null;
+		try {
+			uri = new URI(path);
+		} catch (URISyntaxException e) {
+			return null;
+		}
+
+		return uri.getPath();
 	}
 	
 	/**
@@ -144,9 +164,7 @@ public class Jogger {
 	}
 
 	public void setRoutes(List<Route> routes) {
-		if (routes == null) {
-			throw new IllegalArgumentException("No routes provided");
-		}
+		Preconditions.notNull(routes, "no routes provided");
 		this.routes = routes;
 	}
 
@@ -156,10 +174,7 @@ public class Jogger {
 	 * @param route the route to be added.
 	 */
 	public void addRoute(Route route) {
-		if (route == null) {
-			throw new IllegalArgumentException("No route provided");
-		}
-
+		Preconditions.notNull(route, "no route provided");
 		this.routes.add(route);
 	}
 
@@ -175,11 +190,7 @@ public class Jogger {
 	 * @throws NoSuchMethodException if the <code>methodName</code> is not found or doesn't have the right signature.
 	 */
 	public void addRoute(HttpMethod httpMethod, String path, Object controller, String methodName) throws NoSuchMethodException {
-
-		if (controller == null) {
-			throw new IllegalArgumentException("No controller provided");
-		}
-
+		Preconditions.notNull(controller, "no controller provided");
 		Method method = controller.getClass().getMethod(methodName, Request.class, Response.class);
 		addRoute(httpMethod, path, controller, method);
 
@@ -245,9 +256,7 @@ public class Jogger {
 	}
 
 	public void setInterceptors(List<InterceptorEntry> interceptors) {
-		if (interceptors == null) {
-			throw new IllegalArgumentException("No interceptors provided");
-		}
+		Preconditions.notNull(interceptors, "no interceptors provided");
 		this.interceptors = interceptors;
 	}
 
@@ -259,9 +268,7 @@ public class Jogger {
 	 * @param paths the paths in which this interceptor will be invoked, an empty array to respond to all paths.
 	 */
 	public void addInterceptor(Interceptor interceptor, String... paths) {
-		if (interceptor == null) {
-			throw new IllegalArgumentException("No interceptor provided");
-		}
+		Preconditions.notNull(interceptor, "no interceptor provided");
 		interceptors.add(new InterceptorEntry(interceptor, paths));
 	}
 
@@ -270,9 +277,7 @@ public class Jogger {
 	}
 
 	public void setAssetLoader(AssetLoader assetLoader) {
-		if (assetLoader == null) {
-			throw new IllegalArgumentException("No assetLoader provided");
-		}
+		Preconditions.notNull(assetLoader, "no assetLoader provided");
 		this.assetLoader = assetLoader;
 	}
 
@@ -281,9 +286,7 @@ public class Jogger {
 	}
 
 	public void setTemplateEngine(TemplateEngine templateEngine) {
-		if (templateEngine == null) {
-			throw new IllegalArgumentException("No templateEngine provided");
-		}
+		Preconditions.notNull(templateEngine, "no templateEngine provided");
 		this.templateEngine = templateEngine;
 	}
 

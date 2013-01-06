@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import org.eclipse.jetty.http.MimeTypes;
+import org.jogger.util.Preconditions;
 
 /**
  * An {@link AssetLoader} implementation that uses the file system to retrieve assets.
@@ -30,18 +31,12 @@ public class FileAssetLoader implements AssetLoader {
 	 * @param directory
 	 */
 	public FileAssetLoader(String directory) {
-		if (directory == null || "".equals(directory)) {
-			throw new IllegalArgumentException("No directory specified");
-		}
-		
+		Preconditions.notEmpty(directory, "no directory provided");
 		this.parent = new File(directory);
 	}
 	
 	public FileAssetLoader(File parent) {
-		if (parent == null) {
-			throw new IllegalArgumentException("No parent specified");
-		}
-		
+		Preconditions.notNull(parent, "no parent provided");
 		this.parent = parent;
 	}
 

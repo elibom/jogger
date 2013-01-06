@@ -12,6 +12,7 @@ import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.http.servlet.ServletRequest;
 import org.jogger.http.servlet.ServletResponse;
+import org.jogger.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +53,8 @@ public class JoggerServer {
 	 * @param jogger the application configuration that this server will use to handle the HTTP requests.
 	 */
 	public JoggerServer(final Jogger jogger) {
-		if (jogger == null) {
-			throw new IllegalArgumentException("No jogger provided.");
-		}
-		
+		Preconditions.notNull(jogger, "no jogger provided.");
+
 		this.joggerFactory = new JoggerFactory() {
 			@Override
 			public Jogger configure() {
@@ -71,9 +70,7 @@ public class JoggerServer {
 	 * @param joggerFactory the factory from which we will retrieve the {@link Jogger} instance.
 	 */
 	public JoggerServer(final JoggerFactory joggerFactory) {
-		if (joggerFactory == null) {
-			throw new IllegalArgumentException("No joggerFactory provided.");
-		}
+		Preconditions.notNull(joggerFactory, "no joggerFactory provided");
 		
 		this.joggerFactory = joggerFactory;
 		try {
@@ -81,9 +78,8 @@ public class JoggerServer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		if (this.jogger == null) {
-			throw new IllegalArgumentException("joggerFactory is not providing a jogger instance.");
-		}
+		
+		Preconditions.notNull(jogger, "joggerFactory is not providing a jogger instance.");
 		
 	}
 	

@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import org.jogger.asset.Asset;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.util.Preconditions;
 
 /**
  * This class is responsible of executing requests for static assets.
@@ -16,10 +17,7 @@ public class AssetRequestExecutor {
 	private Jogger jogger;
 
 	public AssetRequestExecutor(Jogger jogger) {
-		if (jogger == null) {
-			throw new IllegalArgumentException("No jogger provided.");
-		}
-		
+		Preconditions.notNull(jogger, "no jogger provided.");
 		this.jogger = jogger;
 	}
 	

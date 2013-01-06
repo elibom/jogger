@@ -13,6 +13,7 @@ import org.jogger.interceptor.Controller;
 import org.jogger.interceptor.Interceptor;
 import org.jogger.interceptor.InterceptorEntry;
 import org.jogger.interceptor.InterceptorExecution;
+import org.jogger.util.Preconditions;
 
 /**
  * This class is responsible of executing the <em>interceptors</em> and <em>controller actions</em> when there is a 
@@ -30,10 +31,8 @@ public class RouteRequestExecutor {
 	 * @param jogger
 	 */
 	public RouteRequestExecutor(Jogger jogger) {
-		if (jogger == null) {
-			throw new IllegalArgumentException("No jogger provided.");
-		}
-		
+		Preconditions.notNull(jogger, "no jogger provided");
+
 		this.jogger = jogger;
 	}
 

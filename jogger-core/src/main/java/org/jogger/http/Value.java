@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jogger.util.Preconditions;
+
 /**
  * Wraps a String object that can be converted into other objects (e.g. Long, Boolean, Date, Array, etc.). 
  * 
@@ -14,10 +16,7 @@ public class Value {
 	private String value;
 
 	public Value(String value) {
-		if (value == null) {
-			throw new IllegalArgumentException("value not provided.");
-		}
-		
+		Preconditions.notNull(value, "value not provided.");
 		this.value = value;
 	}
 	
