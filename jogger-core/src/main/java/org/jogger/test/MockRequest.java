@@ -16,7 +16,6 @@ import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.Request;
-import org.jogger.http.Value;
 
 /**
  * This is a {@link Request} implementation that stores the request state in attributes. Useful for testing Jogger 
@@ -32,7 +31,7 @@ public class MockRequest extends AbstractRequest {
 	
 	private String queryString;
 	
-	private Map<String,Value> params;
+	private Map<String,String> params;
 	
 	private String url;
 	
@@ -86,9 +85,9 @@ public class MockRequest extends AbstractRequest {
 		
 	}
 	
-	private Map<String,Value> buildParams(String queryString) {
+	private Map<String,String> buildParams(String queryString) {
 		
-		Map<String,Value> ret = new HashMap<String,Value>();
+		Map<String,String> ret = new HashMap<String,String>();
 		
 		if (queryString == null) {
 			return ret;
@@ -97,7 +96,7 @@ public class MockRequest extends AbstractRequest {
 		String[] elems = queryString.split("&");
 		for (String elem : elems ) {
 			String[] pair = elem.split("=");
-			ret.put( pair[0], new Value(pair[1]) );
+			ret.put( pair[0], pair[1] );
 		}
 		
 		return ret;
@@ -120,12 +119,12 @@ public class MockRequest extends AbstractRequest {
 	}
 
 	@Override
-	public Map<String, Value> getParameters() {
+	public Map<String, String> getParameters() {
 		return params;
 	}
 
 	@Override
-	public Value getParameter(String name) {
+	public String getParameter(String name) {
 		return params.get(name);
 	}
 

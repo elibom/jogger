@@ -23,7 +23,6 @@ import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.jogger.http.Value;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -63,11 +62,11 @@ public class ServletRequestTest {
 				MockController.class.getMethod("init", Request.class, Response.class));
 		ServletRequest request = new ServletRequest(route, servletRequest).init();
 		
-		Map<String,Value> pathVariables = request.getPathVariables();
+		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );
 		Assert.assertEquals( pathVariables.size(), 2 );
-		Assert.assertEquals( pathVariables.get("userId").asLong(), new Long(1) );
-		Assert.assertEquals( pathVariables.get("hash").asString(), "th1s1s4hAsh");
+		Assert.assertEquals( pathVariables.get("userId"), "1" );
+		Assert.assertEquals( pathVariables.get("hash"), "th1s1s4hAsh");
 		
 	}
 	
@@ -82,7 +81,7 @@ public class ServletRequestTest {
 				MockController.class.getMethod("init", Request.class, Response.class));
 		ServletRequest request = new ServletRequest(route, servletRequest).init();
 		
-		Map<String,Value> pathVariables = request.getPathVariables();
+		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );
 		Assert.assertEquals( pathVariables.size(), 0 );
 		
@@ -111,28 +110,17 @@ public class ServletRequestTest {
 		
 		Request request = new ServletRequest(null, servletRequest).init();
 		
-		Map<String,Value> params = request.getParameters();
+		Map<String,String> params = request.getParameters();
 		Assert.assertNotNull( params );
 		Assert.assertEquals( params.size(), 2 );
 		
-		Value param1 = params.get("param1");
+		String param1 = params.get("param1");
 		Assert.assertNotNull( param1 );
-		Assert.assertEquals( param1.asString(), "value1" );
+		Assert.assertEquals( param1, "value1" );
 		
-		Value[] param1Values = param1.asArray();
-		Assert.assertNotNull( param1Values );
-		Assert.assertEquals( param1Values.length, 1 );
-		Assert.assertEquals( param1Values[0].asString(), "value1" );
-		
-		Value param2 = params.get("param2");
+		String param2 = params.get("param2");
 		Assert.assertNotNull( param2 );
-		Assert.assertEquals( param2.asString(), "val1,val2" );
-		
-		Value[] param2Values = param2.asArray();
-		Assert.assertNotNull( param2Values );
-		Assert.assertEquals( param2Values.length, 2);
-		Assert.assertEquals( param2Values[0].asString(), "val1" );
-		Assert.assertEquals( param2Values[1].asString(), "val2" );
+		Assert.assertEquals( param2, "val1,val2" );
 		
 		Assert.assertNull( params.get("notexistnet") );
 		
@@ -150,7 +138,7 @@ public class ServletRequestTest {
 		Request request = new ServletRequest(null, servletRequest).init();
 		
 		Assert.assertNotNull( request.getParameter("param1") );
-		Assert.assertEquals( request.getParameter("param1").asString(), "value1" );
+		Assert.assertEquals( request.getParameter("param1"), "value1" );
 		
 	}
 	
@@ -177,71 +165,7 @@ public class ServletRequestTest {
 		Request request = new ServletRequest(null, servletRequest).init();
 		
 		Assert.assertNotNull( request.getParameter("param1") );
-		Assert.assertEquals( request.getParameter("param1").asString(), "1" );
-		
-		long val = request.getParameter("param1").asLong();
-		Assert.assertEquals( val, 1L);
-		
-	}
-	
-	@Test(expectedExceptions=NumberFormatException.class)
-	public void shouldFailRetrievingUnparseableLongParam() throws Exception {
-		
-		Map<String,String[]> mockParams = new HashMap<String,String[]>();
-		mockParams.put( "param1", new String[] { "notALong" } );
-		
-		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterMap()).thenReturn(mockParams);
-		
-		Request request = new ServletRequest(null, servletRequest).init();
-		
-		Assert.assertNotNull( request.getParameter("param1") );
-		request.getParameter("param1").asLong();
-		
-	}
-	
-	@Test
-	public void shouldRetrieveBooleanParam() throws Exception {
-		
-		Map<String,String[]> mockParams = new HashMap<String,String[]>();
-		mockParams.put( "param1", new String[] { "true" } );
-		mockParams.put( "param2", new String[] { "false" } );
-		mockParams.put( "param3", new String[] { "1" } );
-		
-		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterMap()).thenReturn(mockParams);
-		
-		Request request = new ServletRequest(null, servletRequest).init();
-		
-		Assert.assertEquals( request.getParameter("param1").asBoolean(), Boolean.TRUE );
-		Assert.assertEquals( request.getParameter("param2").asBoolean(), Boolean.FALSE );
-		Assert.assertEquals( request.getParameter("param3").asBoolean(), Boolean.FALSE );
-		
-	}
-	
-	@Test
-	public void shouldRetrieveListParam() throws Exception {
-		
-		Map<String,String[]> mockParams = new HashMap<String,String[]>();
-		mockParams.put( "param1", new String[] { "value1" } );
-		mockParams.put( "param2", new String[] { "value1", "2" } );
-		
-		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterMap()).thenReturn(mockParams);
-		
-		Request request = new ServletRequest(null, servletRequest).init();
-		
-		Assert.assertNotNull( request.getParameter("param1") );
-		Assert.assertNotNull( request.getParameter("param2") );
-		
-		Value[] param1Values = request.getParameter("param1").asArray();
-		Assert.assertEquals( param1Values.length, 1 );
-		Assert.assertEquals( param1Values[0].asString(), "value1");
-		
-		Value[] param2Values = request.getParameter("param2").asArray();
-		Assert.assertEquals( param2Values.length, 2 );
-		Assert.assertEquals( param2Values[0].asString(), "value1");
-		Assert.assertEquals( param2Values[1].asLong(), new Long(2) );
+		Assert.assertEquals( request.getParameter("param1"), "1" );
 		
 	}
 	
@@ -406,7 +330,7 @@ public class ServletRequestTest {
 		Assert.assertNotNull( file.getHeaders() );
 		Assert.assertEquals( file.getHeaders().size(), 3 );
 		
-		Assert.assertEquals( request.getParameter("submit-name").asString(), "Larry");
+		Assert.assertEquals( request.getParameter("submit-name"), "Larry");
 		
 	}
 	

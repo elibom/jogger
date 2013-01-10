@@ -19,7 +19,6 @@ import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.HttpException;
 import org.jogger.http.Request;
-import org.jogger.http.Value;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
@@ -36,7 +35,7 @@ public class ServletRequest extends AbstractRequest {
 	 */
 	private HttpServletRequest request;
 	
-	private Map<String,Value> parameters = new HashMap<String,Value>();
+	private Map<String,String> parameters = new HashMap<String,String>();
 	
 	private List<FileItem> files = new ArrayList<FileItem>();
 	
@@ -67,7 +66,7 @@ public class ServletRequest extends AbstractRequest {
 		// retrieve query and post params
 		Map<String,String[]> requestParams = request.getParameterMap();
 		for (Map.Entry<String,String[]> entry : requestParams.entrySet()) {
-			parameters.put( entry.getKey(), new Value(join(entry.getValue())) );
+			parameters.put( entry.getKey(), join(entry.getValue()) );
 		}
 		
 		// retrieve multipart/form-data parameters
@@ -78,7 +77,7 @@ public class ServletRequest extends AbstractRequest {
 
 				@Override
 				public void handleFormItem(String name, String value) {
-					parameters.put( name, new Value(value) );
+					parameters.put( name, value );
 				}
 
 				@Override
@@ -134,12 +133,12 @@ public class ServletRequest extends AbstractRequest {
 	}
 
 	@Override
-	public Map<String,Value> getParameters() {
+	public Map<String,String> getParameters() {
 		return Collections.unmodifiableMap(parameters);
 	}
 
 	@Override
-	public Value getParameter(String name) {
+	public String getParameter(String name) {
 		return parameters.get(name);
 	}
 

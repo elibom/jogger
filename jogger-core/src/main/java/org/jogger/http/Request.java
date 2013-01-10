@@ -40,18 +40,18 @@ public interface Request {
 	 * Retrieves the path variables. Path variables are wildcards that you can add to the url in the routes.config 
 	 * file. 
 	 * 
-	 * @return a Map<String,Value> object with the path variables.
+	 * @return a Map<String,String> object with the path variables.
 	 */
-	Map<String,Value> getPathVariables();
+	Map<String,String> getPathVariables();
 	
 	/**
 	 * Retrieves the value of a path variable.
 	 * 
 	 * @param name the name of the path variable.
 	 * 
-	 * @return a Value object. Null if it doesn't exists.
+	 * @return a String object. Null if it doesn't exists.
 	 */
-	Value getPathVariable(String name);
+	String getPathVariable(String name);
 	
 	/**
 	 * Retrieves the raw query string part of the URL.
@@ -63,18 +63,18 @@ public interface Request {
 	/**
 	 * Retrieves the request parameters.
 	 * 
-	 * @return a Map<String,Value> object with the request parameters.
+	 * @return a Map<String,String> object with the request parameters.
 	 */
-	Map<String,Value> getParameters();
+	Map<String,String> getParameters();
 	
 	/**
 	 * Retrieves the value of a request parameter.
 	 * 
 	 * @param name the name of the parameter
 	 * 
-	 * @return a Value object. Null if it doesn't exists.
+	 * @return a String object. Null if it doesn't exists.
 	 */
-	Value getParameter(String name);
+	String getParameter(String name);
 	
 	/**
 	 * Returns the HTTP method of the request. 

@@ -28,7 +28,7 @@ public abstract class AbstractRequest implements Request {
 	/**
 	 * Holds the path variables of the request.
 	 */
-	protected Map<String,Value> pathVariables = new HashMap<String,Value>();
+	protected Map<String,String> pathVariables = new HashMap<String,String>();
 	
 	public AbstractRequest(Route route) {
 		this.route = route;
@@ -40,12 +40,12 @@ public abstract class AbstractRequest implements Request {
 	}
 
 	@Override
-	public Map<String, Value> getPathVariables() {
+	public Map<String, String> getPathVariables() {
 		return pathVariables;
 	}
 	
 	@Override
-	public Value getPathVariable(String name) {
+	public String getPathVariable(String name) {
 		return pathVariables.get(name);
 	}
 	
@@ -67,7 +67,7 @@ public abstract class AbstractRequest implements Request {
 		// start index at 1 as group(0) always stands for the entire expression
 		for (int i=1; i <= variables.size(); i++) {
 			String value = matcher.group(i);
-			pathVariables.put(variables.get(i-1), new Value(value));
+			pathVariables.put(variables.get(i-1), value);
 		}
 		
 	}
