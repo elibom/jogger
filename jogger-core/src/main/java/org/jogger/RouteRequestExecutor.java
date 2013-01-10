@@ -45,9 +45,9 @@ public class RouteRequestExecutor {
 	 * 
 	 * @throws Exception
 	 */
-	public void execute(Request request, Response response) throws Exception {
+	public void execute(Route route, Request request, Response response) throws Exception {
 		
-		if (request.getRoute() == null) {
+		if (route == null) {
 			throw new IllegalStateException("There is no route for this request");
 		}
 		
@@ -55,7 +55,7 @@ public class RouteRequestExecutor {
 		List<Interceptor> requestInterceptors = getInterceptors(request.getPath());
 
 		// execute the controller
-		ControllerExecutor controllerExecutor = new ControllerExecutor(request, response, requestInterceptors);
+		ControllerExecutor controllerExecutor = new ControllerExecutor(route, request, response, requestInterceptors);
 		controllerExecutor.proceed();
 	}
 	
@@ -111,6 +111,8 @@ public class RouteRequestExecutor {
 	 * @author German Escobar
 	 */
 	private class ControllerExecutor implements InterceptorExecution {
+		
+		private Route route;
 
 		private Request request;
 
@@ -123,11 +125,13 @@ public class RouteRequestExecutor {
 		/**
 		 * Constructor. Initializes the object with the specified parameters.
 		 * 
-		 * @param request an object that represents the current HTTP request.
-		 * @param response an object that represents the current HTTP response.
+		 * @param route
+		 * @param request the Jogger HTTP request.
+		 * @param response the Jogger HTTP response.
 		 * @param interceptors a list of interceptors that we need to execute before calling the action.
 		 */
-		public ControllerExecutor(Request request, Response response, List<Interceptor> interceptors) {
+		public ControllerExecutor(Route route, Request request, Response response, List<Interceptor> interceptors) {
+			this.route = route;
 			this.request = request;
 			this.response = response;
 			this.interceptors = interceptors;
@@ -139,8 +143,8 @@ public class RouteRequestExecutor {
 			// if we finished executing all the interceptors, call the controller method
 			if (index == interceptors.size()) {
 
-				Object controller = request.getRoute().getController();
-				Method method = request.getRoute().getAction();
+				Object controller = route.getController();
+				Method method = route.getAction();
 				
 				try {
 					method.invoke(controller, request, response);
@@ -166,7 +170,7 @@ public class RouteRequestExecutor {
 			// create and return a new instance of the Controller class
 			return new Controller() {
 				public <A extends Annotation> A getAnnotation(Class<A> annotation) {
-					return request.getRoute().getController().getClass().getAnnotation(annotation);
+					return route.getController().getClass().getAnnotation(annotation);
 				}
 			};
 
@@ -178,7 +182,7 @@ public class RouteRequestExecutor {
 			// create and return a new instance of the Action class
 			return new Action() {
 				public <A extends Annotation> A getAnnotation(Class<A> annotation) {
-					return request.getRoute().getAction().getAnnotation(annotation);
+					return route.getAction().getAnnotation(annotation);
 				}
 			};
 

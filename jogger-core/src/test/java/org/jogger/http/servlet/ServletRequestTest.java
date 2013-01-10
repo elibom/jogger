@@ -60,7 +60,7 @@ public class ServletRequestTest {
 		
 		Route route = new Route(HttpMethod.GET, "/users/{userId}/edit/{hash}", new MockController(), 
 				MockController.class.getMethod("init", Request.class, Response.class));
-		ServletRequest request = new ServletRequest(route, servletRequest).init();
+		ServletRequest request = new ServletRequest(route.getPath(), servletRequest).init();
 		
 		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );
@@ -79,7 +79,7 @@ public class ServletRequestTest {
 		
 		Route route = new Route(HttpMethod.GET, "/users/1/edit/th1s1s4hAsh", new MockController(), 
 				MockController.class.getMethod("init", Request.class, Response.class));
-		ServletRequest request = new ServletRequest(route, servletRequest).init();
+		ServletRequest request = new ServletRequest(route.getPath(), servletRequest).init();
 		
 		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );

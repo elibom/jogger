@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jogger.Route;
-
 
 /**
  * Support class that acts as a base class for {@link org.jogger.http.Request} and {@link org.jogger.test.MockRequest} 
@@ -18,7 +16,7 @@ import org.jogger.Route;
  */
 public abstract class AbstractRequest implements Request {
 	
-	private Route route;
+	protected String routePath;
 	
 	/**
 	 * The regular expression to find holders in a path (e.g. {userId}).
@@ -30,13 +28,8 @@ public abstract class AbstractRequest implements Request {
 	 */
 	protected Map<String,String> pathVariables = new HashMap<String,String>();
 	
-	public AbstractRequest(Route route) {
-		this.route = route;
-	}
-	
-	@Override
-	public Route getRoute() {
-		return route;
+	public AbstractRequest(String routePath) {
+		this.routePath = routePath;
 	}
 
 	@Override

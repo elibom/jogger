@@ -25,6 +25,8 @@ import org.jogger.http.Request;
  */
 public class MockRequest extends AbstractRequest {
 	
+	private Route route;
+	
 	private String host;
 	
 	private String path;
@@ -58,8 +60,9 @@ public class MockRequest extends AbstractRequest {
 	private RouteRequestExecutor routeExecutor;
 	
 	public MockRequest(Jogger jogger, Route route, String method, String url) throws URISyntaxException {
-		super(route);
+		super(route != null ? route.getPath() : null);
 		
+		this.route = route;
 		this.response = new MockResponse(jogger.getTemplateEngine());
 		this.routeExecutor = new RouteRequestExecutor(jogger);
 		
@@ -244,7 +247,7 @@ public class MockRequest extends AbstractRequest {
 	
 	public MockResponse run() throws Exception {
 		// execute request
-		routeExecutor.execute(this, response);
+		routeExecutor.execute(route, this, response);
 		return response;
 		
 	}

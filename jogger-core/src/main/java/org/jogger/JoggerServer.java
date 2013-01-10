@@ -186,7 +186,7 @@ public class JoggerServer {
 			Route route = jogger.getRoute( servletRequest.getMethod(), getPath(servletRequest) );
 			
 			// build the Jogger request/response objects
-			ServletRequest request = new ServletRequest(route, servletRequest);
+			ServletRequest request = new ServletRequest(getRoutePath(route), servletRequest);
 			ServletResponse response = new ServletResponse(servletResponse, jogger.getTemplateEngine());
 			try {
 				request.init();
@@ -197,7 +197,7 @@ public class JoggerServer {
 			
 			try {
 				if (route != null) {
-					routeExecutor.execute(request, response);
+					routeExecutor.execute(route, request, response);
 				} else if (jogger.getAssetLoader() != null) {
 					assetExecutor.execute(request, response);
 					if (response.getStatus() == Response.NOT_FOUND) {
@@ -221,6 +221,10 @@ public class JoggerServer {
 			} catch (Exception e) {
 				throw new ServletException(e);
 			}
+		}
+		
+		private String getRoutePath(Route route) {
+			return route != null ? route.getPath() : null;
 		}
 		
 		private String getPath(HttpServletRequest request) {

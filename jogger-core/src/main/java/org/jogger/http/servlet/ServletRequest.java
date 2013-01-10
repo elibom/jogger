@@ -13,7 +13,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jogger.Route;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
@@ -42,11 +41,11 @@ public class ServletRequest extends AbstractRequest {
 	/**
 	 * Constructor.
 	 * 
-	 * @param route the {@link Route} object which can be null if there is no route for this request.
+	 * @param routePath a String object with the path of the route; can be null if there is no route for this request.
 	 * @param request the Servlet request object.
 	 */
-	public ServletRequest(Route route, HttpServletRequest request) {
-		super(route);
+	public ServletRequest(String routePath, HttpServletRequest request) {
+		super(routePath);
 		this.request = request;
 		
 	}
@@ -59,8 +58,8 @@ public class ServletRequest extends AbstractRequest {
 	 */
 	public ServletRequest init() throws MultipartException, IOException {
 		
-		if (getRoute() != null) {
-			initPathVariables( getRoute().getPath() );
+		if (routePath != null) {
+			initPathVariables( routePath );
 		}
 		
 		// retrieve query and post params

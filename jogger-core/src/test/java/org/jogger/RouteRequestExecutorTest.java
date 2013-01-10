@@ -28,7 +28,7 @@ public class RouteRequestExecutorTest {
 		Route route = new Route(HttpMethod.GET, "/", controller, 
 				MockController.class.getMethod("show", Request.class, Response.class));
 		
-		routeExecutor.execute(mockRequest("get", "/", route), mock(Response.class));
+		routeExecutor.execute(route, mockRequest("get", "/"), mock(Response.class));
 		
 		verify(controller).show(any(Request.class), any(Response.class));
 		verify(controller, never()).init(any(Request.class), any(Response.class));
@@ -50,7 +50,7 @@ public class RouteRequestExecutorTest {
 		jogger.addInterceptor(interceptor2);
 		
 		RouteRequestExecutor routeExecutor = new RouteRequestExecutor(jogger);
-		routeExecutor.execute(mockRequest("get", "/", route), mock(Response.class));
+		routeExecutor.execute(route, mockRequest("get", "/"), mock(Response.class));
 		
 		Assert.assertTrue( interceptor1.wasCalled() );
 		Assert.assertFalse( interceptor1.getControllerHasAnnotation() );
@@ -64,7 +64,7 @@ public class RouteRequestExecutorTest {
 	public void shouldFailWithNoRoute() throws Exception {
 		
 		RouteRequestExecutor routeExecutor = new RouteRequestExecutor( new Jogger() );
-		routeExecutor.execute(mockRequest("get", "/", null), mock(Response.class));
+		routeExecutor.execute(null, mockRequest("get", "/"), mock(Response.class));
 		
 	}
 	
@@ -81,7 +81,7 @@ public class RouteRequestExecutorTest {
 		jogger.addInterceptor(interceptor);
 		
 		RouteRequestExecutor routeExecutor = new RouteRequestExecutor( jogger);
-		routeExecutor.execute(mockRequest("get", "/", route), mock(Response.class));
+		routeExecutor.execute(route, mockRequest("get", "/"), mock(Response.class));
 		
 		Assert.assertTrue( interceptor.getControllerHasAnnotation() );
 		Assert.assertFalse( interceptor.getActionHasAnnotation() );
@@ -101,19 +101,18 @@ public class RouteRequestExecutorTest {
 		jogger.addInterceptor(interceptor);
 		
 		RouteRequestExecutor routeExecutor = new RouteRequestExecutor(jogger);
-		routeExecutor.execute(mockRequest("get", "/", route), mock(Response.class));
+		routeExecutor.execute(route, mockRequest("get", "/"), mock(Response.class));
 		
 		Assert.assertFalse( interceptor.getControllerHasAnnotation() );
 		Assert.assertTrue( interceptor.getActionHasAnnotation() );
 		
 	}
 	
-	private Request mockRequest(String httpMethod, String path, Route route) {
+	private Request mockRequest(String httpMethod, String path) {
 		
 		Request request = mock(Request.class);
 		when(request.getMethod()).thenReturn(httpMethod);
 		when(request.getPath()).thenReturn(path);
-		when(request.getRoute()).thenReturn(route);
 		
 		return request;
 	}
