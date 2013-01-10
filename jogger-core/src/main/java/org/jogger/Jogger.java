@@ -250,6 +250,38 @@ public class Jogger {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the PUT HTTP method and the 
+	 * specified <code>path</code> invoking the {@link RouteHandler} object.
+	 * 
+	 * @param path the path to which this route will respond.
+	 * @param handler the object that will be invoked when the route matches.
+	 */
+	public void put(String path, RouteHandler handler) {
+		try {
+			addRoute(HttpMethod.PUT, path, handler, "handle");
+		} catch (NoSuchMethodException e) {
+			// shouldn't happen unless we change the name of the method in RouteHandler
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the DELETE HTTP method and the 
+	 * specified <code>path</code> invoking the {@link RouteHandler} object.
+	 * 
+	 * @param path the path to which this route will respond.
+	 * @param handler the object that will be invoked when the route matches.
+	 */
+	public void delete(String path, RouteHandler handler) {
+		try {
+			addRoute(HttpMethod.DELETE, path, handler, "handle");
+		} catch (NoSuchMethodException e) {
+			// shouldn't happen unless we change the name of the method in RouteHandler
+			throw new RuntimeException(e);
+		}
+	}
 
 	public List<InterceptorEntry> getInterceptors() {
 		return interceptors;

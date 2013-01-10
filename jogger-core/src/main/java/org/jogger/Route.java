@@ -13,7 +13,12 @@ public class Route {
 	
 	public enum HttpMethod {
 		GET,
-		POST
+		POST,
+		PUT,
+		DELETE,
+		OPTIONS,
+		HEAD,
+		PATCH
 	}
 	
 	private final HttpMethod httpMethod;
