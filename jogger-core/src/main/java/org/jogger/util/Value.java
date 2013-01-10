@@ -11,28 +11,28 @@ import java.util.regex.Pattern;
  * 
  * @author German Escobar
  */
-public class Value {
+public final class Value {
 	
 	private Value() {}
 	
 	/**
 	 * @see {@link Long#parseLong(String)}.
 	 */
-	public final static Long asLong(final String value) throws NumberFormatException {
+	public static Long asLong(final String value) throws NumberFormatException {
 		return Long.parseLong(value);
 	}
 	
 	/**
 	 * @see {@link Integer#parseInt(String)}.
 	 */
-	public final static Integer asInt(final String value) throws NumberFormatException {
+	public static Integer asInt(final String value) throws NumberFormatException {
 		return Integer.parseInt(value);
 	}
 	
 	/**
 	 * @see {@link Boolean#parseBoolean(String)}.
 	 */
-	public final static Boolean asBoolean(final String value) {
+	public static Boolean asBoolean(final String value) {
 		return Boolean.parseBoolean(value);
 	}
 	
@@ -48,7 +48,7 @@ public class Value {
 	 * 
 	 * @see {@link SimpleDateFormat#parse(String}.
 	 */
-	public final static Date asDate(final String value, final String pattern) throws IllegalArgumentException, ParseException {
+	public static Date asDate(final String value, final String pattern) throws IllegalArgumentException, ParseException {
 		
 		Preconditions.notEmpty(value, "no value provided.");
 		Preconditions.notEmpty(pattern, "no pattern provided.");
@@ -65,7 +65,7 @@ public class Value {
 	 * @return a non-empty String array or an empty String array if the <code>value</code> is null or empty.
 	 * @throws IllegalArgumentException if the separator is null.
 	 */
-	public final static String[] asArray(final String value) throws IllegalArgumentException {
+	public static String[] asArray(final String value) throws IllegalArgumentException {
 		return asArray(value, ",");
 	}
 	
@@ -78,7 +78,7 @@ public class Value {
 	 * @return a non-empty String array or an empty String array if the <code>value</code> is null or empty.
 	 * @throws IllegalArgumentException if the separator is null
 	 */
-	public final static String[] asArray(final String value, final String separator) throws IllegalArgumentException {
+	public static String[] asArray(final String value, final String separator) throws IllegalArgumentException {
 		Preconditions.notEmpty(separator, "no separator provided.");
 		
 		if (value == null || "".equals(value)) {
@@ -103,7 +103,7 @@ public class Value {
 	 * 
 	 * @return an object or null.
 	 */
-	public final static <T> T asObject(final String value, final ObjectConverter<T> converter) {
+	public static <T> T asObject(final String value, final ObjectConverter<T> converter) {
 		Preconditions.notNull(converter, "no converter specified.");
 		return converter.convert(value);
 	}

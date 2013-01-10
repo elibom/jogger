@@ -5,7 +5,7 @@ package org.jogger.util;
  * 
  * @author German Escobar
  */
-public class Preconditions {
+public final class Preconditions {
 
 	/**
 	 * Hide constructor.

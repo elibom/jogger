@@ -7,7 +7,9 @@ package org.jogger;
  * 
  * @author German Escobar
  */
-public class Environment {
+public final class Environment {
+	
+	private Environment() {}
 
 	/**
 	 * Retrieves the environment in which Jogger is working.

@@ -14,7 +14,7 @@ import org.jogger.util.Preconditions;
  */
 public class FileAssetLoader implements AssetLoader {
 	
-	private final static String DEFAULT_BASE_DIRECTORY = "assets";
+	private static final String DEFAULT_BASE_DIRECTORY = "assets";
 	
 	private File parent;
 	

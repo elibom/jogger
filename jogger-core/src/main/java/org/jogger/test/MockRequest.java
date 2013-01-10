@@ -15,10 +15,9 @@ import org.jogger.RouteRequestExecutor;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
-import org.jogger.http.Request;
 
 /**
- * This is a {@link Request} implementation that stores the request state in attributes. Useful for testing Jogger 
+ * This is a {@link org.jogger.http.Request} implementation that stores the request state in attributes. Useful for testing Jogger 
  * without a Servlet Container. 
  * 
  * @author German Escobar

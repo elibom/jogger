@@ -21,7 +21,7 @@ public abstract class AbstractRequest implements Request {
 	/**
 	 * The regular expression to find holders in a path (e.g. {userId}).
 	 */
-	private final String PATH_VAR_REGEXP = "\\{([^{}]+)\\}";
+	private static final String PATH_VAR_REGEXP = "\\{([^{}]+)\\}";
 
 	/**
 	 * Holds the path variables of the request.

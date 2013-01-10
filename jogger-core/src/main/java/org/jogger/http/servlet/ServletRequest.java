@@ -17,13 +17,12 @@ import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.HttpException;
-import org.jogger.http.Request;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
 
 /**
- * A {@link Request} implementation based on the Servlet API.
+ * A {@link org.jogger.http.Request} implementation based on the Servlet API.
  * 
  * @author German Escobar
  */
