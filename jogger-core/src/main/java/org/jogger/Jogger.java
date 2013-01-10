@@ -90,16 +90,6 @@ public class Jogger {
 	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
 	
 	/**
-	 * Called when the request throws an exception.
-	 */
-	private ExceptionHandler exceptionHandler;
-	
-	/**
-	 * Called when the resource is not found. 
-	 */
-	private NotFoundHandler notFoundHandler;
-	
-	/**
 	 * Constructor. Initializes the object with the default configuration.
 	 */
 	public Jogger() {
@@ -321,21 +311,4 @@ public class Jogger {
 		Preconditions.notNull(templateEngine, "no templateEngine provided");
 		this.templateEngine = templateEngine;
 	}
-
-	public ExceptionHandler getExceptionHandler() {
-		return exceptionHandler;
-	}
-
-	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
-		this.exceptionHandler = exceptionHandler;
-	}
-
-	public NotFoundHandler getNotFoundHandler() {
-		return notFoundHandler;
-	}
-
-	public void setNotFoundHandler(NotFoundHandler notFoundHandler) {
-		this.notFoundHandler = notFoundHandler;
-	}
-
 }

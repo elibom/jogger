@@ -1,26 +1,49 @@
 package org.jogger;
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import freemarker.template.Configuration;
 
 /**
- * <p>Provides a mechanism in which users can handle the case in which a resource is not found (usually for 
- * rendering a custom 404 template).</p>
- * 
- * <p>To use a custom handler create a concrete implementation of this class and configure it using 
- * {@link Jogger#setNotFoundHandler(NotFoundHandler)}. If no handler is configured the {@link DefaultNotFoundHandler} 
- * is used.</p>
+ * Used by the {@link JoggerServer} when the route or static file doesn't exist.
  * 
  * @author German Escobar
  */
-public interface NotFoundHandler {
-
+public class NotFoundHandler {
+	
+	private Logger log = LoggerFactory.getLogger(NotFoundHandler.class);
+	
+	private Configuration freemarker;
+	
 	/**
-	 * Handles the not found request.
-	 * 
-	 * @param request the Jogger HTTP request.
-	 * @param response the Jogger HTTP response.
+	 * Constructor. Initializes the freemarker configuration object.
 	 */
-	void handle(Request request, Response response);
+	public NotFoundHandler() {
+		this.freemarker = new Configuration();
+		this.freemarker.setClassForTemplateLoading(Jogger.class, "/templates/");
+	}
+
+	public void handle(Request request, Response response) {
+		
+		Map<String,Object> root = new HashMap<String,Object>();
+		root.put("title", "404 - Not Found");
+		root.put("message", "The page/resource doesn't exists.");
+		
+		try {
+			StringWriter writer = new StringWriter();
+			freemarker.getTemplate("404.ftl").process(root, writer);
+			response.write(writer.toString());
+		} catch (Exception e) {
+			log.error("Exception while rendering default status 404 template: " + e.getMessage(), e);
+		}
+		
+	}
 	
 }

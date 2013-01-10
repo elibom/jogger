@@ -165,15 +165,13 @@ public class JoggerServer {
 		
 		private AssetRequestExecutor assetExecutor;
 		
-		private ExceptionHandler defaultExceptionHandler;
+		private ExceptionHandler exceptionHandler = new ExceptionHandler();
 		
-		private NotFoundHandler defaultNotFoundHandler;
+		private NotFoundHandler notFoundHandler = new NotFoundHandler();
 		
 		public JoggerHandler(Jogger jogger) {
 			routeExecutor = new RouteRequestExecutor(jogger);
 			assetExecutor = new AssetRequestExecutor(jogger);
-			defaultExceptionHandler = new DefaultExceptionHandler();
-			defaultNotFoundHandler = new DefaultNotFoundHandler();
 		}
 
 		@Override
@@ -202,11 +200,10 @@ public class JoggerServer {
 					routeExecutor.execute(request, response);
 				} else if (jogger.getAssetLoader() != null) {
 					assetExecutor.execute(request, response);
+					if (response.getStatus() == Response.NOT_FOUND) {
+						handleNotFound(request, response);
+					}
 				} else {
-					response.notFound();
-				}
-				
-				if (response.getStatus() == Response.NOT_FOUND) {
 					handleNotFound(request, response);
 				}
 				
@@ -236,46 +233,14 @@ public class JoggerServer {
 			return path;
 		}
 		
-		/**
-		 * Helper method. Called when the requested asset was not found.
-		 * 
-		 * @param request the Jogger HTTP request object.
-		 * @param response the Jogger HTTP response object.
-		 */
-		private void handleNotFound(Request request, Response response) {
-			
-			NotFoundHandler notFoundHandler = jogger.getNotFoundHandler();
-			if (notFoundHandler == null) {
-				defaultNotFoundHandler.handle(request, response);
-				return;
-			}
-			
-			try {
-				notFoundHandler.handle(request, response);
-			} catch (Exception e) {
-				log.error("Exception running the not found handler ... using the default one: " + e.getMessage(), e);
-				defaultNotFoundHandler.handle(request, response);
-			}
-			
+		private void handleException(Exception e, Request request, Response response) {
+			log.error(request.getMethod() + " " + request.getPath() + " - Exception processing request: " + e.getMessage(), e);
+			exceptionHandler.handle(e, request, response);
 		}
 		
-		private void handleException(Exception e, Request request, Response response) {
-			
-			log.error("Exception processing request (" + request.getMethod() + " " + request.getPath() + "): " + e.getMessage(), e);
-
-			ExceptionHandler exceptionHandler = jogger.getExceptionHandler();
-			if (exceptionHandler == null) {
-				defaultExceptionHandler.handle(e, request, response);
-				return;
-			}
-
-			try {
-				exceptionHandler.handle(e, request, response);
-			} catch (Exception f) {
-				log.error("Exception running the exception handler ... using the default one: " + e.getMessage(), e);
-				defaultExceptionHandler.handle(e, request, response);
-			}
-
+		private void handleNotFound(Request request, Response response) {
+			log.trace(request.getMethod() + " " + request.getPath() + " - 404 Not Found!");
+			notFoundHandler.handle(request, response);
 		}
 			
 	}

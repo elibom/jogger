@@ -1,31 +1,58 @@
 package org.jogger;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import freemarker.template.Configuration;
 
 /**
- * <p>Provides a mechanism by which users can handle exceptions thrown in a request (e.g. for showing a custom 500 
- * page, sending an email to support, etc.). Notice that when this exception handler is called the exception has 
- * already been logged and the response already has the status 500 (Internal Error).</p>
- * 
- * <p>To use a custom handler create a concrete implementation of this class and configure it using 
- * {@link Jogger#setExceptionHandler(ExceptionHandler)}. If no handler is configured the 
- * {@link DefaultExceptionHandler} is used.
+ * Used by the {@link JoggerServer} when an exception is caught in a request. It renders a template showing the 
+ * exception message and stack trace.
  * 
  * @author German Escobar
  */
-public interface ExceptionHandler {
-
-	/**
-	 * <p>Handles the exception.</p>
-	 * 
-	 * <p><strong>Note:</strong> Don't log the exception or change the status of the response. This has already been 
-	 * done for you.</p> 
-	 * 
-	 * @param exception the exception that was thrown.
-	 * @param request the Jogger HTTP request.
-	 * @param response the Jogger HTTP response.
-	 */
-	void handle(Exception exception, Request request, Response response);
+public class ExceptionHandler {
 	
+	private Logger log = LoggerFactory.getLogger(ExceptionHandler.class);
+	
+	private Configuration freemarker;
+	
+	/**
+	 * Constructor. Initializes the freemarker configuration object.
+	 */
+	public ExceptionHandler() {
+		this.freemarker = new Configuration();
+		this.freemarker.setClassForTemplateLoading(Jogger.class, "/templates/");
+	}
+
+	public void handle(Exception exception, Request request, Response response) {
+		
+		Map<String,Object> root = new HashMap<String,Object>();
+		root.put("title", "Internal Server Error");
+		root.put("message", exception.getMessage());
+		root.put("stackTrace", getStackTrace(exception));
+		
+		try {
+			StringWriter writer = new StringWriter();
+			freemarker.getTemplate("500.ftl").process(root, writer);
+			response.write(writer.toString());
+		} catch (Exception e) {
+			log.error("Exception while rendering default status 500 template: " + e.getMessage(), e);
+		}
+		
+	}
+	
+	private String getStackTrace(Exception exception) {
+		StringWriter errors = new StringWriter();
+		exception.printStackTrace(new PrintWriter(errors));
+		return errors.toString();
+	}
+
 }

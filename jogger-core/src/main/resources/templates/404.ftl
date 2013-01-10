@@ -22,8 +22,9 @@
 				padding: 20px 0;
 			}
 			div.content, h1 {
-				width: 640px;
+				width: 960px;
 				margin: 0 auto;
+				padding: 0 10px;
 			}
 			h1 {
 				color: white;
@@ -34,7 +35,7 @@
 				color: #888;
 			}
 			p.small {
-				font-size: 16px;
+				font-size: 14px;
 			}
 		</style>
 	</head>
@@ -45,6 +46,8 @@
 		
 		<div class="content">
 			<p>${message}</p>
+			<hr>
+			<p class="small">Powered by <a href="https://github.com/germanescobar/jogger">Jogger</a></p>
 		</div>
 	</body>
 </html>

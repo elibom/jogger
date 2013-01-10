@@ -22,8 +22,9 @@
 				padding: 20px 0;
 			}
 			div.content, h1 {
-				width: 640px;
+				width: 960px;
 				margin: 0 auto;
+				padding: 0 10px;
 			}
 			h1 {
 				color: white;
@@ -37,6 +38,9 @@
 				font-size: 14px;
 				color: #666;
 				font-weight: bold;
+			}
+			p.small {
+				font-size: 14px;
 			}
 			pre {
 				background: #fafafa;
@@ -59,6 +63,7 @@
 			<p>${message}</p>
 			<small>Stack trace:</small>
 			<pre><code>${stackTrace}</code></pre>
+			<p class="small">Powered by <a href="https://github.com/germanescobar/jogger">Jogger</a></p>
 		</div>
 	</body>
 </html>
