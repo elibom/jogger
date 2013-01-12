@@ -1,5 +1,7 @@
 package org.jogger.test;
 
+import static org.jogger.http.Http.Headers.CONTENT_TYPE;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -39,8 +41,6 @@ public class MockRequest extends AbstractRequest {
 	private String method;
 	
 	private String remoteAddress = "localhost";
-	
-	private String contentType = "text/html";
 	
 	private int port;
 	
@@ -129,6 +129,11 @@ public class MockRequest extends AbstractRequest {
 	public String getParameter(String name) {
 		return params.get(name);
 	}
+	
+	public MockRequest addParameter(String name, String value) {
+		params.put(name, value);
+		return this;
+	}
 
 	@Override
 	public String getUrl() {
@@ -147,7 +152,12 @@ public class MockRequest extends AbstractRequest {
 
 	@Override
 	public String getContentType() {
-		return contentType;
+		return headers.get(CONTENT_TYPE);
+	}
+	
+	public MockRequest withContentType(String contentType) {
+		headers.put(CONTENT_TYPE, contentType);
+		return this;
 	}
 
 	@Override
