@@ -6,7 +6,7 @@ A **micro-web framework** that provides a simple and elegant way of creating web
 
 ## Getting started
 
-To get started first [include the Jogger library](Including Jogger) and then create your first Jogger app like this:
+To get started first [include the Jogger library](https://github.com/germanescobar/jogger/wiki/Including-Jogger) and then create a class with a *main* method like this:
 
 ```java
 public class Main {
@@ -28,7 +28,7 @@ public class Main {
     }
 }
 ```
-Run it and point your browser to [http://localhost:5000](http://localhost:5000). That's it!
+Run it and point your browser to [http://localhost:5000](http://localhost:5000). That's it, you just created your first Jogger app!
 
 ## What's provided?
 
