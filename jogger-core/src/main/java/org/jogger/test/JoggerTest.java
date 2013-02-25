@@ -51,6 +51,32 @@ public abstract class JoggerTest {
 	}
 	
 	/**
+	 * Helper method. Creates and returns a {@link MockRequest} with 'DELETE' as the HTTP method. Call the
+	 * {@link MockRequest#run()} method to execute the request.
+	 *
+	 * @param path the path of the DELETE request
+	 *
+	 * @return a {@link MockRequest} object.
+	 * @throws Exception
+	 */
+	public MockRequest delete(String path) throws Exception {
+		return service("DELETE", path);
+	}
+
+	/**
+	 * Helper method. Creates and returns a {@link MockRequest} with 'PUT' as the HTTP method. Call the
+	 * {@link MockRequest#run()} method to execute the request.
+	 *
+	 * @param path the path of the PUT request
+	 *
+	 * @return a {@link MockRequest} object.
+	 * @throws Exception
+	 */
+	public MockRequest put(String path) throws Exception {
+		return service("PUT", path);
+	}
+
+	/**
 	 * Helper method. Builds a {@link MockRequest} based on the received arguments.
 	 * 
 	 * @param httpMethod the HTTP method.
