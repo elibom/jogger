@@ -60,7 +60,7 @@
 		</header>
 		
 		<div class="content">
-			<p>${message}</p>
+			<p>${message!""}</p>
 			<small>Stack trace:</small>
 			<pre><code>${stackTrace}</code></pre>
 			<p class="small">Powered by <a href="https://github.com/germanescobar/jogger">Jogger</a></p>

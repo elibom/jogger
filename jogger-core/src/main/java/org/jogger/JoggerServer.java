@@ -239,7 +239,11 @@ public class JoggerServer {
 		
 		private void handleException(Exception e, Request request, Response response) {
 			log.error(request.getMethod() + " " + request.getPath() + " - Exception processing request: " + e.getMessage(), e);
-			exceptionHandler.handle(e, request, response);
+			try {
+				exceptionHandler.handle(e, request, response);
+			} catch (Exception ex) {
+				log.error("Exception while rendering default status 500 template: " + ex.getMessage());
+			}
 		}
 		
 		private void handleNotFound(Request request, Response response) {
