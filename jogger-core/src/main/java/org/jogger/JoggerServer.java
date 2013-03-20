@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.jogger.http.Path;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.http.servlet.ServletRequest;
@@ -228,13 +229,7 @@ public class JoggerServer {
 		}
 		
 		private String getPath(HttpServletRequest request) {
-			String path = request.getRequestURI();
-			
-			if (path == null) {
-				return "/";
-			}
-			
-			return path;
+			return Path.fixPath(request.getRequestURI());
 		}
 		
 		private void handleException(Exception e, Request request, Response response) {

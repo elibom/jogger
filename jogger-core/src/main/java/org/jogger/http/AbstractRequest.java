@@ -19,11 +19,6 @@ public abstract class AbstractRequest implements Request {
 	protected String routePath;
 	
 	/**
-	 * The regular expression to find holders in a path (e.g. {userId}).
-	 */
-	private static final String PATH_VAR_REGEXP = "\\{([^{}]+)\\}";
-
-	/**
 	 * Holds the path variables of the request.
 	 */
 	protected Map<String,String> pathVariables = new HashMap<String,String>();
@@ -52,12 +47,13 @@ public abstract class AbstractRequest implements Request {
 		pathVariables.clear();
 		
 		List<String> variables = getVariables( routePath );
-		String regexPath = routePath.replaceAll( PATH_VAR_REGEXP, "([^#?]+)" );
+		String regexPath = routePath.replaceAll( Path.VAR_REGEXP, Path.VAR_REPLACE );
 		
 		Matcher matcher = Pattern.compile(regexPath).matcher( getPath() );
 		matcher.matches();
 		
 		// start index at 1 as group(0) always stands for the entire expression
+		
 		for (int i=1; i <= variables.size(); i++) {
 			String value = matcher.group(i);
 			pathVariables.put(variables.get(i-1), value);
@@ -76,7 +72,7 @@ public abstract class AbstractRequest implements Request {
 		
 		List<String> variables = new ArrayList<String>();
 		
-		Matcher matcher = Pattern.compile(PATH_VAR_REGEXP).matcher( routePath );
+		Matcher matcher = Pattern.compile(Path.VAR_REGEXP).matcher( routePath );
 		while (matcher.find()) {
 			// group(0) always stands for the entire expression and we only want what is inside the {}
 			variables.add( matcher.group(1) );

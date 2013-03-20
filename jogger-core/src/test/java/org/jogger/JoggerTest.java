@@ -51,15 +51,17 @@ public class JoggerTest {
 		Jogger jogger = new Jogger();
 		jogger.addRoute(HttpMethod.GET, "", new MockController(), "init");
 		jogger.addRoute(HttpMethod.GET, "/test", new MockController(), "init");
-		jogger.addRoute(HttpMethod.POST, "/test/{id}", new MockController(), "init");
+		jogger.addRoute(HttpMethod.POST, "/test/{id}/", new MockController(), "init");
 		jogger.addRoute(HttpMethod.GET, "/test/{id_test}/mocks/{id_mock}", new MockController(), "init");
 		
 		Assert.assertNotNull(jogger.getRoute("get", ""));
 		Assert.assertNotNull(jogger.getRoute("get", "/"));
 		Assert.assertNotNull(jogger.getRoute("GET", "/test"));
-		// Assert.assertNotNull(jogger.getRoute("get", "/test/")); fails!
-		Assert.assertNotNull(jogger.getRoute("post", "/test/1"));
+		Assert.assertNotNull(jogger.getRoute("get", "/test/"));
+		Assert.assertNotNull(jogger.getRoute("post", "/Test/1"));
+		Assert.assertNotNull(jogger.getRoute("post", "/test/1-234234/"));
 		Assert.assertNotNull(jogger.getRoute("get", "/test/1/mocks/2"));
+		Assert.assertNotNull(jogger.getRoute("get", "/test/1/mocks/2/"));
 		
 	}
 	

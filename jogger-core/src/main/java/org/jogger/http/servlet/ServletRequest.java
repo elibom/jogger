@@ -17,6 +17,7 @@ import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.HttpException;
+import org.jogger.http.Path;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
@@ -110,13 +111,7 @@ public class ServletRequest extends AbstractRequest {
 
 	@Override
 	public String getPath() {
-		String path = request.getRequestURI();
-		
-		if (path == null) {
-			return "/";
-		}
-		
-		return path;
+		return Path.fixPath(request.getRequestURI());
 	}
 
 	@Override

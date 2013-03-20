@@ -56,7 +56,7 @@ public class ServletRequestTest {
 		
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getContextPath()).thenReturn("");
-		when(servletRequest.getRequestURI()).thenReturn("/users/1/edit/th1s1s4hAsh");
+		when(servletRequest.getRequestURI()).thenReturn("/users/1/edit/th1s1s4hAsh/");
 		
 		Route route = new Route(HttpMethod.GET, "/users/{userId}/edit/{hash}", new MockController(), 
 				MockController.class.getMethod("init", Request.class, Response.class));

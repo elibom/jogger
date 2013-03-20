@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jogger.Route.HttpMethod;
 import org.jogger.asset.AssetLoader;
 import org.jogger.asset.FileAssetLoader;
+import org.jogger.http.Path;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.interceptor.Interceptor;
@@ -121,10 +122,8 @@ public class Jogger {
 	}
 
 	private String parsePath(String path) {
-
-		if (!path.startsWith("/")) {
-			path = "/" + path;
-		}
+		
+		path = Path.fixPath(path);
 
 		URI uri = null;
 		try {
@@ -145,8 +144,8 @@ public class Jogger {
 	 * @return true if the path matches, false otherwise.
 	 */
 	private boolean matchesPath(String routePath, String pathToMatch) {
-		routePath = routePath.replaceAll("\\{([^{}]+)\\}", "[^#/?]+");
-		return pathToMatch.matches(routePath);
+		routePath = routePath.replaceAll(Path.VAR_REGEXP, Path.VAR_REPLACE);
+		return pathToMatch.matches("(?i)" + routePath);
 	}
 
 	public List<Route> getRoutes() {

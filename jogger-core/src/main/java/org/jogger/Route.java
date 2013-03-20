@@ -2,6 +2,7 @@ package org.jogger;
 
 import java.lang.reflect.Method;
 
+import org.jogger.http.Path;
 import org.jogger.util.Preconditions;
 
 /**
@@ -36,17 +37,9 @@ public class Route {
 		Preconditions.notNull(action, "no action provided");
 		
 		this.httpMethod = httpMethod;
-		this.path = addSlashPrefixTo(path);
+		this.path = Path.fixPath(path);
 		this.controller = controller;
 		this.action = action;
-	}
-	
-	private String addSlashPrefixTo(String path) {
-		if (!path.startsWith("/")) {
-			path = "/" + path;
-		}
-		
-		return path;
 	}
 
 	public HttpMethod getHttpMethod() {
