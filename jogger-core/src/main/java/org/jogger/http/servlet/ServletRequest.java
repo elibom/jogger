@@ -33,7 +33,7 @@ public class ServletRequest extends AbstractRequest {
 	 */
 	private HttpServletRequest request;
 	
-	private Map<String,String> parameters = new HashMap<String,String>();
+	private Map<String,String> multipartParams = new HashMap<String,String>();
 	
 	private List<FileItem> files = new ArrayList<FileItem>();
 	
@@ -61,12 +61,6 @@ public class ServletRequest extends AbstractRequest {
 			initPathVariables( routePath );
 		}
 		
-		// retrieve query and post params
-		Map<String,String[]> requestParams = request.getParameterMap();
-		for (Map.Entry<String,String[]> entry : requestParams.entrySet()) {
-			parameters.put( entry.getKey(), join(entry.getValue()) );
-		}
-		
 		// retrieve multipart/form-data parameters
 		if (Multipart.isMultipartContent(request)) {
 			
@@ -75,7 +69,7 @@ public class ServletRequest extends AbstractRequest {
 
 				@Override
 				public void handleFormItem(String name, String value) {
-					parameters.put( name, value );
+					multipartParams.put( name, value );
 				}
 
 				@Override
@@ -132,12 +126,26 @@ public class ServletRequest extends AbstractRequest {
 
 	@Override
 	public Map<String,String> getParameters() {
-		return Collections.unmodifiableMap(parameters);
+		Map<String,String> params = new HashMap<String,String>();
+		
+		Map<String,String[]> requestParams = request.getParameterMap();
+		for (Map.Entry<String,String[]> entry : requestParams.entrySet()) {
+			params.put( entry.getKey(), join(entry.getValue()) );
+		}
+		
+		params.putAll(multipartParams);
+		
+		return Collections.unmodifiableMap(params);
 	}
 
 	@Override
 	public String getParameter(String name) {
-		return parameters.get(name);
+		String[] param = request.getParameterValues(name);
+		if (param != null) {
+			return join(param);
+		}
+		
+		return multipartParams.get(name);
 	}
 
 	@Override

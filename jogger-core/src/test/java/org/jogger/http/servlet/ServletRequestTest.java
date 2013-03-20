@@ -128,12 +128,9 @@ public class ServletRequestTest {
 	
 	@Test
 	public void shouldRetrieveStringParam() throws Exception {
-		
-		Map<String,String[]> mockParams = new HashMap<String,String[]>();
-		mockParams.put( "param1", new String[] { "value1" } );
-		
+
 		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		when(servletRequest.getParameterValues("param1")).thenReturn( new String[] { "value1" } );
 		
 		Request request = new ServletRequest(null, servletRequest).init();
 		
@@ -155,12 +152,9 @@ public class ServletRequestTest {
 	
 	@Test
 	public void shouldRetrieveLongParam() throws Exception {
-		
-		Map<String,String[]> mockParams = new HashMap<String,String[]>();
-		mockParams.put( "param1", new String[] { "1" } );
-		
+
 		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterMap()).thenReturn(mockParams);
+		when(servletRequest.getParameterValues("param1")).thenReturn( new String[] { "1" } );
 		
 		Request request = new ServletRequest(null, servletRequest).init();
 		
