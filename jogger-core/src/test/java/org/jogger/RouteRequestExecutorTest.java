@@ -108,6 +108,31 @@ public class RouteRequestExecutorTest {
 		
 	}
 	
+	@Test
+	public void shouldRetrieveActionAnnotationInSuperclass() throws Exception {
+		
+		Jogger jogger = new Jogger();
+		
+		AnnotatedActionSubclassMockController controller = new AnnotatedActionSubclassMockController();
+		Method method = AnnotatedActionMockController.class.getMethod("action", Request.class, Response.class);
+		Route route = new Route(HttpMethod.GET, "/", controller, method);
+		
+		ProceedInterceptor interceptor = new ProceedInterceptor();
+		jogger.addInterceptor(interceptor);
+		
+		RouteRequestExecutor routeExecutor = new RouteRequestExecutor(jogger);
+		routeExecutor.execute(route, mockRequest("get", "/"), mock(Response.class));
+		
+		Assert.assertFalse( interceptor.getControllerHasAnnotation() );
+		Assert.assertTrue( interceptor.getActionHasAnnotation() );
+		
+	}
+	
+	private class AnnotatedActionSubclassMockController extends AnnotatedActionMockController {
+		@Override
+		public void action(Request request, Response response) {}
+	}
+	
 	private Request mockRequest(String httpMethod, String path) {
 		
 		Request request = mock(Request.class);

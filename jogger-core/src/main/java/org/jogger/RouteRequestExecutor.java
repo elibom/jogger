@@ -181,8 +181,40 @@ public class RouteRequestExecutor {
 
 			// create and return a new instance of the Action class
 			return new Action() {
-				public <A extends Annotation> A getAnnotation(Class<A> annotation) {
-					return route.getAction().getAnnotation(annotation);
+				public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+					return findAnnotation(route.getAction(), annotationClass);
+				}
+				
+				/**
+				 * Helper method. Tries to find the annotation in the method or its super methods. Annotations on 
+				 * methods are not inherited by default, so we need to handle this explicitly. 
+				 * 
+				 * @param method the method from which we want to find the annotation.
+				 * @param annotationClass the class of the annotation we are searching for.
+				 * 
+				 * @return the annotation or null if not found.
+				 */
+				private <A extends Annotation> A findAnnotation(Method method, Class<A> annotationClass) {
+					A annotation = method.getAnnotation(annotationClass);
+					if (annotation != null) {
+						return annotation;
+					}
+					
+					Method superMethod = getSuperMethod(method);
+					if (superMethod != null) {
+						return findAnnotation(superMethod, annotationClass);
+					}
+					
+					return null;
+				}
+				
+				private Method getSuperMethod(Method method) {
+					Class<?> superClass = method.getDeclaringClass().getSuperclass();
+					try {
+						return superClass.getDeclaredMethod(method.getName(), method.getParameterTypes());
+					} catch (NoSuchMethodException e) {
+						return null;
+					}
 				}
 			};
 
