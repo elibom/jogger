@@ -1,11 +1,14 @@
 package org.jogger;
 
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.util.Date;
 
 import org.jogger.asset.Asset;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.util.Preconditions;
+import org.jogger.util.Value;
 
 /**
  * This class is responsible of executing requests for static assets.
@@ -39,6 +42,18 @@ public class AssetRequestExecutor {
 		
 		Asset asset = jogger.getAssetLoader().load(URLDecoder.decode(request.getPath(), "UTF-8"));
 		if (asset != null) {
+            // check if asset has been modified
+            String ifModifiedSince = request.getHeader("If-Modified-Since");
+            try {
+                Date dt = Value.asDate(ifModifiedSince, "EEE, dd MMM yyyy HH:mm:ss zzz");
+                if (dt.getTime() == asset.getLastModified()) {
+                    response.status(Response.NOT_MODIFIED);
+                    return;
+                }
+            } catch (IllegalArgumentException ex) {
+            } catch (ParseException ex) {
+            }
+
 			response.status(Response.OK);
 			response.write(asset);
 		} else {

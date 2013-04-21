@@ -23,18 +23,29 @@ public class Asset {
 	 * The content length of the asset.
 	 */
 	private final long length;
+
+    /**
+     * The epoch timestamp when this asset was last modified
+     */
+    private final long lastModified;
 	
 	/**
 	 * The content type of the asset.
 	 */
 	private final String contentType;
 
-	public Asset(InputStream inputStream, String name, String contentType, long length) {
+
+    public Asset(InputStream inputStream, String name, String contentType, long length) {
+        this(inputStream, name, contentType, length, 0);
+    }
+
+	public Asset(InputStream inputStream, String name, String contentType, long length, long lastModified) {
 		this.inputStream = inputStream;
 		this.name = name;
 		this.contentType = contentType;
 		this.length = length;
-	}
+        this.lastModified = lastModified;
+    }
 
 	public String getName() {
 		return name;
@@ -52,4 +63,7 @@ public class Asset {
 		return length;
 	}
 
+    public long getLastModified() {
+        return lastModified;
+    }
 }

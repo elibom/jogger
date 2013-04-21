@@ -48,11 +48,12 @@ public class FileAssetLoader implements AssetLoader {
 			if (!file.exists() || !file.isFile()) {
 				return null;
 			}
-			
+
+			long lastModified = file.lastModified();
 			MimeTypes mimeTypes = new MimeTypes();
 			String contentType = mimeTypes.getMimeByExtension(file.getName()).toString();
 			
-			return new Asset(new FileInputStream(file), file.getName(), contentType, file.length());
+			return new Asset(new FileInputStream(file), file.getName(), contentType, file.length(), lastModified);
 		} catch (FileNotFoundException e) {
 			return null;
 		}
