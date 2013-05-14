@@ -242,7 +242,7 @@ public class JoggerServer {
 		}
 		
 		private void handleNotFound(Request request, Response response) {
-			log.trace(request.getMethod() + " " + request.getPath() + " - 404 Not Found!");
+			log.debug(request.getMethod() + " " + request.getPath() + " - 404 Not Found!");
 			notFoundHandler.handle(request, response);
 		}
 			

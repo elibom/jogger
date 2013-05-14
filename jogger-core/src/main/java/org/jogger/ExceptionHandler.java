@@ -39,6 +39,7 @@ public class ExceptionHandler {
 		
 		StringWriter writer = new StringWriter();
 		freemarker.getTemplate("500.ftl").process(root, writer);
+		response.contentType("text/plain; charset=UTF-8");
 		response.write(writer.toString());
 		
 	}
