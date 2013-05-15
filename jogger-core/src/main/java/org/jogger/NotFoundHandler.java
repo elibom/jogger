@@ -39,7 +39,7 @@ public class NotFoundHandler {
 		try {
 			StringWriter writer = new StringWriter();
 			freemarker.getTemplate("404.ftl").process(root, writer);
-			response.contentType("text/plain; charset=UTF-8").write(writer.toString());
+			response.contentType("text/html; charset=UTF-8").write(writer.toString());
 		} catch (Exception e) {
 			log.error("Exception while rendering default status 404 template: " + e.getMessage(), e);
 		}
