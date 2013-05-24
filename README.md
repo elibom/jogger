@@ -11,7 +11,7 @@ To get started first [include the Jogger library](https://github.com/germanescob
 ```java
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
     
         Jogger app = new Jogger();
         app.get("/", new RouteHandler() {
