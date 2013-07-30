@@ -2,7 +2,7 @@ package org.jogger.http;
 
 /**
  * Defines HTTP related constants.
- * 
+ *
  * @author German Escobar
  */
 public class Http {
@@ -25,12 +25,12 @@ public class Http {
 		public static final String IF_NONE_MATCH = "If-None-Match";
 		public static final String USER_AGENT = "User-Agent";
 	}
-	
+
 	public static class ContentType {
 		public static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
-        public static final String APPLICATION_JSON = "application/json";
-        public static final String APPLICATION_XML = "application/xml";
-        public static final String TEXT_HTML = "text/xml";
-        public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+		public static final String APPLICATION_JSON = "application/json";
+		public static final String APPLICATION_XML = "application/xml";
+		public static final String TEXT_HTML = "text/xml";
+		public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 	}
 }

@@ -28,17 +28,17 @@ public class JoggerServerTest {
 			} catch (ConnectException e) {}
 		}
 	}
-	
+
 	@Test
 	public void shouldExecuteRoute() throws Exception {
 		Jogger app = new Jogger();
 		app.get("/", new RouteHandler() {
 			@Override
 			public void handle(org.jogger.http.Request request, Response response) {
-				
+
 			}
 		});
-		
+
 		JoggerServer joggerServer = new JoggerServer(app);
 		joggerServer.listen(27773);
 
@@ -49,7 +49,7 @@ public class JoggerServerTest {
 			joggerServer.stop();
 		}
 	}
-	
+
 	@Test
 	public void shouldHandleException() throws Exception {
 		Jogger app = new Jogger();
@@ -59,7 +59,7 @@ public class JoggerServerTest {
 				throw new RuntimeException();
 			}
 		});
-		
+
 		JoggerServer joggerServer = new JoggerServer(app);
 		joggerServer.listen(27773);
 
@@ -70,20 +70,20 @@ public class JoggerServerTest {
 			joggerServer.stop();
 		}
 	}
-	
+
 	@Test
 	public void shouldJoinServerThread() throws Exception {
 		final AtomicBoolean running = new AtomicBoolean(false);
-		
+
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				JoggerServer joggerServer = new JoggerServer(new Jogger());
 				joggerServer.listen(27773);
-				
+
 				try {
 					running.getAndSet(true);
-					
+
 					try {
 						joggerServer.join();
 					} catch (InterruptedException e) {}
@@ -94,12 +94,12 @@ public class JoggerServerTest {
 			}
 		});
 		thread.start();
-		
+
 		Thread.sleep(100);
 		Assert.assertTrue(running.get());
 		thread.interrupt();
 		Thread.sleep(100);
 		Assert.assertFalse(running.get());
 	}
-	
+
 }

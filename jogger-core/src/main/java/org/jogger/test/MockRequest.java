@@ -19,90 +19,87 @@ import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 
 /**
- * This is a {@link org.jogger.http.Request} implementation that stores the request state in attributes. Useful for testing Jogger 
- * without a Servlet Container. 
- * 
+ * This is a {@link org.jogger.http.Request} implementation that stores the request state in attributes. Useful for testing Jogger
+ * without a Servlet Container.
+ *
  * @author German Escobar
  */
 public class MockRequest extends AbstractRequest {
-	
+
 	private Route route;
-	
+
 	private String host;
-	
+
 	private String path;
-	
+
 	private String queryString;
-	
+
 	private Map<String,String> params;
-	
+
 	private String url;
-	
+
 	private String method;
-	
+
 	private String remoteAddress = "localhost";
-	
+
 	private int port;
-	
+
 	private boolean secure = false;
-	
+
 	private Map<String,Cookie> cookies = new HashMap<String,Cookie>();
-	
+
 	private Map<String,String> headers = new HashMap<String,String>();
-	
+
 	private List<FileItem> files = new ArrayList<FileItem>();
-	
+
 	private String body;
-	
+
 	private MockResponse response;
-	
+
 	private RouteRequestExecutor routeExecutor;
-	
+
 	public MockRequest(Jogger jogger, Route route, String method, String url) throws URISyntaxException {
 		super(route != null ? route.getPath() : null);
-		
+
 		this.route = route;
 		this.response = new MockResponse(jogger.getTemplateEngine());
 		this.routeExecutor = new RouteRequestExecutor(jogger);
-		
+
 		this.method = method;
-		
+
 		URI uri = new URI(url);
 		this.host = uri.getHost();
 		this.path = uri.getPath();
 		this.queryString = uri.getQuery();
 		this.params = buildParams( queryString );
 		this.port = uri.getPort() > 0 ? uri.getPort() : 80;
-		
+
 		if ( uri.getScheme().equals("https") ) {
 			this.secure = true;
 		}
-		
+
 		String strPort = uri.getPort() > 0 ? ":" + uri.getPort() : "";
 		this.url = uri.getScheme() + "://" + uri.getHost() + strPort  + "/" + uri.getPath();
-		
+
 		if (route != null) {
 			initPathVariables(route.getPath());
 		}
-		
 	}
-	
+
 	private Map<String,String> buildParams(String queryString) {
-		
 		Map<String,String> ret = new HashMap<String,String>();
-		
+
 		if (queryString == null) {
 			return ret;
 		}
-		
+
 		String[] elems = queryString.split("&");
 		for (String elem : elems ) {
 			String[] pair = elem.split("=");
 			ret.put( pair[0], pair[1] );
 		}
-		
+
 		return ret;
-		
 	}
 
 	@Override
@@ -129,7 +126,7 @@ public class MockRequest extends AbstractRequest {
 	public String getParameter(String name) {
 		return params.get(name);
 	}
-	
+
 	public MockRequest addParameter(String name, String value) {
 		params.put(name, value);
 		return this;
@@ -154,7 +151,7 @@ public class MockRequest extends AbstractRequest {
 	public String getContentType() {
 		return headers.get(CONTENT_TYPE);
 	}
-	
+
 	public MockRequest withContentType(String contentType) {
 		headers.put(CONTENT_TYPE, contentType);
 		return this;
@@ -177,15 +174,14 @@ public class MockRequest extends AbstractRequest {
         }
         return "XMLHttpRequest".equals(headers.get("x-requested-with"));
 	}
-	
+
 	public MockRequest ajax() {
 		headers.put("x-requested-with", "XMLHttpRequest");
 		return this;
 	}
-	
+
 	public MockRequest addCookie(Cookie cookie) {
 		cookies.put(cookie.getName(), cookie);
-		
 		return this;
 	}
 
@@ -203,7 +199,7 @@ public class MockRequest extends AbstractRequest {
 	public Map<String, String> getHeaders() {
 		return headers;
 	}
-	
+
 	public MockRequest setHeaders(Map<String, String> headers) {
 		this.headers = headers;
 		return this;
@@ -213,7 +209,7 @@ public class MockRequest extends AbstractRequest {
 	public String getHeader(String name) {
 		return headers.get(name);
 	}
-	
+
 	public MockRequest setHeader(String name, String value) {
 		headers.put(name, value);
 		return this;
@@ -223,11 +219,11 @@ public class MockRequest extends AbstractRequest {
 	public FileItem[] getFiles() {
 		return files.toArray( new FileItem[0] );
 	}
-	
+
 	public MockRequest addFile(File file, String fileName, String contentType) {
 		String fieldName = "file" + files.size();
 		files.add( new FileItem(fieldName, fileName, contentType, 0, file, new HashMap<String,String>()) );
-		
+
 		return this;
 	}
 
@@ -244,21 +240,20 @@ public class MockRequest extends AbstractRequest {
 			public InputStream asInputStream() {
 				return null;
 			}
-			
+
 		};
 	}
-	
+
 	public MockRequest setBodyAsString(String body) {
 		this.body = body;
-		
 		return this;
 	}
-	
+
 	public MockResponse run() throws Exception {
 		// execute request
 		routeExecutor.execute(route, this, response);
 		return response;
-		
+
 	}
-	
+
 }

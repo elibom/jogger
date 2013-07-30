@@ -8,17 +8,17 @@ import de.neuland.jade4j.template.JadeTemplate;
 
 /**
  * A {@link TemplateEngine} implementation for <a href="https://github.com/neuland/jade4j">Jade</a>.
- * 
+ *
  * @author German Escobar
  */
 public class JadeTemplateEngine implements TemplateEngine {
-	
+
 	private JadeConfiguration jadeConfig;
-	
+
 	public JadeTemplateEngine() {
 		this(new JadeConfiguration());
 	}
-	
+
 	public JadeTemplateEngine(JadeConfiguration jadeConfig) {
 		this.jadeConfig = jadeConfig;
 	}

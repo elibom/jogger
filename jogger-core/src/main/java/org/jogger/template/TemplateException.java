@@ -1,10 +1,10 @@
 package org.jogger.template;
 
 /**
- * Wraps any other exception thrown by {@link TemplateEngine} implementations. It extends from 
- * <code>java.lang.RuntimeException</code> because we don't want to have to throw the exception in every controller 
+ * Wraps any other exception thrown by {@link TemplateEngine} implementations. It extends from
+ * <code>java.lang.RuntimeException</code> because we don't want to have to throw the exception in every controller
  * action that renders templates. Besides, an exception in a template is actually a <em>runtime exception</em>.
- * 
+ *
  * @author German Escobar
  */
 public class TemplateException extends RuntimeException {

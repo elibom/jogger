@@ -19,36 +19,36 @@ import org.jogger.util.Preconditions;
 
 /**
  * A {@link Response} implementation based on the Servlet API.
- * 
+ *
  * @author German Escobar
  */
 public class ServletResponse implements Response {
-	
+
 	/**
 	 * The underlying Servlet Response.
 	 */
 	private HttpServletResponse response;
 
 	private TemplateEngine templateEngine;
-	
+
 	/**
 	 * The attributes that we are passing to the view.
 	 */
-	private Map<String,Object> attributes = new HashMap<String,Object>(); 
-	
+	private Map<String,Object> attributes = new HashMap<String,Object>();
+
 	/**
 	 * Constructor. Initializes the object with the underlying Servlet Response and the FreeMarker configuration.
-	 * 
+	 *
 	 * @param response the Servlet response object.
 	 * @param templateEngine the {@link TemplateEngine} implementation to use.
 	 */
 	public ServletResponse(HttpServletResponse response, TemplateEngine templateEngine) {
 		Preconditions.notNull(response, "no response provided.");
 		Preconditions.notNull(templateEngine, "no templateEngine provided.");
-		
+
 		this.response = response;
 		response.setStatus(Response.OK);
-		
+
 		this.templateEngine = templateEngine;
 	}
 
@@ -60,37 +60,32 @@ public class ServletResponse implements Response {
 	@Override
 	public Response status(int status) {
 		response.setStatus(status);
-		
 		return this;
 	}
 
 	@Override
 	public Response badRequest() {
 		response.setStatus(Response.BAD_REQUEST);
-		
 		return this;
 	}
 
 	@Override
 	public Response unauthorized() {
 		response.setStatus(Response.UNAUTHORIZED);
-		
 		return this;
 	}
 
 	@Override
 	public Response notFound() {
 		response.setStatus(Response.NOT_FOUND);
-		
 		return this;
 	}
-	
-	
+
+
 
 	@Override
 	public Response conflict() {
 		response.setStatus(Response.CONFLICT);
-		
 		return this;
 	}
 
@@ -102,7 +97,6 @@ public class ServletResponse implements Response {
 	@Override
 	public Response contentType(String contentType) {
 		response.setContentType(contentType);
-		
 		return this;
 	}
 
@@ -114,40 +108,38 @@ public class ServletResponse implements Response {
 	@Override
 	public Response setHeader(String name, String value) {
 		response.setHeader(name, value);
-		
 		return this;
 	}
 
 	@Override
 	public Response setCookie(Cookie cookie) {
 		response.addCookie(map(cookie));
-		
 		return this;
 	}
 
 	@Override
 	public Response removeCookie(Cookie cookie) {
 		cookie.setMaxAge(0);
-		
+
 		setCookie(cookie);
-		
+
 		return this;
 	}
-	
+
 	javax.servlet.http.Cookie map(Cookie cookie) {
 		javax.servlet.http.Cookie servletCookie = new javax.servlet.http.Cookie(cookie.getName(), cookie.getValue());
 		servletCookie.setMaxAge(cookie.getMaxAge());
-		
+
 		if (cookie.getPath() != null) {
 			servletCookie.setPath(cookie.getPath());
 		}
-		
+
 		if (cookie.getDomain() != null) {
 			servletCookie.setDomain(cookie.getDomain());
 		}
-		
+
 		servletCookie.setHttpOnly(cookie.isHttpOnly());
-		
+
 		return servletCookie;
 	}
 
@@ -160,9 +152,9 @@ public class ServletResponse implements Response {
 	public Response setAttribute(String name, Object object) {
 		Preconditions.notEmpty(name, "no name provided.");
 		Preconditions.notNull(object, "no object specified");
-		
+
 		attributes.put(name, object);
-		
+
 		return this;
 	}
 
@@ -178,7 +170,6 @@ public class ServletResponse implements Response {
 
 	@Override
 	public Response write(Asset asset) {
-		
 		response.setBufferSize(10240);
 		response.setContentType(asset.getContentType());
 		response.setHeader("Content-Length", String.valueOf(asset.getLength()));
@@ -225,10 +216,9 @@ public class ServletResponse implements Response {
 
 	@Override
 	public Response render(String templateName, Map<String, Object> atts) throws TemplateException {
-		
 		// merge the user attributes with the controller attributes
 		attributes.putAll(atts);
-		
+
 		try {
 			templateEngine.render(templateName, attributes, response.getWriter());
 		} catch (IOException e) {

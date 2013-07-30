@@ -2,7 +2,7 @@ package org.jogger.interceptor;
 
 /**
  * Helper class. Represents a interceptor entry (i.e. an interceptor and the matching paths).
- * 
+ *
  * @author German Escobar
  */
 public class InterceptorEntry {
@@ -23,5 +23,5 @@ public class InterceptorEntry {
 	public String[] getPaths() {
 		return paths;
 	}
-	
+
 }

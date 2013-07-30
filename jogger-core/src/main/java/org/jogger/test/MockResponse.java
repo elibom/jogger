@@ -13,33 +13,33 @@ import org.jogger.template.TemplateEngine;
 import org.jogger.template.TemplateException;
 
 /**
- * <p>This is a {@link Response} implementation that stores the response state in attributes. Useful for testing Jogger 
+ * <p>This is a {@link Response} implementation that stores the response state in attributes. Useful for testing Jogger
  * without a Servlet Container.</p>
- * 
+ *
  * @author German Escobar
  */
 public class MockResponse implements Response {
 
 	private TemplateEngine templateEngine;
-	
+
 	private Map<String,String> headers = new HashMap<String,String>();
-	
+
 	private Map<String,Cookie> addedCookies = new HashMap<String,Cookie>();
-	
-	private Map<String,Cookie> removedCookies = new HashMap<String,Cookie>(); 
-	
+
+	private Map<String,Cookie> removedCookies = new HashMap<String,Cookie>();
+
 	private Map<String,Object> attributes = new HashMap<String,Object>();
-	
+
 	private String contentType = "text/html";
-	
+
 	private int status = Response.OK;
-	
+
 	private String output;
-	
+
 	private Asset renderedAsset;
-	
+
 	private String renderedTemplate;
-	
+
 	public MockResponse(TemplateEngine templateEngine) {
 		this.templateEngine = templateEngine;
 	}
@@ -112,11 +112,11 @@ public class MockResponse implements Response {
 		removedCookies.put(cookie.getName(), cookie);
 		return this;
 	}
-	
+
 	public Map<String,Cookie> getAddedCookies() {
 		return addedCookies;
 	}
-	
+
 	public Map<String,Cookie> getRemovedCookies() {
 		return removedCookies;
 	}
@@ -153,21 +153,21 @@ public class MockResponse implements Response {
 	public Response render(String templateName, Map<String, Object> atts) throws TemplateException {
 		// merge the user attributes with the controller attributes
 		attributes.putAll(atts);
-		
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		PrintWriter writer = new PrintWriter(out);
-		
+
 		// retrieve and process the template
 		templateEngine.render(templateName, attributes, writer);
-			
+
 		try {
 			output = out.toString("UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new TemplateException(e);
 		}
-			
+
 		this.renderedTemplate = templateName;
-			
+
 		return this;
 	}
 
@@ -176,7 +176,7 @@ public class MockResponse implements Response {
 		this.status = Response.FOUND;
 		headers.put("Location", path);
 	}
-	
+
 	public String getOutputAsString() {
 		return output;
 	}
@@ -184,9 +184,9 @@ public class MockResponse implements Response {
 	public String getRenderedTemplate() {
 		return renderedTemplate;
 	}
-	
+
 	public Asset getRenderedAsset() {
 		return renderedAsset;
 	}
-	
+
 }

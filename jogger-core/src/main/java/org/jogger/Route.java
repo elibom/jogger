@@ -7,11 +7,11 @@ import org.jogger.util.Preconditions;
 
 /**
  * Holds the information of a route.
- * 
+ *
  * @author German Escobar
  */
 public class Route {
-	
+
 	public enum HttpMethod {
 		GET,
 		POST,
@@ -21,21 +21,21 @@ public class Route {
 		HEAD,
 		PATCH
 	}
-	
+
 	private final HttpMethod httpMethod;
-	
+
 	private final String path;
-	
+
 	private final Object controller;
-	
+
 	private final Method action;
-	
+
 	public Route(HttpMethod httpMethod, String path, Object controller, Method action) {
 		Preconditions.notNull(httpMethod, "no httpMethod provided");
 		Preconditions.notNull(path, "no path provided");
 		Preconditions.notNull(controller, "no controller provided");
 		Preconditions.notNull(action, "no action provided");
-		
+
 		this.httpMethod = httpMethod;
 		this.path = Path.fixPath(path);
 		this.controller = controller;
@@ -57,5 +57,5 @@ public class Route {
 	public Method getAction() {
 		return action;
 	}
-	
+
 }

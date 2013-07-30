@@ -3,9 +3,9 @@
  * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
  * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -36,16 +36,16 @@ public final class Streams {
 
 	/**
 	 * Copies the contents of the given {@link InputStream} to the given {@link OutputStream}. Shortcut for
-	 * 
+	 *
 	 * <pre>copy(pInputStream, pOutputStream, new byte[8192]);</pre>
-	 * 
+	 *
 	 * @param pInputStream The input stream, which is being read. It is guaranteed, that {@link InputStream#close()} is
 	 *            called on the stream.
 	 * @param pOutputStream The output stream, to which data should be written. May be null, in which case the input
 	 *            streams contents are simply discarded.
 	 * @param pClose True guarantees, that {@link OutputStream#close()} is called on the stream. False indicates, that
 	 *            only {@link OutputStream#flush()} should be called finally.
-	 * 
+	 *
 	 * @return Number of bytes, which have been copied.
 	 * @throws IOException An I/O error occurred.
 	 */
@@ -55,7 +55,7 @@ public final class Streams {
 
 	/**
 	 * Copies the contents of the given {@link InputStream} to the given {@link OutputStream}.
-	 * 
+	 *
 	 * @param pIn The input stream, which is being read. It is guaranteed, that {@link InputStream#close()} is called on
 	 *            the stream.
 	 * @param pOut The output stream, to which data should be written. May be null, in which case the input streams
@@ -63,7 +63,7 @@ public final class Streams {
 	 * @param pClose True guarantees, that {@link OutputStream#close()} is called on the stream. False indicates, that
 	 *            only {@link OutputStream#flush()} should be called finally.
 	 * @param pBuffer Temporary buffer, which is to be used for copying data.
-	 * 
+	 *
 	 * @return Number of bytes, which have been copied.
 	 * @throws IOException An I/O error occurred.
 	 */
@@ -116,10 +116,10 @@ public final class Streams {
 	/**
 	 * This convenience method allows to read a <code>org.apache.commons.fileupload.FileItemStream</code>'s content into a
 	 * string. The platform's default character encoding is used for converting bytes into characters.
-	 * 
+	 *
 	 * @param pStream The input stream to read.
 	 * @see #asString(InputStream, String)
-	 * 
+	 *
 	 * @return The streams contents, as a string.
 	 * @throws IOException An I/O error occurred.
 	 */
@@ -132,11 +132,11 @@ public final class Streams {
 	/**
 	 * This convenience method allows to read a <code>org.apache.commons.fileupload.FileItemStream</code>'s content into a
 	 * string, using the given character encoding.
-	 * 
+	 *
 	 * @param pStream The input stream to read.
 	 * @param pEncoding The character encoding, typically "UTF-8".
 	 * @see #asString(InputStream)
-	 * 
+	 *
 	 * @return The streams contents, as a string.
 	 * @throws IOException An I/O error occurred.
 	 */
@@ -150,16 +150,15 @@ public final class Streams {
 	 * Checks, whether the given file name is valid in the sense, that it doesn't contain any NUL characters. If the
 	 * file name is valid, it will be returned without any modifications. Otherwise, an {@link InvalidFileNameException}
 	 * is raised.
-	 * 
+	 *
 	 * @param pFileName The file name to check
-	 * 
+	 *
 	 * @return Unmodified file name, if valid.
 	 * @throws InvalidFileNameException The file name was found to be invalid.
 	 */
 	public static String checkFileName(String pFileName) {
-		
 		if (pFileName != null && pFileName.indexOf('\u0000') != -1) {
-			
+
 			final StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < pFileName.length(); i++) {
 				char c = pFileName.charAt(i);
@@ -174,7 +173,7 @@ public final class Streams {
 			}
 			throw new InvalidFileNameException(pFileName, "Invalid file name: " + sb);
 		}
-		
+
 		return pFileName;
 	}
 }

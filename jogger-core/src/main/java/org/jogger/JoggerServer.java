@@ -19,20 +19,20 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A server that handles HTTP requests using the provided {@link Jogger} instance.
- * 
+ *
  * @author German Escobar
  */
 public class JoggerServer {
-	
+
 	private Logger log = LoggerFactory.getLogger(JoggerServer.class);
-	
+
 	private static final int DEFAULT_PORT = 5000;
-	
+
 	/**
 	 * Used to create the {@link Jogger} instance.
 	 */
 	private JoggerFactory joggerFactory;
-	
+
 	/**
 	 * The cached version of the app configuration.
 	 */
@@ -42,15 +42,15 @@ public class JoggerServer {
 	 * The Jetty server instance.
 	 */
 	private Server server;
-	
+
 	/**
 	 * The port in which the server will respond.
 	 */
 	private int port = DEFAULT_PORT;
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param jogger the application configuration that this server will use to handle the HTTP requests.
 	 */
 	public JoggerServer(final Jogger jogger) {
@@ -64,33 +64,32 @@ public class JoggerServer {
 		};
 		this.jogger = jogger;
 	}
-	
+
 	/**
-	 * Constructor. 
-	 * 
+	 * Constructor.
+	 *
 	 * @param joggerFactory the factory from which we will retrieve the {@link Jogger} instance.
 	 */
 	public JoggerServer(final JoggerFactory joggerFactory) {
 		Preconditions.notNull(joggerFactory, "no joggerFactory provided");
-		
+
 		this.joggerFactory = joggerFactory;
 		try {
 			this.jogger = joggerFactory.configure();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		Preconditions.notNull(jogger, "joggerFactory is not providing a jogger instance.");
-		
 	}
-	
+
 	public Jogger getJogger() {
 		return jogger;
 	}
-	
+
 	/**
 	 * Starts the HTTP server listening in the configured <code>port</code> attribute.
-	 * 
+	 *
 	 * @return itself for method chaining.
 	 */
 	public JoggerServer listen() {
@@ -99,9 +98,9 @@ public class JoggerServer {
 
 	/**
 	 * Starts the HTTP server listening in the specified <code>port</code>
-	 * 
+	 *
 	 * @param port the port in which the HTTP server will listen.
-	 * 
+	 *
 	 * @return itself for method chaining.
 	 */
 	public JoggerServer listen(int port) {
@@ -117,13 +116,13 @@ public class JoggerServer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return this;
 	}
 
 	/**
 	 * Joins to the server thread preventing the program to finish.
-	 * 
+	 *
 	 * @return itself for method chaining.
 	 * @throws InterruptedException if the thread is interrupted.
 	 */
@@ -134,7 +133,7 @@ public class JoggerServer {
 
 	/**
 	 * Stops the HTTP server.
-	 * 
+	 *
 	 * @return itself for method chaining.
 	 */
 	public JoggerServer stop() {
@@ -143,10 +142,10 @@ public class JoggerServer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return this;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
@@ -157,19 +156,19 @@ public class JoggerServer {
 
 	/**
 	 * The Jetty handler that will handle HTTP requests.
-	 * 
+	 *
 	 * @author German Escobar
 	 */
 	private class JoggerHandler extends AbstractHandler {
-		
+
 		private RouteRequestExecutor routeExecutor;
-		
+
 		private AssetRequestExecutor assetExecutor;
-		
+
 		private ExceptionHandler exceptionHandler = new ExceptionHandler();
-		
+
 		private NotFoundHandler notFoundHandler = new NotFoundHandler();
-		
+
 		public JoggerHandler(Jogger jogger) {
 			routeExecutor = new RouteRequestExecutor(jogger);
 			assetExecutor = new AssetRequestExecutor(jogger);
@@ -178,14 +177,14 @@ public class JoggerServer {
 		@Override
 		public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest servletRequest,
 				HttpServletResponse servletResponse) throws IOException, ServletException {
-			
+
 			if (Environment.isDevelopment()) {
 				reloadJogger();
 			}
 
 			// try to find a matching route
 			Route route = jogger.getRoute( servletRequest.getMethod(), getPath(servletRequest) );
-			
+
 			// build the Jogger request/response objects
 			ServletRequest request = new ServletRequest(getRoutePath(route), servletRequest);
 			ServletResponse response = new ServletResponse(servletResponse, jogger.getTemplateEngine());
@@ -195,7 +194,7 @@ public class JoggerServer {
 				handleException(e, request, response);
 				return;
 			}
-			
+
 			try {
 				if (route != null) {
 					routeExecutor.execute(route, request, response);
@@ -207,7 +206,6 @@ public class JoggerServer {
 				} else {
 					handleNotFound(request, response);
 				}
-				
 			} catch (Exception e) {
 				response.status(Response.INTERNAL_ERROR);
 				handleException(e, request, response);
@@ -215,7 +213,7 @@ public class JoggerServer {
 				baseRequest.setHandled(true);
 			}
 		}
-		
+
 		private void reloadJogger() throws ServletException {
 			try {
 				jogger = joggerFactory.configure();
@@ -223,15 +221,15 @@ public class JoggerServer {
 				throw new ServletException(e);
 			}
 		}
-		
+
 		private String getRoutePath(Route route) {
 			return route != null ? route.getPath() : null;
 		}
-		
+
 		private String getPath(HttpServletRequest request) {
 			return Path.fixPath(request.getRequestURI());
 		}
-		
+
 		private void handleException(Exception e, Request request, Response response) {
 			log.error(request.getMethod() + " " + request.getPath() + " - Exception processing request: " + e.getMessage(), e);
 			try {
@@ -240,11 +238,11 @@ public class JoggerServer {
 				log.error("Exception while rendering default status 500 template: " + ex.getMessage());
 			}
 		}
-		
+
 		private void handleNotFound(Request request, Response response) {
 			log.debug(request.getMethod() + " " + request.getPath() + " - 404 Not Found!");
 			notFoundHandler.handle(request, response);
 		}
-			
+
 	}
 }

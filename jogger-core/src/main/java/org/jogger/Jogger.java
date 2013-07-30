@@ -20,10 +20,10 @@ import org.jogger.util.Preconditions;
 
 /**
  * <p>Use this class to configure your application's routes, interceptors, template engine, exception handlers, etc.</p>
- * 
+ *
  * <h3>Adding routes</h3>
  * There are multiple ways in which you can add routes:
- * 
+ *
  * <ol>
  * 	<li>Using the <code>get</code>, <code>post</code>, etc. methods:
  * 		<pre>
@@ -31,12 +31,12 @@ import org.jogger.util.Preconditions;
  * app.get("/", new RouteHandler() {
  * 	&#064Override
  * 	public void handle(Request request, Response response) {
- * 	
+ *
  * 	}
  * });
  * 		</pre>
  * 	</li>
- * 	<li>Using the <code>addRoute</code> methods. In this case, the class <code>MyController</code> with a method 
+ * 	<li>Using the <code>addRoute</code> methods. In this case, the class <code>MyController</code> with a method
  * <code>root</code> (that receives a {@link Request} and {@link Response}) must exists.
  * 		<pre>
  * Jogger app = new Jogger();
@@ -50,22 +50,22 @@ import org.jogger.util.Preconditions;
  * app.setRoutes(routes);
  * 		</pre>
  * 	</li>
- * </ol> 
+ * </ol>
  * To learn how to load routes from a file or using annotations click here.
- * 
+ *
  * <h3>Default configuration</h3>
  * When you instantiate this class it comes with the following default configuration:
- * 
+ *
  * <ul>
  * 	<li>An empty route list (i.e. no routes).</li>
  * 	<li>An empty interceptor list (i.e. no interceptors).</li>
  * 	<li>A {@link FileAssetLoader} for loading static files.</li>
  * 	<li>A {@link FreemarkerTemplateEngine} for loading and rendering templates.</li>
  * </ul>
- * 
- * You can then add routes, interceptors, change the {@link AssetLoader} and {@link TemplateEngine} 
+ *
+ * You can then add routes, interceptors, change the {@link AssetLoader} and {@link TemplateEngine}
  * implementations, etc.
- * 
+ *
  * @author German Escobar
  */
 public class Jogger {
@@ -89,24 +89,23 @@ public class Jogger {
 	 * Used to load and render templates.
 	 */
 	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
-	
+
 	/**
 	 * Constructor. Initializes the object with the default configuration.
 	 */
 	public Jogger() {
-		
+
 	}
-	
+
 	/**
 	 * Retrieves the {@link Route} that matches the specified <code>httpMethod</code> and <code>path</code>.
-	 * 
+	 *
 	 * @param httpMethod the HTTP method to match. Should not be null or empty.
 	 * @param path the path to match. Should not be null but can be empty (which is interpreted as /)
-	 * 
+	 *
 	 * @return a {@link Route} object that matches the arguments or null if no route matches.
 	 */
 	public Route getRoute(String httpMethod, String path) {
-
 		Preconditions.notEmpty(httpMethod, "no httpMethod provided.");
 		Preconditions.notNull(path, "no path provided.");
 
@@ -122,7 +121,6 @@ public class Jogger {
 	}
 
 	private String parsePath(String path) {
-		
 		path = Path.fixPath(path);
 
 		URI uri = null;
@@ -134,13 +132,13 @@ public class Jogger {
 
 		return uri.getPath();
 	}
-	
+
 	/**
 	 * Helper method. Tells if the the HTTP path matches the route path.
-	 * 
+	 *
 	 * @param routePath the path defined for the route.
 	 * @param pathToMatch the path from the HTTP request.
-	 * 
+	 *
 	 * @return true if the path matches, false otherwise.
 	 */
 	private boolean matchesPath(String routePath, String pathToMatch) {
@@ -159,7 +157,7 @@ public class Jogger {
 
 	/**
 	 * Adds a route to the list of routes using a {@link Route} object.
-	 * 
+	 *
 	 * @param route the route to be added.
 	 */
 	public void addRoute(Route route) {
@@ -169,13 +167,13 @@ public class Jogger {
 
 	/**
 	 * Creates a {@link Route} object from the received arguments and adds it to the list of routes.
-	 * 
+	 *
 	 * @param httpMethod the HTTP method to which this route is going to respond.
 	 * @param path the path to which this route is going to respond.
 	 * @param controller the object that will be invoked when this route matches.
-	 * @param methodName the name of the method in the <code>controller</code> object that will be invoked when this 
+	 * @param methodName the name of the method in the <code>controller</code> object that will be invoked when this
 	 * route matches.
-	 * 
+	 *
 	 * @throws NoSuchMethodException if the <code>methodName</code> is not found or doesn't have the right signature.
 	 */
 	public void addRoute(HttpMethod httpMethod, String path, Object controller, String methodName) throws NoSuchMethodException {
@@ -187,14 +185,13 @@ public class Jogger {
 
 	/**
 	 * Creates a {@link Route} object from the received arguments and adds it to the list of routes.
-	 * 
+	 *
 	 * @param httpMethod the HTTP method to which this route is going to respond.
 	 * @param path the path to which this route is going to respond.
 	 * @param controller the object that will be invoked when this route matches.
 	 * @param method the Method that will be invoked when this route matches.
 	 */
 	public void addRoute(HttpMethod httpMethod, String path, Object controller, Method method) {
-
 		// validate signature
 		Class<?>[] paramTypes = method.getParameterTypes();
 		if (paramTypes.length != 2 || !paramTypes[0].equals(Request.class) || !paramTypes[1].equals(Response.class)) {
@@ -205,13 +202,12 @@ public class Jogger {
 		method.setAccessible(true); // to access methods from anonymous classes
 
 		routes.add(new Route(httpMethod, path, controller, method));
-
 	}
 
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the GET HTTP method and the 
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the GET HTTP method and the
 	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 * 
+	 *
 	 * @param path the path to which this route will respond.
 	 * @param handler the object that will be invoked when the route matches.
 	 */
@@ -225,9 +221,9 @@ public class Jogger {
 	}
 
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the POST HTTP method and the 
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the POST HTTP method and the
 	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 * 
+	 *
 	 * @param path the path to which this route will respond.
 	 * @param handler the object that will be invoked when the route matches.
 	 */
@@ -239,11 +235,11 @@ public class Jogger {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the PUT HTTP method and the 
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the PUT HTTP method and the
 	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 * 
+	 *
 	 * @param path the path to which this route will respond.
 	 * @param handler the object that will be invoked when the route matches.
 	 */
@@ -255,11 +251,11 @@ public class Jogger {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the DELETE HTTP method and the 
+	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the DELETE HTTP method and the
 	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 * 
+	 *
 	 * @param path the path to which this route will respond.
 	 * @param handler the object that will be invoked when the route matches.
 	 */
@@ -282,9 +278,9 @@ public class Jogger {
 	}
 
 	/**
-	 * Adds the <code>interceptor</code> to the list of interceptors that will matches the specified 
-	 * <code>paths</code>. 
-	 * 
+	 * Adds the <code>interceptor</code> to the list of interceptors that will matches the specified
+	 * <code>paths</code>.
+	 *
 	 * @param interceptor the interceptor object to be added.
 	 * @param paths the paths in which this interceptor will be invoked, an empty array to respond to all paths.
 	 */

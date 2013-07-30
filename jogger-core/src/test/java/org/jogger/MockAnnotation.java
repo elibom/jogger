@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation used for testing by {@link JoggerServletTest}.
- * 
+ *
  * @author German Escobar
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })

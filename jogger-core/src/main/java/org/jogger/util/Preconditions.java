@@ -2,7 +2,7 @@ package org.jogger.util;
 
 /**
  * This class provides helper methods to check preconditions throwing an exception when not met.
- * 
+ *
  * @author German Escobar
  */
 public final class Preconditions {
@@ -11,7 +11,7 @@ public final class Preconditions {
 	 * Hide constructor.
 	 */
 	private Preconditions() {}
-	
+
 	/**
 	 * Checks that an object is not null.
 	 *
@@ -25,15 +25,15 @@ public final class Preconditions {
 			throw new IllegalArgumentException("A precondition failed: " + message);
 		}
 	}
-	
+
 	/**
-     * Checks that a string is not null or empty.
-     *
-     * @param value the string to be tested.
-     * @param message the message for the exception in case the string is empty.
-     *
-     * @throws IllegalArgumentException if the string is empty.
-     */
+	 * Checks that a string is not null or empty.
+	 *
+	 * @param value the string to be tested.
+	 * @param message the message for the exception in case the string is empty.
+	 *
+	 * @throws IllegalArgumentException if the string is empty.
+	 */
 	public static void notEmpty(String value, String message) throws IllegalArgumentException {
 		if (value == null || "".equals(value.trim())) {
 			throw new IllegalArgumentException("A precondition failed: " + message);

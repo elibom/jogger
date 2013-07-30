@@ -2,49 +2,49 @@ package org.jogger.http;
 
 /**
  * Represents an HTTP Cookie.
- * 
+ *
  * @author German Escobar
  */
 public class Cookie {
 
 	private String name;
-	
+
 	private String domain;
-	
+
 	private String path;
-	
+
 	private boolean secure = false;
-	
+
 	private String value;
-	
+
 	private int maxAge = -1;
-	
+
 	private boolean httpOnly = false;
-	
+
 	public Cookie(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}
-	
+
 	public Cookie(String name, String value, int maxAge) {
 		this(name, value, maxAge, null);
 	}
-	
+
 	public Cookie(String name, String value, int maxAge, String path) {
 		this.name = name;
 		this.value = value;
 		this.maxAge = maxAge;
 		this.path = path;
 	}
-	
+
 	public Cookie(String name, String value, int maxAge, boolean httpOnly) {
 		this.name = name;
 		this.value = value;
 		this.maxAge = maxAge;
 		this.httpOnly = httpOnly;
 	}
-	
-	
+
+
 
 	public String getName() {
 		return name;
@@ -101,5 +101,5 @@ public class Cookie {
 	public void setHttpOnly(boolean httpOnly) {
 		this.httpOnly = httpOnly;
 	}
-	
+
 }

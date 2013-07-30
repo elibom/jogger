@@ -4,31 +4,31 @@ import java.io.InputStream;
 
 /**
  * Represents a static asset resource.
- * 
+ *
  * @author German Escobar
  */
 public class Asset {
-	
+
 	/**
 	 * The input stream of the asset.
 	 */
 	private final InputStream inputStream;
-	
+
 	/**
 	 * The name of the asset.
 	 */
 	private final String name;
-	
+
 	/**
 	 * The content length of the asset.
 	 */
 	private final long length;
 
-    /**
-     * The epoch timestamp when this asset was last modified
-     */
-    private final long lastModified;
-	
+	/**
+	 * The epoch timestamp when this asset was last modified
+	 */
+	private final long lastModified;
+
 	/**
 	 * The content type of the asset.
 	 */
@@ -44,8 +44,8 @@ public class Asset {
 		this.name = name;
 		this.contentType = contentType;
 		this.length = length;
-        this.lastModified = lastModified;
-    }
+		this.lastModified = lastModified;
+	}
 
 	public String getName() {
 		return name;
@@ -63,7 +63,7 @@ public class Asset {
 		return length;
 	}
 
-    public long getLastModified() {
-        return lastModified;
-    }
+	public long getLastModified() {
+		return lastModified;
+	}
 }
