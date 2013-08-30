@@ -173,7 +173,10 @@ public class ServletResponse implements Response {
 		response.setBufferSize(10240);
 		response.setContentType(asset.getContentType());
 		response.setHeader("Content-Length", String.valueOf(asset.getLength()));
-		response.setHeader("Content-Disposition", "inline; filename=\"" + asset.getName() + "\"");
+		String contentDisposition = response.getHeader("Content-Disposition");
+		if (contentDisposition == null || "".equals(contentDisposition.trim())) {
+			response.setHeader("Content-Disposition", "inline; filename=\"" + asset.getName() + "\"");
+		}
 
 		// prepare streams
 		BufferedInputStream input = null;
