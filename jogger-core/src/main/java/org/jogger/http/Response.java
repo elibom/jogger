@@ -147,5 +147,7 @@ public interface Response {
 	 * @param path the path to which the request is redirected.
 	 */
 	void redirect(String path);
+	
+	boolean isWritten();
 
 }

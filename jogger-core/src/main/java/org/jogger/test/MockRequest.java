@@ -13,10 +13,10 @@ import java.util.Map;
 
 import org.jogger.Jogger;
 import org.jogger.Route;
-import org.jogger.RouteRequestExecutor;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
+import org.jogger.util.Preconditions;
 
 /**
  * This is a {@link org.jogger.http.Request} implementation that stores the request state in attributes. Useful for testing Jogger
@@ -25,8 +25,6 @@ import org.jogger.http.FileItem;
  * @author German Escobar
  */
 public class MockRequest extends AbstractRequest {
-
-	private Route route;
 
 	private String host;
 
@@ -55,15 +53,12 @@ public class MockRequest extends AbstractRequest {
 	private String body;
 
 	private MockResponse response;
+	
+	private Jogger jogger;
 
-	private RouteRequestExecutor routeExecutor;
-
-	public MockRequest(Jogger jogger, Route route, String method, String url) throws URISyntaxException {
-		super(route != null ? route.getPath() : null);
-
-		this.route = route;
+	public MockRequest(Jogger jogger, String method, String url) throws URISyntaxException {
+		this.jogger = jogger;
 		this.response = new MockResponse(jogger.getTemplateEngine());
-		this.routeExecutor = new RouteRequestExecutor(jogger);
 
 		this.method = method;
 
@@ -80,10 +75,6 @@ public class MockRequest extends AbstractRequest {
 
 		String strPort = uri.getPort() > 0 ? ":" + uri.getPort() : "";
 		this.url = uri.getScheme() + "://" + uri.getHost() + strPort  + "/" + uri.getPath();
-
-		if (route != null) {
-			initPathVariables(route.getPath());
-		}
 	}
 
 	private Map<String,String> buildParams(String queryString) {
@@ -244,6 +235,14 @@ public class MockRequest extends AbstractRequest {
 		};
 	}
 
+	@Override
+	public void setRoute(Route route) {
+		Preconditions.notNull(route, "no route provided.");
+		this.route = route;
+		
+		this.initPathVariables(route.getPath());
+	}
+
 	public MockRequest setBodyAsString(String body) {
 		this.body = body;
 		return this;
@@ -251,7 +250,7 @@ public class MockRequest extends AbstractRequest {
 
 	public MockResponse run() throws Exception {
 		// execute request
-		routeExecutor.execute(route, this, response);
+		jogger.handle(this, response);
 		return response;
 
 	}

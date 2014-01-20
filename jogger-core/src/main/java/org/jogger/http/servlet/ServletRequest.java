@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jogger.Route;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
@@ -21,6 +22,7 @@ import org.jogger.http.Path;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
+import org.jogger.util.Preconditions;
 
 /**
  * A {@link org.jogger.http.Request} implementation based on the Servlet API.
@@ -41,25 +43,25 @@ public class ServletRequest extends AbstractRequest {
 	/**
 	 * Constructor.
 	 *
-	 * @param routePath a String object with the path of the route; can be null if there is no route for this request.
 	 * @param request the Servlet request object.
+	 * 
+	 * @throws MultipartException if there is a problem parsing the multipart/form-data.
+	 * @throws IOException if there is a problem parsing the multipart/form-data.
 	 */
-	public ServletRequest(String routePath, HttpServletRequest request) {
-		super(routePath);
+	public ServletRequest(HttpServletRequest request) throws MultipartException, IOException {
+		Preconditions.notNull(request, "no servlet request provided.");
 		this.request = request;
+		
+		init();
 	}
 
 	/**
 	 * Initializes the path variables and the multipart content.
 	 *
-	 * @throws FileUploadException if there is a problem parsing the multipart/form-data.
+	 * @throws MultipartException if there is a problem parsing the multipart/form-data.
 	 * @throws IOException if there is a problem parsing the multipart/form-data.
 	 */
-	public ServletRequest init() throws MultipartException, IOException {
-		if (routePath != null) {
-			initPathVariables( routePath );
-		}
-
+	private ServletRequest init() throws MultipartException, IOException {
 		// retrieve multipart/form-data parameters
 		if (Multipart.isMultipartContent(request)) {
 			Multipart multipart = new Multipart();
@@ -274,6 +276,14 @@ public class ServletRequest extends AbstractRequest {
 		};
 
 		return bodyParser;
+	}
+
+	@Override
+	public void setRoute(Route route) {
+		Preconditions.notNull(route, "no route provided.");
+		this.route = route;
+		
+		initPathVariables(route.getPath());
 	}
 
 }

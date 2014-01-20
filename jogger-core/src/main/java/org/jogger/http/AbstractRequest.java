@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jogger.Route;
+
 
 /**
  * Support class that acts as a base class for {@link org.jogger.http.Request} and {@link org.jogger.test.MockRequest}
@@ -16,16 +18,12 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractRequest implements Request {
 
-	protected String routePath;
+	protected Route route;
 
 	/**
 	 * Holds the path variables of the request.
 	 */
 	protected Map<String,String> pathVariables = new HashMap<String,String>();
-
-	public AbstractRequest(String routePath) {
-		this.routePath = routePath;
-	}
 
 	@Override
 	public Map<String, String> getPathVariables() {
@@ -44,15 +42,14 @@ public abstract class AbstractRequest implements Request {
 	 */
 	protected void initPathVariables(String routePath) {
 		pathVariables.clear();
+		
+		List<String> variables = getVariables(routePath);
+		String regexPath = routePath.replaceAll(Path.VAR_REGEXP, Path.VAR_REPLACE);
 
-		List<String> variables = getVariables( routePath );
-		String regexPath = routePath.replaceAll( Path.VAR_REGEXP, Path.VAR_REPLACE );
-
-		Matcher matcher = Pattern.compile("(?i)" + regexPath).matcher( getPath() );
+		Matcher matcher = Pattern.compile("(?i)" + regexPath).matcher(getPath());
 		matcher.matches();
 
 		// start index at 1 as group(0) always stands for the entire expression
-
 		for (int i=1; i <= variables.size(); i++) {
 			String value = matcher.group(i);
 			pathVariables.put(variables.get(i-1), value);
@@ -69,10 +66,10 @@ public abstract class AbstractRequest implements Request {
 	private List<String> getVariables(String routePath) {
 		List<String> variables = new ArrayList<String>();
 
-		Matcher matcher = Pattern.compile(Path.VAR_REGEXP).matcher( routePath );
+		Matcher matcher = Pattern.compile(Path.VAR_REGEXP).matcher(routePath);
 		while (matcher.find()) {
 			// group(0) always stands for the entire expression and we only want what is inside the {}
-			variables.add( matcher.group(1) );
+			variables.add(matcher.group(1));
 		}
 
 		return variables;

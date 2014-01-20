@@ -1,5 +1,10 @@
 package org.jogger;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,14 +19,14 @@ public class JoggerServerTest {
 
 	@Test
 	public void shouldStartStopServer() throws Exception {
-		JoggerServer joggerServer = new JoggerServer(new Jogger());
-		joggerServer.listen(27773);
+		Jogger app = new Jogger();
+		app.listen(27773);
 
 		try {
 			HttpResponse response = Request.Get("http://localhost:27773/").execute().returnResponse();
 			Assert.assertEquals(response.getStatusLine().getStatusCode(), 404);
 		} finally {
-			joggerServer.stop();
+			app.stop();
 			try {
 				new Socket("localhost", 27773);
 				Assert.fail("Server is still running");
@@ -30,44 +35,32 @@ public class JoggerServerTest {
 	}
 
 	@Test
-	public void shouldExecuteRoute() throws Exception {
-		Jogger app = new Jogger();
-		app.get("/", new RouteHandler() {
-			@Override
-			public void handle(org.jogger.http.Request request, Response response) {
-
-			}
-		});
-
-		JoggerServer joggerServer = new JoggerServer(app);
-		joggerServer.listen(27773);
+	public void shouldExecuteMiddleware() throws Exception {
+		Middleware middleware = mock(Middleware.class);
+		Jogger app = new Jogger(middleware);
+		app.listen(27773);
 
 		try {
-			HttpResponse response = Request.Get("http://localhost:27773/").execute().returnResponse();
-			Assert.assertEquals(response.getStatusLine().getStatusCode(), 200);
+			Request.Get("http://localhost:27773/").execute().returnResponse();
+			verify(middleware).handle(any(org.jogger.http.Request.class), any(Response.class), any(MiddlewareChain.class));
 		} finally {
-			joggerServer.stop();
+			app.stop();
 		}
 	}
 
 	@Test
 	public void shouldHandleException() throws Exception {
-		Jogger app = new Jogger();
-		app.get("/", new RouteHandler() {
-			@Override
-			public void handle(org.jogger.http.Request request, Response response) {
-				throw new RuntimeException();
-			}
-		});
-
-		JoggerServer joggerServer = new JoggerServer(app);
-		joggerServer.listen(27773);
+		Middleware middleware = mock(Middleware.class);
+		doThrow(new RuntimeException()).when(middleware).handle(any(org.jogger.http.Request.class), any(Response.class), any(MiddlewareChain.class));
+		
+		Jogger app = new Jogger(middleware);
+		app.listen(27773);
 
 		try {
 			HttpResponse response = Request.Get("http://localhost:27773/").execute().returnResponse();
 			Assert.assertEquals(response.getStatusLine().getStatusCode(), 500);
 		} finally {
-			joggerServer.stop();
+			app.stop();
 		}
 	}
 
@@ -78,17 +71,17 @@ public class JoggerServerTest {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				JoggerServer joggerServer = new JoggerServer(new Jogger());
-				joggerServer.listen(27773);
+				Jogger app = new Jogger();
+				app.listen(27773);
 
 				try {
 					running.getAndSet(true);
 
 					try {
-						joggerServer.join();
+						app.join();
 					} catch (InterruptedException e) {}
 				} finally {
-					joggerServer.stop();
+					app.stop();
 					running.getAndSet(false);
 				}
 			}

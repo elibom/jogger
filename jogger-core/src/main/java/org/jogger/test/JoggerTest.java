@@ -1,10 +1,6 @@
 package org.jogger.test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.jogger.Jogger;
-import org.jogger.Route;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -91,21 +87,7 @@ public abstract class JoggerTest {
 		}
 
 		String url = "http://localhost" + path;
-		Route route = getJogger().getRoute(httpMethod, fixPath(path));
-		return new MockRequest(getJogger(), route, httpMethod, url);
-	}
-
-	/**
-	 * Retrieves the path by removing the query string, hash tags, etc from the <code>path</code>.
-	 *
-	 * @param path the path that we will fix
-	 *
-	 * @return a String
-	 * @throws URISyntaxException
-	 */
-	private String fixPath(String path) throws URISyntaxException {
-		URI uri = new URI(path);
-		return uri.getPath();
+		return new MockRequest(getJogger(), httpMethod, url);
 	}
 
 	/**

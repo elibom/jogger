@@ -13,17 +13,17 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
     
-        Jogger app = new Jogger();
-        app.get("/", new RouteHandler() {
+        RouterMiddleware router = new RouterMiddleware();
+        router.get("/", new RouteHandler() {
             @Override
             public void handle(Request request, Response response) {
                 response.write("<h1>Hello World!</h1>");
             }
         });
         
-        JoggerServer server = new JoggerServer(app);
-        server.listen(5000);
-        server.join();
+        Jogger app = new Jogger(router);
+        app.listen(5000);
+        app.join();
         
     }
 }
@@ -35,12 +35,12 @@ Run it and point your browser to [http://localhost:5000](http://localhost:5000).
 Out of the box Jogger comes with the following:
 
 * An embedded [Jetty server](http://www.eclipse.org/jetty/).
-* An **asset handler** that allows you to serve static files (CSS, Javascript, images, etc.). 
-* A **routing mechanism** that allows you to map HTTP requests to Java methods. [Learn more](https://github.com/germanescobar/jogger/wiki/Routing-Guide)
+* An **asset middleware** that allows you to serve static files (CSS, Javascript, images, etc.). 
+* A **routing middleware** that allows you to map HTTP requests to Java methods. [Learn more](https://github.com/germanescobar/jogger/wiki/Routing-Guide)
 * A **view template engine**. The default is [Freemarker](http://freemarker.sourceforge.net/) but [Jade](https://github.com/neuland/jade4j) is also supported. [Learn more](https://github.com/germanescobar/jogger/wiki/Templating-Guide)
 * A **testing framework** that allows you to create integration tests easily. [Learn more](https://github.com/germanescobar/jogger/wiki/Testing-Guide)
 
 ## Documentation
 
 * [Main documentation page](https://github.com/germanescobar/jogger/wiki)
-* [API docs](http://germanescobar.net/projects/jogger/api/0.7.0/core/)
+* [API docs](http://germanescobar.net/projects/jogger/api/0.8.10/core/)

@@ -4,7 +4,7 @@ import org.jogger.http.Request;
 import org.jogger.http.Response;
 
 /**
- * This interface is used in {@link Jogger} to create routes easily using anonymous classes. For example:
+ * This interface is used in the {@link RouterMiddleware} to create routes easily using anonymous classes. For example:
  *
  * <pre><code>
  * 	Jogger jogger = new Jogger();
