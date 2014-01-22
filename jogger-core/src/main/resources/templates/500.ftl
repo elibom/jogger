@@ -26,6 +26,7 @@
 				margin: 0 auto;
 				padding: 0 10px;
 			}
+			div.content { padding-bottom: 40px; }
 			h1 {
 				color: white;
 				font-size: 40px;
