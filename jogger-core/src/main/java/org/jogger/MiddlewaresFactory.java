@@ -13,7 +13,8 @@ public interface MiddlewaresFactory {
 	 * middleware every time it is called.
 	 * 
 	 * @return an array of {@link Middleware} instances.
+	 * @throws Exception
 	 */
-	Middleware[] create();
+	Middleware[] create() throws Exception;
 	
 }

@@ -87,7 +87,11 @@ public class Jogger {
 	public Jogger(final MiddlewaresFactory middlewareFactory) {
 		Preconditions.notNull(middlewareFactory, "no middlewareFactory provided.");
 		this.middlewareFactory = middlewareFactory;
-		this.middlewares = middlewareFactory.create();
+		try {
+			this.middlewares = middlewareFactory.create();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -196,7 +200,7 @@ public class Jogger {
 	}
 
 	public Middleware[] getMiddlewareList() {
-		return middlewareFactory.create();
+		return middlewares;
 	}
 
 	public TemplateEngine getTemplateEngine() {
