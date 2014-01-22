@@ -38,7 +38,7 @@ public class StaticMiddleware implements Middleware {
 	/**
 	 * The path prefix this middleware uses to decide to match a request.
 	 */
-	private String path;
+	private String prefix;
 
 	/**
 	 * Constructor. Creates a new instance with the provided path and with a {@link FileAssetLoader} as the 
@@ -48,33 +48,47 @@ public class StaticMiddleware implements Middleware {
 	 */
 	public StaticMiddleware(String path) {
 		Preconditions.notNull(path, "no path provided.");
-		this.path = fixPath(path);
+		this.prefix = fixPrefix(path);
 		this.assetLoader = new FileAssetLoader(path);
 	}
 	
 	/**
-	 * Adds a leading and trailing slash if they are not present (i.e. "assets" becomes "/assets/")
+	 * Helper method. Adds a leading and trailing slash if they are not present (i.e. "assets" becomes "/assets/")
 	 * 
-	 * @param path the path to be fixed, can't be null.
+	 * @param prefix the path to be fixed, can't be null.
 	 * 
-	 * @return the path with leading and trailing slashes.
+	 * @return the prefix with leading and trailing slashes.
 	 */
-	private String fixPath(String path) {
-		String fixedPath = path.startsWith("/") ? path : "/" + path;
-		return fixedPath.endsWith("/") ? fixedPath : fixedPath + "/";
+	private String fixPrefix(String prefix) {
+		String fixedPrefix = prefix.startsWith("/") ? prefix : "/" + prefix;
+		return fixedPrefix.endsWith("/") ? fixedPrefix : fixedPrefix + "/";
 	}
 	
 	/**
-	 * Constructor. Creates a new instance with the provided asset loader and path.
+	 * Constructor. Creates a new instance with a {@link FileAssetLoader} with the provided path, and the prefix.
+	 * 
+	 * @param path the path where the static files are located in the file system.
+	 * @param prefix the prefix used to match the request path
+	 */
+	public StaticMiddleware(String path, String prefix) {
+		Preconditions.notNull(path, "no path provided.");
+		Preconditions.notNull(prefix, "no prefix provided.");
+		
+		this.prefix = fixPrefix(prefix);
+		this.assetLoader = new FileAssetLoader(path);
+	}
+	
+	/**
+	 * Constructor. Creates a new instance with the provided asset loader and prefix.
 	 * 
 	 * @param assetLoader the object used to load the assets.
-	 * @param path the prefix used to match the request path.
+	 * @param prefix the prefix used to match the request path.
 	 */
-	public StaticMiddleware(AssetLoader assetLoader, String path) {
+	public StaticMiddleware(AssetLoader assetLoader, String prefix) {
 		Preconditions.notNull(assetLoader, "no assetLoader provided.");
-		Preconditions.notNull(path, "no path provided.");
+		Preconditions.notNull(prefix, "no prefix provided.");
 		
-		this.path = fixPath(path);
+		this.prefix = fixPrefix(prefix);
 		this.assetLoader = assetLoader;
 	}
 
@@ -82,7 +96,7 @@ public class StaticMiddleware implements Middleware {
 	public void handle(Request request, Response response, MiddlewareChain chain) throws Exception {
 		// check if we have to handle the request or not
 		String requestPath = fixRequestPath(request.getPath());
-		if (!requestPath.startsWith(path)) {
+		if (!requestPath.startsWith(prefix)) {
 			chain.next();
 			return;
 		}
@@ -94,7 +108,7 @@ public class StaticMiddleware implements Middleware {
 		}
 		
 		// load the asset
-		requestPath = requestPath.replace(path, "");
+		requestPath = requestPath.replace(prefix, "");
 		Asset asset = assetLoader.load(URLDecoder.decode(requestPath, "UTF-8"));
 		if (asset == null) {
 			response.notFound();
