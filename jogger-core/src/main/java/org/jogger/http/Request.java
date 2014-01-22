@@ -3,6 +3,8 @@ package org.jogger.http;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.jogger.Route;
+
 /**
  * Represents an HTTP Request.
  *
@@ -117,6 +119,8 @@ public interface Request {
 	 * @return a {@link BodyParser} implementation.
 	 */
 	BodyParser getBody();
+	
+	void setRoute(Route route);
 
 	/**
 	 * This is what we returned when the {@link Request#getBody()} is called. Provides convenient methods to parse the

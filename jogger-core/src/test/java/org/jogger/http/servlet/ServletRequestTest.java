@@ -33,7 +33,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getServerName()).thenReturn("localhost");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getHost(), "localhost");
 	}
 
@@ -43,7 +43,7 @@ public class ServletRequestTest {
 		when(servletRequest.getContextPath()).thenReturn("/context");
 		when(servletRequest.getRequestURI()).thenReturn("/users/edit/1");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getPath(), "/users/edit/1");
 	}
 
@@ -55,7 +55,8 @@ public class ServletRequestTest {
 
 		Route route = new Route(HttpMethod.GET, "/users/{userId}/edit/{hash}", new MockController(),
 				MockController.class.getMethod("init", Request.class, Response.class));
-		ServletRequest request = new ServletRequest(route.getPath(), servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
+		request.setRoute(route);
 
 		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );
@@ -72,7 +73,8 @@ public class ServletRequestTest {
 
 		Route route = new Route(HttpMethod.GET, "/users/1/edit/th1s1s4hAsh", new MockController(),
 				MockController.class.getMethod("init", Request.class, Response.class));
-		ServletRequest request = new ServletRequest(route.getPath(), servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
+		request.setRoute(route);
 
 		Map<String,String> pathVariables = request.getPathVariables();
 		Assert.assertNotNull( pathVariables );
@@ -84,7 +86,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getQueryString()).thenReturn("method=test&action=success");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getQueryString(), "method=test&action=success");
 	}
 
@@ -97,7 +99,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getParameterMap()).thenReturn(mockParams);
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 
 		Map<String,String> params = request.getParameters();
 		Assert.assertNotNull( params );
@@ -117,18 +119,18 @@ public class ServletRequestTest {
 	@Test
 	public void shouldRetrieveStringParam() throws Exception {
 		HttpServletRequest servletRequest = mockServletRequest();
-		when(servletRequest.getParameterValues("param1")).thenReturn( new String[] { "value1" } );
+		when(servletRequest.getParameterValues("param1")).thenReturn(new String[] { "value1" });
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 
-		Assert.assertNotNull( request.getParameter("param1") );
-		Assert.assertEquals( request.getParameter("param1"), "value1" );
+		Assert.assertNotNull(request.getParameter("param1"));
+		Assert.assertEquals(request.getParameter("param1"), "value1");
 	}
 
 	@Test
 	public void shouldNotRetrieveNonExistingParam() throws Exception {
 		HttpServletRequest servletRequest = mockServletRequest();
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertNull( request.getParameter("nonexisting") );
 	}
 
@@ -137,7 +139,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getParameterValues("param1")).thenReturn( new String[] { "1" } );
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 
 		Assert.assertNotNull( request.getParameter("param1") );
 		Assert.assertEquals( request.getParameter("param1"), "1" );
@@ -148,7 +150,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getRequestURL()).thenReturn(new StringBuffer("http://www.google.com:81/test"));
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getUrl(), "http://www.google.com:81/test");
 	}
 
@@ -156,7 +158,7 @@ public class ServletRequestTest {
 	public void shouldRetrieveMethod() throws Exception {
 		HttpServletRequest servletRequest = mockServletRequest("GET");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getMethod(), "GET");
 	}
 
@@ -165,7 +167,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getRemoteAddr()).thenReturn("localhost");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getRemoteAddress(), "localhost");
 	}
 
@@ -174,7 +176,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getContentType()).thenReturn("application/json");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getContentType(), "application/json");
 	}
 
@@ -183,7 +185,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getServerPort()).thenReturn(1);
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getPort(), 1);
 	}
 
@@ -192,7 +194,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.isSecure()).thenReturn(true);
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.isSecure(), true);
 	}
 
@@ -201,7 +203,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getHeader("x-requested-with")).thenReturn("XMLHttpRequest");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.isAjax(), true);
 
 		when(servletRequest.getHeader("x-requested-with")).thenReturn(null);
@@ -218,7 +220,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getCookies()).thenReturn(servletCookies);
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Map<String,Cookie> cookies = request.getCookies();
 
 		Assert.assertEquals(cookies.size(), 1);
@@ -241,7 +243,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getCookies()).thenReturn(servletCookies);
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Map<String,Cookie> cookies = request.getCookies();
 
 		Assert.assertEquals(cookies.size(), 0);
@@ -252,7 +254,7 @@ public class ServletRequestTest {
 		HttpServletRequest servletRequest = mockServletRequest();
 		when(servletRequest.getHeader("Authorization")).thenReturn("Basic ...");
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertEquals(request.getHeader("Authorization"), "Basic ...");
 	}
 
@@ -271,7 +273,7 @@ public class ServletRequestTest {
 
 		});
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertNotNull( request.getFiles() );
 		Assert.assertEquals( request.getFiles().length, 1 );
 
@@ -301,7 +303,7 @@ public class ServletRequestTest {
 
 		});
 
-		Request request = new ServletRequest(null, servletRequest).init();
+		Request request = new ServletRequest(servletRequest);
 		Assert.assertNotNull( request.getFiles() );
 		Assert.assertEquals( request.getFiles().length, 2 );
 	}

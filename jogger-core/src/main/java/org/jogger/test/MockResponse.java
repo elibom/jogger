@@ -39,6 +39,8 @@ public class MockResponse implements Response {
 	private Asset renderedAsset;
 
 	private String renderedTemplate;
+	
+	private boolean written;
 
 	public MockResponse(TemplateEngine templateEngine) {
 		this.templateEngine = templateEngine;
@@ -135,12 +137,14 @@ public class MockResponse implements Response {
 	@Override
 	public Response write(String html) {
 		this.output = html;
+		this.written = true;
 		return this;
 	}
 
 	@Override
 	public Response write(Asset asset) {
 		this.renderedAsset = asset;
+		this.written = true;
 		return this;
 	}
 
@@ -159,6 +163,7 @@ public class MockResponse implements Response {
 
 		// retrieve and process the template
 		templateEngine.render(templateName, attributes, writer);
+		this.written = true;
 
 		try {
 			output = out.toString("UTF-8");
@@ -187,6 +192,11 @@ public class MockResponse implements Response {
 
 	public Asset getRenderedAsset() {
 		return renderedAsset;
+	}
+
+	@Override
+	public boolean isWritten() {
+		return written;
 	}
 
 }

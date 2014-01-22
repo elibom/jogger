@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 
 import org.jogger.Jogger;
 import org.jogger.RouteHandler;
+import org.jogger.RouterMiddleware;
 import org.jogger.http.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -20,8 +21,10 @@ public class JoggerTestTest {
 
 	@Test
 	public void shouldTestGetWithQueryString() throws Exception {
-		Jogger app = new Jogger();
-		app.get("/test", mock(RouteHandler.class));
+		RouterMiddleware router = new RouterMiddleware();
+		router.get("/test", mock(RouteHandler.class));
+		Jogger app = new Jogger(router);
+		
 		JoggerTest joggerTest = buildJoggerTest(app);
 
 		MockResponse response = joggerTest.get("/test?param=value").run();

@@ -1,17 +1,16 @@
 package ${package};
 
-import org.jogger.JoggerServer;
+import org.jogger.Jogger;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		
 		// start the server
-		JoggerServer server = new JoggerServer(new ApplicationFactory());
-		server.listen(5000);
+		Jogger app = JoggerFactory.create();
+		app.listen(5000);
 		System.out.println("Jogger is now running on port 5000 ... ");
 	
-		server.join();
+		app.join();
 	}
 
 }

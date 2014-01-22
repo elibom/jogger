@@ -1,301 +1,206 @@
 package org.jogger;
 
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jogger.Route.HttpMethod;
-import org.jogger.asset.AssetLoader;
-import org.jogger.asset.FileAssetLoader;
-import org.jogger.http.Path;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.jogger.interceptor.Interceptor;
-import org.jogger.interceptor.InterceptorEntry;
+import org.jogger.http.servlet.ServletRequest;
+import org.jogger.http.servlet.ServletResponse;
 import org.jogger.template.FreemarkerTemplateEngine;
 import org.jogger.template.TemplateEngine;
 import org.jogger.util.Preconditions;
 
 /**
- * <p>Use this class to configure your application's routes, interceptors, template engine, exception handlers, etc.</p>
- *
- * <h3>Adding routes</h3>
- * There are multiple ways in which you can add routes:
- *
- * <ol>
- * 	<li>Using the <code>get</code>, <code>post</code>, etc. methods:
- * 		<pre>
- * Jogger app = new Jogger();
- * app.get("/", new RouteHandler() {
- * 	&#064Override
- * 	public void handle(Request request, Response response) {
- *
- * 	}
- * });
- * 		</pre>
- * 	</li>
- * 	<li>Using the <code>addRoute</code> methods. In this case, the class <code>MyController</code> with a method
- * <code>root</code> (that receives a {@link Request} and {@link Response}) must exists.
- * 		<pre>
- * Jogger app = new Jogger();
- * app.addRoute(HttpMethod.GET, "/", new MyController(), "root");
- * 		</pre>
- * 	</li>
- * 	<li>Setting the routes list directly with the method {@link #setRoutes(List)}.
- * 		<pre>
- * Jogger app = new Jogger();
- * List<Route> routes = ...; // retreive the routes somehow
- * app.setRoutes(routes);
- * 		</pre>
- * 	</li>
- * </ol>
- * To learn how to load routes from a file or using annotations click here.
- *
- * <h3>Default configuration</h3>
- * When you instantiate this class it comes with the following default configuration:
- *
- * <ul>
- * 	<li>An empty route list (i.e. no routes).</li>
- * 	<li>An empty interceptor list (i.e. no interceptors).</li>
- * 	<li>A {@link FileAssetLoader} for loading static files.</li>
- * 	<li>A {@link FreemarkerTemplateEngine} for loading and rendering templates.</li>
- * </ul>
- *
- * You can then add routes, interceptors, change the {@link AssetLoader} and {@link TemplateEngine}
- * implementations, etc.
+ * A server that handles HTTP requests using the provided middleware list.
  *
  * @author German Escobar
  */
 public class Jogger {
 
-	/**
-	 * The list of routes.
-	 */
-	private List<Route> routes = new CopyOnWriteArrayList<Route>();
+	private static final int DEFAULT_PORT = 5000;
 
 	/**
-	 * The list of interceptors.
+	 * The Jetty server instance.
 	 */
-	private List<InterceptorEntry> interceptors = new CopyOnWriteArrayList<InterceptorEntry>();
+	private Server server;
 
 	/**
-	 * Used to load the static assets.
+	 * The port in which the server will respond.
 	 */
-	private AssetLoader assetLoader = new FileAssetLoader();
-
+	private int port = DEFAULT_PORT;
+	
 	/**
-	 * Used to load and render templates.
+	 * The factory used to create the middleware list.
 	 */
+	private MiddlewaresFactory middlewareFactory;
+	
+	/**
+	 * The cached version of the middlewares
+	 */
+	private Middleware[] middlewares;
+	
 	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
-
+	
 	/**
-	 * Constructor. Initializes the object with the default configuration.
+	 * Constructor. Initializes a new instance without middlewares.
 	 */
 	public Jogger() {
-
-	}
-
-	/**
-	 * Retrieves the {@link Route} that matches the specified <code>httpMethod</code> and <code>path</code>.
-	 *
-	 * @param httpMethod the HTTP method to match. Should not be null or empty.
-	 * @param path the path to match. Should not be null but can be empty (which is interpreted as /)
-	 *
-	 * @return a {@link Route} object that matches the arguments or null if no route matches.
-	 */
-	public Route getRoute(String httpMethod, String path) {
-		Preconditions.notEmpty(httpMethod, "no httpMethod provided.");
-		Preconditions.notNull(path, "no path provided.");
-
-		String cleanPath = parsePath(path);
-
-		for (Route route : routes) {
-			if (matchesPath(route.getPath(), cleanPath) && route.getHttpMethod().toString().equalsIgnoreCase(httpMethod)) {
-				return route;
+		this(new MiddlewaresFactory() {
+			@Override
+			public Middleware[] create() {
+				return new Middleware[0];
 			}
-		}
-
-		return null;
+		});
 	}
-
-	private String parsePath(String path) {
-		path = Path.fixPath(path);
-
-		URI uri = null;
+	
+	/**
+	 * Constructor. Initializes a new instance with the supplied middleware list. The order is important because they will be 
+	 * called in that same order.
+	 * 
+	 * @param middlewares an array of middlewares that will be executed on each request.
+	 */
+	public Jogger(final Middleware...middlewares) {
+		Preconditions.notNull(middlewares, "no middlewares provided.");
+		this.middlewareFactory = new MiddlewaresFactory() {
+			@Override
+			public Middleware[] create() {
+				return middlewares;
+			}
+		};
+		this.middlewares = middlewares;
+	}
+	
+	/**
+	 * Constructor. Initializes a new instance with the supplied {@link MiddlewaresFactory}.
+	 * 
+	 * @param middlewareFactory the factory from which we are going to retrieve the array of middlewares.
+	 */
+	public Jogger(final MiddlewaresFactory middlewareFactory) {
+		Preconditions.notNull(middlewareFactory, "no middlewareFactory provided.");
+		this.middlewareFactory = middlewareFactory;
 		try {
-			uri = new URI(path);
-		} catch (URISyntaxException e) {
-			return null;
-		}
-
-		return uri.getPath();
-	}
-
-	/**
-	 * Helper method. Tells if the the HTTP path matches the route path.
-	 *
-	 * @param routePath the path defined for the route.
-	 * @param pathToMatch the path from the HTTP request.
-	 *
-	 * @return true if the path matches, false otherwise.
-	 */
-	private boolean matchesPath(String routePath, String pathToMatch) {
-		routePath = routePath.replaceAll(Path.VAR_REGEXP, Path.VAR_REPLACE);
-		return pathToMatch.matches("(?i)" + routePath);
-	}
-
-	public List<Route> getRoutes() {
-		return routes;
-	}
-
-	public void setRoutes(List<Route> routes) {
-		Preconditions.notNull(routes, "no routes provided");
-		this.routes = routes;
-	}
-
-	/**
-	 * Adds a route to the list of routes using a {@link Route} object.
-	 *
-	 * @param route the route to be added.
-	 */
-	public void addRoute(Route route) {
-		Preconditions.notNull(route, "no route provided");
-		this.routes.add(route);
-	}
-
-	/**
-	 * Creates a {@link Route} object from the received arguments and adds it to the list of routes.
-	 *
-	 * @param httpMethod the HTTP method to which this route is going to respond.
-	 * @param path the path to which this route is going to respond.
-	 * @param controller the object that will be invoked when this route matches.
-	 * @param methodName the name of the method in the <code>controller</code> object that will be invoked when this
-	 * route matches.
-	 *
-	 * @throws NoSuchMethodException if the <code>methodName</code> is not found or doesn't have the right signature.
-	 */
-	public void addRoute(HttpMethod httpMethod, String path, Object controller, String methodName) throws NoSuchMethodException {
-		Preconditions.notNull(controller, "no controller provided");
-		Method method = controller.getClass().getMethod(methodName, Request.class, Response.class);
-		addRoute(httpMethod, path, controller, method);
-
-	}
-
-	/**
-	 * Creates a {@link Route} object from the received arguments and adds it to the list of routes.
-	 *
-	 * @param httpMethod the HTTP method to which this route is going to respond.
-	 * @param path the path to which this route is going to respond.
-	 * @param controller the object that will be invoked when this route matches.
-	 * @param method the Method that will be invoked when this route matches.
-	 */
-	public void addRoute(HttpMethod httpMethod, String path, Object controller, Method method) {
-		// validate signature
-		Class<?>[] paramTypes = method.getParameterTypes();
-		if (paramTypes.length != 2 || !paramTypes[0].equals(Request.class) || !paramTypes[1].equals(Response.class)) {
-			throw new RoutesException("Expecting two params of type org.jogger.http.Request and org.jogger.http.Response "
-					+ "respectively");
-		}
-
-		method.setAccessible(true); // to access methods from anonymous classes
-
-		routes.add(new Route(httpMethod, path, controller, method));
-	}
-
-	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the GET HTTP method and the
-	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 *
-	 * @param path the path to which this route will respond.
-	 * @param handler the object that will be invoked when the route matches.
-	 */
-	public void get(String path, RouteHandler handler) {
-		try {
-			addRoute(HttpMethod.GET, path, handler, "handle");
-		} catch (NoSuchMethodException e) {
-			// shouldn't happen unless we change the name of the method in RouteHandler
+			this.middlewares = middlewareFactory.create();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * Handles an HTTP request by delgating the call to the middlewares.
+	 * 
+	 * @param request the Jogger HTTP request.
+	 * @param response the Jogger HTTP response.
+	 * @throws Exception
+	 */
+	public void handle(Request request, Response response) throws Exception {
+		if (Environment.isDevelopment()) {
+			this.middlewares = this.middlewareFactory.create();
+		}
+		
+		handle(request, response, new ArrayList<Middleware>(Arrays.asList(middlewares)));
+	}
+	
+	/**
+	 * Helper method. Creates a {@link MiddlewareChain} implementation to recursively call the middlewares.
+	 * 
+	 * @param request
+	 * @param response
+	 * @param middlewares
+	 * @throws Exception
+	 */
+	private void handle(final Request request, final Response response, final List<Middleware> middlewares) throws Exception {
+		if (middlewares.isEmpty()) {
+			return;
+		}
+		
+		Middleware current = middlewares.remove(0);
+		current.handle(request, response, new MiddlewareChain() {
+			@Override
+			public void next() throws Exception {
+				// recursive call
+				handle(request, response, middlewares);
+			}
+		});
+	}
 
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the POST HTTP method and the
-	 * specified <code>path</code> invoking the {@link RouteHandler} object.
+	 * Starts the HTTP server listening in the configured <code>port</code> attribute.
 	 *
-	 * @param path the path to which this route will respond.
-	 * @param handler the object that will be invoked when the route matches.
+	 * @return itself for method chaining.
 	 */
-	public void post(String path, RouteHandler handler) {
+	public Jogger listen() {
+		return listen(port);
+	}
+
+	/**
+	 * Starts the HTTP server listening in the specified <code>port</code>
+	 *
+	 * @param port the port in which the HTTP server will listen.
+	 *
+	 * @return itself for method chaining.
+	 */
+	public Jogger listen(int port) {
+		this.port = port;
+
+		// configure the Jetty server
+		server = new Server(port);
+		server.setHandler(new JoggerHandler());
+
+		// start the Jetty server
 		try {
-			addRoute(HttpMethod.POST, path, handler, "handle");
-		} catch (NoSuchMethodException e) {
-			// shouldn't happen unless we change the name of the method in RouteHandler
+			server.start();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		return this;
 	}
 
 	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the PUT HTTP method and the
-	 * specified <code>path</code> invoking the {@link RouteHandler} object.
+	 * Joins to the server thread preventing the program to finish.
 	 *
-	 * @param path the path to which this route will respond.
-	 * @param handler the object that will be invoked when the route matches.
+	 * @return itself for method chaining.
+	 * @throws InterruptedException if the thread is interrupted.
 	 */
-	public void put(String path, RouteHandler handler) {
+	public Jogger join() throws InterruptedException {
+		server.join();
+		return this;
+	}
+
+	/**
+	 * Stops the HTTP server.
+	 *
+	 * @return itself for method chaining.
+	 */
+	public Jogger stop() {
 		try {
-			addRoute(HttpMethod.PUT, path, handler, "handle");
-		} catch (NoSuchMethodException e) {
-			// shouldn't happen unless we change the name of the method in RouteHandler
+			server.stop();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+
+		return this;
 	}
 
-	/**
-	 * Creates a {@link Route} object and adds it to the routes list. It will respond to the DELETE HTTP method and the
-	 * specified <code>path</code> invoking the {@link RouteHandler} object.
-	 *
-	 * @param path the path to which this route will respond.
-	 * @param handler the object that will be invoked when the route matches.
-	 */
-	public void delete(String path, RouteHandler handler) {
-		try {
-			addRoute(HttpMethod.DELETE, path, handler, "handle");
-		} catch (NoSuchMethodException e) {
-			// shouldn't happen unless we change the name of the method in RouteHandler
-			throw new RuntimeException(e);
-		}
+	public int getPort() {
+		return port;
 	}
 
-	public List<InterceptorEntry> getInterceptors() {
-		return interceptors;
+	public void setPort(int port) {
+		this.port = port;
 	}
 
-	public void setInterceptors(List<InterceptorEntry> interceptors) {
-		Preconditions.notNull(interceptors, "no interceptors provided");
-		this.interceptors = interceptors;
-	}
-
-	/**
-	 * Adds the <code>interceptor</code> to the list of interceptors that will matches the specified
-	 * <code>paths</code>.
-	 *
-	 * @param interceptor the interceptor object to be added.
-	 * @param paths the paths in which this interceptor will be invoked, an empty array to respond to all paths.
-	 */
-	public void addInterceptor(Interceptor interceptor, String... paths) {
-		Preconditions.notNull(interceptor, "no interceptor provided");
-		interceptors.add(new InterceptorEntry(interceptor, paths));
-	}
-
-	public AssetLoader getAssetLoader() {
-		return assetLoader;
-	}
-
-	public void setAssetLoader(AssetLoader assetLoader) {
-		Preconditions.notNull(assetLoader, "no assetLoader provided");
-		this.assetLoader = assetLoader;
+	public Middleware[] getMiddlewareList() {
+		return middlewares;
 	}
 
 	public TemplateEngine getTemplateEngine() {
@@ -305,5 +210,29 @@ public class Jogger {
 	public void setTemplateEngine(TemplateEngine templateEngine) {
 		Preconditions.notNull(templateEngine, "no templateEngine provided");
 		this.templateEngine = templateEngine;
+	}
+
+	/**
+	 * The Jetty handler that will handle HTTP requests.
+	 *
+	 * @author German Escobar
+	 */
+	private class JoggerHandler extends AbstractHandler {
+
+		@Override
+		public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest servletRequest,
+				HttpServletResponse servletResponse) throws IOException, ServletException {
+			try {
+				// wrap Jetty's request and response in Jogger objects
+				Request request = new ServletRequest(servletRequest);
+				Response response = new ServletResponse(servletResponse, templateEngine);
+				
+				Jogger.this.handle(request, response);
+			} catch (Exception e) {
+				throw new ServletException(e);
+			} finally {
+				baseRequest.setHandled(true);
+			}
+		}
 	}
 }

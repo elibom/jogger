@@ -35,6 +35,8 @@ public class ServletResponse implements Response {
 	 * The attributes that we are passing to the view.
 	 */
 	private Map<String,Object> attributes = new HashMap<String,Object>();
+	
+	private boolean written = false;
 
 	/**
 	 * Constructor. Initializes the object with the underlying Servlet Response and the FreeMarker configuration.
@@ -47,8 +49,8 @@ public class ServletResponse implements Response {
 		Preconditions.notNull(templateEngine, "no templateEngine provided.");
 
 		this.response = response;
-		response.setStatus(Response.OK);
-
+		response.setStatus(Response.NOT_FOUND);
+		
 		this.templateEngine = templateEngine;
 	}
 
@@ -162,6 +164,7 @@ public class ServletResponse implements Response {
 	public Response write(String html) throws HttpException {
 		try {
 			response.getWriter().print(html);
+			this.written = true;
 			return this;
 		} catch (IOException e) {
 			throw new HttpException(e);
@@ -190,6 +193,7 @@ public class ServletResponse implements Response {
 			byte[] buffer = new byte[10240];
 			int length;
 			while ((length = input.read(buffer)) > 0) {
+				this.written = true;
 				output.write(buffer, 0, length);
 			}
 		} catch (IOException e) {
@@ -206,9 +210,7 @@ public class ServletResponse implements Response {
 		if (resource != null) {
 			try {
 				resource.close();
-			} catch (IOException e) {
-
-			}
+			} catch (IOException e) {}
 		}
 	}
 
@@ -224,6 +226,7 @@ public class ServletResponse implements Response {
 
 		try {
 			templateEngine.render(templateName, attributes, response.getWriter());
+			this.written = true;
 		} catch (IOException e) {
 			throw new TemplateException(e);
 		}
@@ -239,4 +242,8 @@ public class ServletResponse implements Response {
 		}
 	}
 
+	@Override
+	public boolean isWritten() {
+		return written;
+	}
 }

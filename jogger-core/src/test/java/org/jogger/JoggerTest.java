@@ -1,13 +1,16 @@
 package org.jogger;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jogger.Route.HttpMethod;
-import org.jogger.http.Request;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
 import org.jogger.http.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -15,202 +18,81 @@ import org.testng.annotations.Test;
 public class JoggerTest {
 
 	@Test
-	public void shouldAddRoutes() throws Exception {
-		Jogger jogger = new Jogger();
+	public void shouldStartStopServer() throws Exception {
+		Jogger app = new Jogger();
+		app.listen(27773);
 
-		MockController controller = new MockController();
-		Method initMethod = MockController.class.getMethod("init", Request.class, Response.class);
-		Method showMethod = MockController.class.getMethod("show", Request.class, Response.class);
+		try {
+			HttpResponse response = Request.Get("http://localhost:27773/").execute().returnResponse();
+			Assert.assertEquals(response.getStatusLine().getStatusCode(), 404);
+		} finally {
+			app.stop();
+			try {
+				new Socket("localhost", 27773);
+				Assert.fail("Server is still running");
+			} catch (ConnectException e) {}
+		}
+	}
 
-		List<Route> routes = new ArrayList<Route>();
-		routes.add( new Route(HttpMethod.GET, "/", controller, initMethod) );
-		routes.add( new Route(HttpMethod.GET, "/", controller, showMethod) );
+	@Test
+	public void shouldExecuteMiddleware() throws Exception {
+		Middleware middleware = mock(Middleware.class);
+		Jogger app = new Jogger(middleware);
+		app.listen(27773);
 
-		jogger.setRoutes(routes);
+		try {
+			Request.Get("http://localhost:27773/").execute().returnResponse();
+			verify(middleware).handle(any(org.jogger.http.Request.class), any(Response.class), any(MiddlewareChain.class));
+		} finally {
+			app.stop();
+		}
+	}
 
-		jogger.addRoute(HttpMethod.GET, "/test", controller, "init");
-		jogger.addRoute(HttpMethod.GET, "/test", controller, showMethod);
+	@Test
+	public void shouldHandleException() throws Exception {
+		Middleware middleware = mock(Middleware.class);
+		doThrow(new RuntimeException()).when(middleware).handle(any(org.jogger.http.Request.class), any(Response.class), any(MiddlewareChain.class));
+		
+		Jogger app = new Jogger(middleware);
+		app.listen(27773);
 
-		jogger.get("/another", new RouteHandler() {
+		try {
+			HttpResponse response = Request.Get("http://localhost:27773/").execute().returnResponse();
+			Assert.assertEquals(response.getStatusLine().getStatusCode(), 500);
+		} finally {
+			app.stop();
+		}
+	}
+
+	@Test
+	public void shouldJoinServerThread() throws Exception {
+		final AtomicBoolean running = new AtomicBoolean(false);
+
+		Thread thread = new Thread(new Runnable() {
 			@Override
-			public void handle(Request request, Response response) {}
+			public void run() {
+				Jogger app = new Jogger();
+				app.listen(27773);
+
+				try {
+					running.getAndSet(true);
+
+					try {
+						app.join();
+					} catch (InterruptedException e) {}
+				} finally {
+					app.stop();
+					running.getAndSet(false);
+				}
+			}
 		});
-		jogger.post("/another", new RouteHandler() {
-			@Override
-			public void handle(Request request, Response response) {}
-		});
+		thread.start();
 
-		Assert.assertEquals(jogger.getRoutes().size(), 6);
-	}
-
-	@Test(dependsOnMethods="shouldAddRoutes")
-	public void shouldFindExistingRoutes() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(HttpMethod.GET, "", new MockController(), "init");
-		jogger.addRoute(HttpMethod.GET, "/test", new MockController(), "init");
-		jogger.addRoute(HttpMethod.POST, "/test/{id}/", new MockController(), "init");
-		jogger.addRoute(HttpMethod.GET, "/test/{id_test}/mocks/{id_mock}", new MockController(), "init");
-
-		Assert.assertNotNull(jogger.getRoute("get", ""));
-		Assert.assertNotNull(jogger.getRoute("get", "/"));
-		Assert.assertNotNull(jogger.getRoute("GET", "/test"));
-		Assert.assertNotNull(jogger.getRoute("get", "/test/"));
-		Assert.assertNotNull(jogger.getRoute("post", "/Test/1"));
-		Assert.assertNotNull(jogger.getRoute("post", "/test/1-234234/"));
-		Assert.assertNotNull(jogger.getRoute("get", "/test/1/mocks/2"));
-		Assert.assertNotNull(jogger.getRoute("get", "/test/1/mocks/2/"));
-	}
-
-	@Test(dependsOnMethods="shouldAddRoutes")
-	public void shouldNotFindNotExistingRoutes() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(HttpMethod.GET, "", new MockController(), "init");
-		jogger.addRoute(HttpMethod.GET, "/test", new MockController(), "init");
-		jogger.addRoute(HttpMethod.POST, "/test/{id}", new MockController(), "init");
-
-		Assert.assertNull(jogger.getRoute("post", "/"));
-		Assert.assertNull(jogger.getRoute("post", "/test"));
-		Assert.assertNull(jogger.getRoute("get", "/undefined"));
-		Assert.assertNull(jogger.getRoute("get", "/test/1"));
-	}
-
-	@Test
-	public void shouldAddRouteUsingObjectAndMethod() throws Exception {
-		Jogger jogger = new Jogger();
-
-		MockController controller = new MockController();
-		Method initMethod = MockController.class.getMethod("init", Request.class, Response.class);
-
-		jogger.addRoute(HttpMethod.GET, "", controller, initMethod); // also check that empty path maps to root
-
-		Assert.assertEquals(jogger.getRoutes().size(), 1);
-
-		Route route = jogger.getRoutes().iterator().next();
-		Assert.assertNotNull(route);
-		Assert.assertEquals(route.getHttpMethod(), HttpMethod.GET);
-		Assert.assertEquals(route.getPath(), "/");
-		Assert.assertEquals(route.getController(), controller);
-		Assert.assertEquals(route.getAction(), initMethod);
-	}
-
-	@Test
-	public void shouldAddRouteUsingObjectAndMethodName() throws Exception {
-		Jogger jogger = new Jogger();
-
-		MockController controller = new MockController();
-		jogger.addRoute(HttpMethod.GET, "/", controller, "init");
-
-		Assert.assertEquals(jogger.getRoutes().size(), 1);
-
-		Route route = jogger.getRoutes().iterator().next();
-		Assert.assertNotNull(route);
-		Assert.assertEquals(route.getHttpMethod(), HttpMethod.GET);
-		Assert.assertEquals(route.getPath(), "/");
-		Assert.assertEquals(route.getController(), controller);
-
-		Method method = route.getAction();
-		Assert.assertNotNull(method);
-		Assert.assertEquals(method.getName(), "init");
-	}
-
-	@Test(expectedExceptions=NoSuchMethodException.class)
-	public void shouldFailToAddRouteWithInvalidMethodName() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(HttpMethod.GET, "", new MockController(), "invalidMethod");
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToAddRouteWithNullHttpMethod() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(null, "", new MockController(), "init");
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToAddRouteWithNullPath() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(null, "", new MockController(), "init");
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToAddRouteWithNullObject() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(HttpMethod.GET, "", null, "init");
-	}
-
-	@Test
-	public void shouldAddRouteUsingGetMethod() throws Exception {
-		Jogger jogger = new Jogger();
-
-		RouteHandler handler = mock(RouteHandler.class);
-		jogger.get("/", handler);
-
-		Assert.assertEquals(jogger.getRoutes().size(), 1);
-
-		Route route = jogger.getRoutes().iterator().next();
-		Assert.assertNotNull(route);
-		Assert.assertEquals(route.getHttpMethod(), HttpMethod.GET);
-		Assert.assertEquals(route.getPath(), "/");
-		Assert.assertEquals(route.getController(), handler);
-
-		Method method = route.getAction();
-		Assert.assertNotNull(method);
-		Assert.assertEquals(method.getName(), "handle");
-	}
-
-	@Test
-	public void shouldAddRouteUsingPostMethod() throws Exception {
-		Jogger jogger = new Jogger();
-
-		RouteHandler handler = mock(RouteHandler.class);
-		jogger.get("/", handler);
-
-		Assert.assertEquals(jogger.getRoutes().size(), 1);
-
-		Route route = jogger.getRoutes().iterator().next();
-		Assert.assertNotNull(route);
-		Assert.assertEquals(route.getHttpMethod(), HttpMethod.GET);
-		Assert.assertEquals(route.getPath(), "/");
-		Assert.assertEquals(route.getController(), handler);
-
-		Method method = route.getAction();
-		Assert.assertNotNull(method);
-		Assert.assertEquals(method.getName(), "handle");
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToSetEmptyRoutes() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.setRoutes(null);
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToAddNullRoute() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addRoute(null);
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToSetNullInterceptors() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.setInterceptors(null);
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToAddNullInterceptor() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.addInterceptor(null);
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToSetNullAssetLoader() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.setAssetLoader(null);
-	}
-
-	@Test(expectedExceptions=IllegalArgumentException.class)
-	public void shouldFailToSetNullTemplateEngine() throws Exception {
-		Jogger jogger = new Jogger();
-		jogger.setTemplateEngine(null);
+		Thread.sleep(100);
+		Assert.assertTrue(running.get());
+		thread.interrupt();
+		Thread.sleep(100);
+		Assert.assertFalse(running.get());
 	}
 
 }

@@ -60,16 +60,6 @@ public class ServletResponseTest {
 	}
 
 	@Test
-	public void shouldSetNotFound() throws Exception {
-		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
-
-		Response response = new ServletResponse(servletResponse, mock(TemplateEngine.class));
-		response.notFound();
-
-		verify(servletResponse).setStatus(Response.NOT_FOUND);
-	}
-
-	@Test
 	public void shouldRetrieveContentType() throws Exception {
 		HttpServletResponse servletResponse = mock(HttpServletResponse.class);
 		when(servletResponse.getContentType()).thenReturn("application/json");
