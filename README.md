@@ -12,7 +12,6 @@ To get started first [include the Jogger library](https://github.com/germanescob
 public class Main {
 
     public static void main(String[] args) throws Exception {
-    
         RouterMiddleware router = new RouterMiddleware();
         router.get("/", new RouteHandler() {
             @Override
@@ -24,11 +23,10 @@ public class Main {
         Jogger app = new Jogger(router);
         app.listen(5000);
         app.join();
-        
     }
 }
 ```
-Run it and point your browser to [http://localhost:5000](http://localhost:5000). That's it, you just created your first Jogger app!
+Run it and point your browser to [http://localhost:5000](http://localhost:5000). There you go, you've just created your first Jogger app!
 
 ## What's provided?
 
@@ -43,4 +41,4 @@ Out of the box Jogger comes with the following:
 ## Documentation
 
 * [Main documentation page](https://github.com/germanescobar/jogger/wiki)
-* [API docs](http://germanescobar.net/projects/jogger/api/0.8.10/core/)
+* [API docs](http://germanescobar.net/projects/jogger/api/0.9.0/core/)
