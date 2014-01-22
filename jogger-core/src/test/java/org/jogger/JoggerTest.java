@@ -15,7 +15,7 @@ import org.jogger.http.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class JoggerServerTest {
+public class JoggerTest {
 
 	@Test
 	public void shouldStartStopServer() throws Exception {

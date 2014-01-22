@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,25 +39,55 @@ public class Jogger {
 	private int port = DEFAULT_PORT;
 	
 	/**
-	 * A list of middlewares that will handle HTTP requests.
+	 * The factory used to create the middleware list.
 	 */
-	private List<Middleware> middlewareList = new CopyOnWriteArrayList<Middleware>();
+	private MiddlewaresFactory middlewareFactory;
+	
+	/**
+	 * The cached version of the middlewares
+	 */
+	private Middleware[] middlewares;
 	
 	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
 	
 	/**
 	 * Constructor. Initializes a new instance without middlewares.
 	 */
-	public Jogger() {}
+	public Jogger() {
+		this(new MiddlewaresFactory() {
+			@Override
+			public Middleware[] create() {
+				return new Middleware[0];
+			}
+		});
+	}
 	
 	/**
 	 * Constructor. Initializes a new instance with the supplied middleware list. The order is important because they will be 
 	 * called in that same order.
 	 * 
-	 * @param middlewareList an array of middlewares that will be executed on each request.
+	 * @param middlewares an array of middlewares that will be executed on each request.
 	 */
-	public Jogger(Middleware...middlewareList) {
-		this.middlewareList.addAll(Arrays.asList(middlewareList));
+	public Jogger(final Middleware...middlewares) {
+		Preconditions.notNull(middlewares, "no middlewares provided.");
+		this.middlewareFactory = new MiddlewaresFactory() {
+			@Override
+			public Middleware[] create() {
+				return middlewares;
+			}
+		};
+		this.middlewares = middlewares;
+	}
+	
+	/**
+	 * Constructor. Initializes a new instance with the supplied {@link MiddlewaresFactory}.
+	 * 
+	 * @param middlewareFactory the factory from which we are going to retrieve the array of middlewares.
+	 */
+	public Jogger(final MiddlewaresFactory middlewareFactory) {
+		Preconditions.notNull(middlewareFactory, "no middlewareFactory provided.");
+		this.middlewareFactory = middlewareFactory;
+		this.middlewares = middlewareFactory.create();
 	}
 	
 	/**
@@ -69,7 +98,11 @@ public class Jogger {
 	 * @throws Exception
 	 */
 	public void handle(Request request, Response response) throws Exception {
-		handle(request, response, new ArrayList<Middleware>(middlewareList));
+		if (Environment.isDevelopment()) {
+			this.middlewares = this.middlewareFactory.create();
+		}
+		
+		handle(request, response, new ArrayList<Middleware>(Arrays.asList(middlewares)));
 	}
 	
 	/**
@@ -77,20 +110,20 @@ public class Jogger {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param middleware
+	 * @param middlewares
 	 * @throws Exception
 	 */
-	private void handle(final Request request, final Response response, final List<Middleware> middleware) throws Exception {
-		if (middleware.isEmpty()) {
+	private void handle(final Request request, final Response response, final List<Middleware> middlewares) throws Exception {
+		if (middlewares.isEmpty()) {
 			return;
 		}
 		
-		Middleware current = middleware.remove(0);
+		Middleware current = middlewares.remove(0);
 		current.handle(request, response, new MiddlewareChain() {
 			@Override
 			public void next() throws Exception {
 				// recursive call
-				handle(request, response, middleware);
+				handle(request, response, middlewares);
 			}
 		});
 	}
@@ -162,8 +195,8 @@ public class Jogger {
 		this.port = port;
 	}
 
-	public List<Middleware> getMiddlewareList() {
-		return middlewareList;
+	public Middleware[] getMiddlewareList() {
+		return middlewareFactory.create();
 	}
 
 	public TemplateEngine getTemplateEngine() {
