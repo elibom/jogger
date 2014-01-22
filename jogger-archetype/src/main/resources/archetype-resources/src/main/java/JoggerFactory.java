@@ -5,27 +5,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jogger.Jogger;
-import org.jogger.JoggerFactory;
-import org.jogger.RouteHandler;
+import org.jogger.RouterMiddleware;
+import org.jogger.StaticMiddleware;
+import org.jogger.ShowExceptionsMiddleware;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.RouteHandler;
 import org.jogger.template.FreemarkerTemplateEngine;
 
 import freemarker.template.Configuration;
 
-public class ApplicationFactory implements JoggerFactory {
+public class JoggerFactory {
 
-	@Override
-	public Jogger configure() throws Exception {
-		Jogger app = new Jogger();
-
+	public static Jogger create() throws Exception {
 		// configure freemarker
 		Configuration freemarker = new Configuration();
 		freemarker.setDirectoryForTemplateLoading(new File("templates/"));
-		app.setTemplateEngine(new FreemarkerTemplateEngine(freemarker));
-
+		
 		// routes
-		app.get("/", new RouteHandler() {
+		RouterMiddleware router = new RouterMiddleware();
+		router.get("/", new RouteHandler() {
 			@Override
 			public void handle(Request request, Response response) {
 				Map<String,Object> root = new HashMap<String,Object>();
@@ -33,7 +32,7 @@ public class ApplicationFactory implements JoggerFactory {
 				response.render("hello.ftl", root);
 			}
 		});
-		app.get("/hello", new RouteHandler() {
+		router.get("/hello", new RouteHandler() {
 			@Override
 			public void handle(Request request, Response response) {
 				// this is just another example
@@ -41,7 +40,10 @@ public class ApplicationFactory implements JoggerFactory {
 			}
 		});
 		
+		// create the app
+		Jogger app = new Jogger(new StaticMiddleware("assets"), new ShowExceptionsMiddleware(), router);
+		app.setTemplateEngine(new FreemarkerTemplateEngine(freemarker));
+		
 		return app;
 	}
-
 }

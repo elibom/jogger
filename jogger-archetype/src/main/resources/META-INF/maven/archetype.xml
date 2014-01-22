@@ -7,7 +7,7 @@
 	
 	<sources>
 		<source>src/main/java/Main.java</source>
-		<source>src/main/java/ApplicationFactory.java</source>
+		<source>src/main/java/JoggerFactory.java</source>
 	</sources>
 	
 	<resources>
