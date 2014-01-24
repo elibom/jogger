@@ -110,7 +110,7 @@ public class StaticMiddleware implements Middleware {
 		}
 		
 		// load the asset
-		requestPath = requestPath.replace(prefix, "");
+		requestPath = requestPath.replaceFirst(prefix, "");
 		Asset asset = assetLoader.load(URLDecoder.decode(requestPath, "UTF-8"));
 		if (asset == null) {
 			chain.next();
