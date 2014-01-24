@@ -46,16 +46,16 @@ public class StaticMiddlewareTest {
 	@Test
 	public void shouldNotFindMissingAsset() throws Exception {
 		AssetLoader assetLoader = mock(AssetLoader.class);
-
 		StaticMiddleware middleware = new StaticMiddleware(assetLoader, "assets");
 
 		Request request = mockRequest("get", "/assets/test.css");
 		Response response = mock(Response.class);
 
-		middleware.handle(request, response, mock(MiddlewareChain.class));
+		MiddlewareChain chain = mock(MiddlewareChain.class);
+		middleware.handle(request, response, chain);
 
 		verify(response, never()).write(any(Asset.class));
-		verify(response).notFound();
+		verify(chain).next();
 	}
 	
 	@Test
@@ -70,10 +70,11 @@ public class StaticMiddlewareTest {
 		Request request = mockRequest("post", "/assets/test.css");
 		Response response = mock(Response.class);
 
-		middleware.handle(request, response, mock(MiddlewareChain.class));
+		MiddlewareChain chain = mock(MiddlewareChain.class);
+		middleware.handle(request, response, chain);
 
 		verify(response, never()).write(any(Asset.class));
-		verify(response).notFound();
+		verify(chain).next();
 	}
 	
 	@Test

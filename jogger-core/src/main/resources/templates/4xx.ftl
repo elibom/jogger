@@ -45,7 +45,7 @@
 		</header>
 		
 		<div class="content">
-			<p>${message}</p>
+			<p>${message!""}</p>
 			<hr>
 			<p class="small">Powered by <a href="https://github.com/germanescobar/jogger">Jogger</a></p>
 		</div>

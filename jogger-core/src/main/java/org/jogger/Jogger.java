@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.jogger.exception.NotFoundException;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
 import org.jogger.http.servlet.ServletRequest;
@@ -49,6 +50,8 @@ public class Jogger {
 	private Middleware[] middlewares;
 	
 	private TemplateEngine templateEngine = new FreemarkerTemplateEngine();
+	
+	private ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 	
 	/**
 	 * Constructor. Initializes a new instance without middlewares.
@@ -106,7 +109,13 @@ public class Jogger {
 			this.middlewares = this.middlewareFactory.create();
 		}
 		
-		handle(request, response, new ArrayList<Middleware>(Arrays.asList(middlewares)));
+		try {
+			handle(request, response, new ArrayList<Middleware>(Arrays.asList(middlewares)));
+		} catch (Exception e) {
+			if (exceptionHandler != null) {
+				exceptionHandler.handle(e, request, response);
+			}
+		}
 	}
 	
 	/**
@@ -119,7 +128,7 @@ public class Jogger {
 	 */
 	private void handle(final Request request, final Response response, final List<Middleware> middlewares) throws Exception {
 		if (middlewares.isEmpty()) {
-			return;
+			throw new NotFoundException();
 		}
 		
 		Middleware current = middlewares.remove(0);
@@ -210,6 +219,10 @@ public class Jogger {
 	public void setTemplateEngine(TemplateEngine templateEngine) {
 		Preconditions.notNull(templateEngine, "no templateEngine provided");
 		this.templateEngine = templateEngine;
+	}
+
+	public void setExceptionHandler(ExceptionHandler exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
 	}
 
 	/**

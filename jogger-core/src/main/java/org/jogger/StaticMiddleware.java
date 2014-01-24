@@ -103,7 +103,7 @@ public class StaticMiddleware implements Middleware {
 		
 		// only handle GET requests
 		if (!request.getMethod().equalsIgnoreCase("get")) {
-			response.notFound();
+			chain.next();
 			return;
 		}
 		
@@ -111,7 +111,7 @@ public class StaticMiddleware implements Middleware {
 		requestPath = requestPath.replace(prefix, "");
 		Asset asset = assetLoader.load(URLDecoder.decode(requestPath, "UTF-8"));
 		if (asset == null) {
-			response.notFound();
+			chain.next();
 			return;
 		}
 		
