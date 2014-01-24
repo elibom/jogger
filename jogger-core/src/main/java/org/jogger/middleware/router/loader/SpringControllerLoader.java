@@ -1,6 +1,6 @@
-package org.jogger.routes;
+package org.jogger.middleware.router.loader;
 
-import org.jogger.RoutesException;
+import org.jogger.middleware.router.RoutesException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

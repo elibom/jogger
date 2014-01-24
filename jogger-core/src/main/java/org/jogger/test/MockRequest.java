@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.jogger.Jogger;
-import org.jogger.Route;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
+import org.jogger.middleware.router.Route;
 import org.jogger.util.Preconditions;
 
 /**

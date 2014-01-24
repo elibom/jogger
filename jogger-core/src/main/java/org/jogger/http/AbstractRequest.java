@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jogger.Route;
+import org.jogger.middleware.router.Route;
 
 
 /**

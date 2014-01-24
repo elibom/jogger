@@ -1,4 +1,4 @@
-package org.jogger.routes;
+package org.jogger.middleware.router.loader;
 
 import java.io.File;
 import java.io.FileInputStream;

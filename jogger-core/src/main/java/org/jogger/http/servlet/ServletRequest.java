@@ -13,7 +13,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jogger.Route;
 import org.jogger.http.AbstractRequest;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
@@ -22,6 +21,7 @@ import org.jogger.http.Path;
 import org.jogger.http.servlet.multipart.Multipart;
 import org.jogger.http.servlet.multipart.MultipartException;
 import org.jogger.http.servlet.multipart.PartHandler;
+import org.jogger.middleware.router.Route;
 import org.jogger.util.Preconditions;
 
 /**

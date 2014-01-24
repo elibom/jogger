@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 import java.net.URISyntaxException;
 
 import org.jogger.Jogger;
-import org.jogger.RouteHandler;
-import org.jogger.RouterMiddleware;
 import org.jogger.http.Response;
+import org.jogger.middleware.router.RouteHandler;
+import org.jogger.middleware.router.RouterMiddleware;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.middleware.router;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -11,11 +11,19 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jogger.Route.HttpMethod;
+import org.jogger.AnnotatedActionMockController;
+import org.jogger.AnnotatedMockController;
+import org.jogger.MiddlewareChain;
+import org.jogger.MockAnnotation;
+import org.jogger.MockController;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.jogger.interceptor.Interceptor;
-import org.jogger.interceptor.InterceptorExecution;
+import org.jogger.middleware.router.Route;
+import org.jogger.middleware.router.RouteHandler;
+import org.jogger.middleware.router.RouterMiddleware;
+import org.jogger.middleware.router.Route.HttpMethod;
+import org.jogger.middleware.router.interceptor.Interceptor;
+import org.jogger.middleware.router.interceptor.InterceptorExecution;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

@@ -1,9 +1,9 @@
-package org.jogger.interceptor;
+package org.jogger.middleware.router.interceptor;
 
 import java.lang.annotation.Annotation;
 
 /**
- * This interface provides access to some features of the controller to an {@link org.jogger.interceptor.Interceptor}
+ * This interface provides access to some features of the controller to an {@link org.jogger.middleware.router.interceptor.Interceptor}
  * implementation.
  *
  * @author German Escobar

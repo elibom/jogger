@@ -1,10 +1,10 @@
-package org.jogger.routes;
+package org.jogger.middleware.router.loader;
 
 import java.text.ParseException;
 import java.util.List;
 
-import org.jogger.Route;
-import org.jogger.RoutesException;
+import org.jogger.middleware.router.Route;
+import org.jogger.middleware.router.RoutesException;
 
 /**
  *

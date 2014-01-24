@@ -1,10 +1,12 @@
-package org.jogger;
+package org.jogger.middleware.statik;
 
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jogger.Middleware;
+import org.jogger.MiddlewareChain;
 import org.jogger.asset.Asset;
 import org.jogger.asset.AssetLoader;
 import org.jogger.asset.FileAssetLoader;

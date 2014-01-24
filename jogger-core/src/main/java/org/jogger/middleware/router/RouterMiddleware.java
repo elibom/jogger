@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.middleware.router;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -9,15 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jogger.Route.HttpMethod;
+import org.jogger.Middleware;
+import org.jogger.MiddlewareChain;
 import org.jogger.http.Path;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.jogger.interceptor.Action;
-import org.jogger.interceptor.Controller;
-import org.jogger.interceptor.Interceptor;
-import org.jogger.interceptor.InterceptorEntry;
-import org.jogger.interceptor.InterceptorExecution;
+import org.jogger.middleware.router.Route.HttpMethod;
+import org.jogger.middleware.router.interceptor.Action;
+import org.jogger.middleware.router.interceptor.Controller;
+import org.jogger.middleware.router.interceptor.Interceptor;
+import org.jogger.middleware.router.interceptor.InterceptorEntry;
+import org.jogger.middleware.router.interceptor.InterceptorExecution;
 import org.jogger.util.Preconditions;
 
 /**

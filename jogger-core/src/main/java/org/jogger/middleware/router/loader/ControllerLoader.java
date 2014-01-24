@@ -1,6 +1,6 @@
-package org.jogger.routes;
+package org.jogger.middleware.router.loader;
 
-import org.jogger.RoutesException;
+import org.jogger.middleware.router.RoutesException;
 
 /**
  * Implementations of this interface provide mechanism to load controllers.

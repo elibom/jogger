@@ -3,8 +3,8 @@ package org.jogger.router;
 import java.text.ParseException;
 import java.util.List;
 
-import org.jogger.Route;
-import org.jogger.routes.FileSystemRoutesLoader;
+import org.jogger.middleware.router.Route;
+import org.jogger.middleware.router.loader.FileSystemRoutesLoader;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

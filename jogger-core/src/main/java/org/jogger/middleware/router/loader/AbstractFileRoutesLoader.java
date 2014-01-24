@@ -1,4 +1,4 @@
-package org.jogger.routes;
+package org.jogger.middleware.router.loader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.jogger.Route;
-import org.jogger.Route.HttpMethod;
-import org.jogger.RoutesException;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.middleware.router.Route;
+import org.jogger.middleware.router.RoutesException;
+import org.jogger.middleware.router.Route.HttpMethod;
 
 /**
  * <p>Base class for classes that load routes from a file. Concrete implementations need only to

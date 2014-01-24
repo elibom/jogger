@@ -1,4 +1,4 @@
-package org.jogger.interceptor;
+package org.jogger.middleware.router.interceptor;
 
 /**
  * Helper class. Represents a interceptor entry (i.e. an interceptor and the matching paths).

@@ -1,4 +1,4 @@
-package org.jogger.interceptor;
+package org.jogger.middleware.router.interceptor;
 
 
 /**

@@ -17,12 +17,12 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jogger.MockController;
-import org.jogger.Route;
-import org.jogger.Route.HttpMethod;
 import org.jogger.http.Cookie;
 import org.jogger.http.FileItem;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.middleware.router.Route;
+import org.jogger.middleware.router.Route.HttpMethod;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

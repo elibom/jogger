@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.middleware.router;
 
 import java.lang.reflect.Method;
 

@@ -3,7 +3,7 @@ package org.jogger.http;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.jogger.Route;
+import org.jogger.middleware.router.Route;
 
 /**
  * Represents an HTTP Request.

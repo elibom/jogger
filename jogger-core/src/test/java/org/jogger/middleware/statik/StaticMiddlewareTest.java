@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.middleware.statik;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -9,10 +9,12 @@ import static org.mockito.Mockito.when;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.jogger.MiddlewareChain;
 import org.jogger.asset.Asset;
 import org.jogger.asset.AssetLoader;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
+import org.jogger.middleware.statik.StaticMiddleware;
 import org.testng.annotations.Test;
 
 public class StaticMiddlewareTest {

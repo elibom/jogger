@@ -1,4 +1,4 @@
-package org.jogger;
+package org.jogger.middleware.router;
 
 import org.jogger.http.Request;
 import org.jogger.http.Response;
