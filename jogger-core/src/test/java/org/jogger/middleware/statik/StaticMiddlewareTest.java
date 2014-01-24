@@ -37,6 +37,24 @@ public class StaticMiddlewareTest {
 		verify(response).write(asset);
 	}
 	
+	@Test
+	public void shouldFindExistingAssetWithEmptyPrefix() throws Exception {
+		Asset asset = new Asset(null, "test.css", "text/css", 34);
+
+		AssetLoader assetLoader = mock(AssetLoader.class);
+		when(assetLoader.load("assets/test.css")).thenReturn(asset);
+
+		StaticMiddleware middleware = new StaticMiddleware(assetLoader, "");
+		
+		Request request = mockRequest("get", "/assets/test.css");
+		Response response = mock(Response.class);
+
+		middleware.handle(request, response, mock(MiddlewareChain.class));
+
+		verify(assetLoader).load("assets/test.css");
+		verify(response).write(asset);
+	}
+	
 	private Request mockRequest(String httpMethod, String path) {
 		Request request = mock(Request.class);
 		when(request.getMethod()).thenReturn(httpMethod);

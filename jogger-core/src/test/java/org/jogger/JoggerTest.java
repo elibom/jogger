@@ -1,8 +1,8 @@
 package org.jogger;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.net.ConnectException;
@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.jogger.exception.NotFoundException;
 import org.jogger.http.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -62,6 +63,14 @@ public class JoggerTest {
 		} finally {
 			app.stop();
 		}
+	}
+	
+	@Test(expectedExceptions=NotFoundException.class)
+	public void shouldNotFailWithNullExceptionHandler() throws Exception {
+		Jogger app = new Jogger();
+		app.setExceptionHandler(null);
+
+		app.handle(mock(org.jogger.http.Request.class), mock(Response.class));
 	}
 
 	@Test

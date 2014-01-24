@@ -114,6 +114,8 @@ public class Jogger {
 		} catch (Exception e) {
 			if (exceptionHandler != null) {
 				exceptionHandler.handle(e, request, response);
+			} else {
+				throw e;
 			}
 		}
 	}
