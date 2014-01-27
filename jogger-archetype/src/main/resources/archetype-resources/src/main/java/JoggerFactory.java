@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jogger.Jogger;
-import org.jogger.RouterMiddleware;
-import org.jogger.StaticMiddleware;
-import org.jogger.ShowExceptionsMiddleware;
+import org.jogger.middleware.router.RouterMiddleware;
+import org.jogger.middleware.statik.StaticMiddleware;
 import org.jogger.http.Request;
 import org.jogger.http.Response;
-import org.jogger.RouteHandler;
+import org.jogger.middleware.router.RouteHandler;
 import org.jogger.template.FreemarkerTemplateEngine;
 
 import freemarker.template.Configuration;
@@ -41,7 +40,7 @@ public class JoggerFactory {
 		});
 		
 		// create the app
-		Jogger app = new Jogger(new StaticMiddleware("assets"), new ShowExceptionsMiddleware(), router);
+		Jogger app = new Jogger(new StaticMiddleware("assets"), router);
 		app.setTemplateEngine(new FreemarkerTemplateEngine(freemarker));
 		
 		return app;

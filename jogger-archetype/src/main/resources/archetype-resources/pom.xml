@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>org.jogger</groupId>
 			<artifactId>jogger-core</artifactId>
-			<version>0.9.0</version>
+			<version>0.10.0</version>
 		</dependency>
 		
 		<dependency>
