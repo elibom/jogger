@@ -1,3 +1,7 @@
+/target
+/test-output
+/.classpath
 /.project
 /.settings
-/target
+/.cache
+nb-*.xml
