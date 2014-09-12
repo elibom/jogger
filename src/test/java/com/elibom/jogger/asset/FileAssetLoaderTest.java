@@ -1,8 +1,6 @@
 package com.elibom.jogger.asset;
 
-import com.elibom.jogger.asset.FileAssetLoader;
-import com.elibom.jogger.asset.Asset;
-import junit.framework.Assert;
+import org.testng.Assert;
 
 import org.testng.annotations.Test;
 
