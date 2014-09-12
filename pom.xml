@@ -3,7 +3,7 @@
 	
     <groupId>com.elibom</groupId>
     <artifactId>jogger</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <name>Jogger</name>
@@ -21,7 +21,8 @@
     <scm>
         <url>scm:git:git@github.com:elibom/jogger.git</url>
         <connection>scm:git:git@github.com:elibom/jogger.git</connection>
-    </scm>
+      <tag>jogger-0.2.0</tag>
+  </scm>
 
     <developers>
         <developer>
