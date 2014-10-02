@@ -16,7 +16,7 @@ public class Http {
 		public static final String AUTHORIZATION = "Authorization";
 		public static final String CACHE_CONTROL = "Cache-Control";
 		public static final String CONNECTION = "Connection";
-		public static final String CONTENT_TYPE = "Conten-Type";
+		public static final String CONTENT_TYPE = "Content-Type";
 		public static final String CONTENT_LENGTH = "Content-Length";
 		public static final String CONTENT_MD5 = "Content-MD5";
 		public static final String DATE = "Date";
@@ -30,7 +30,7 @@ public class Http {
 		public static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
 		public static final String APPLICATION_JSON = "application/json";
 		public static final String APPLICATION_XML = "application/xml";
-		public static final String TEXT_HTML = "text/xml";
+		public static final String TEXT_HTML = "text/html";
 		public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 	}
 }
