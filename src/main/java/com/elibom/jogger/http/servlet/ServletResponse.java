@@ -141,6 +141,7 @@ public class ServletResponse implements Response {
 		}
 
 		servletCookie.setHttpOnly(cookie.isHttpOnly());
+                servletCookie.setSecure(cookie.isSecure());
 
 		return servletCookie;
 	}
